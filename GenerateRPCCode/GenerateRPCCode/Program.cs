@@ -18,6 +18,7 @@ namespace GenerateRPCCode
     {
         static EnumDeclarationSyntax s_EDSProtoID;
         static CompilationUnitSyntax s_CompilationUnitSyntax;
+        static NamespaceDeclarationSyntax s_NameSpace;
 
         static void Main(string[] args)
         {
@@ -25,19 +26,24 @@ namespace GenerateRPCCode
 
             s_CompilationUnitSyntax = new CompilationUnitSyntax
             {
-
+                
             };
+            s_NameSpace = Syntax.NamespaceDeclaration((NameSyntax)Syntax.ParseName("CSRPC"));
+            s_CompilationUnitSyntax.Members.Add(s_NameSpace);
 
             s_EDSProtoID = Syntax.EnumDeclaration(identifier: "ProtoID", modifiers: Modifiers.Public);
+            s_NameSpace.Members.Add(s_EDSProtoID);
 
             foreach (Type t in typeof(IHelloService).Assembly.GetTypes())
             {
                 if (t.IsInterface && typeof(ICoolRpc).IsAssignableFrom(t))
                 {
                     var nodes2 = ParseInterface(t);
-                    nodes.AddRange(nodes2);
+                    //nodes.AddRange(nodes2);
                 }
             }
+
+            nodes.Add(s_CompilationUnitSyntax);
 
             string s = GenerateCode(nodes, new CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration());
             Console.Write(s);
@@ -80,7 +86,8 @@ namespace GenerateRPCCode
                         }
                 }
             };
-            nodes.Add(classRpcImpl);
+            s_NameSpace.Members.Add(classRpcImpl);
+            //nodes.Add(classRpcImpl);
 
             classRpcImpl.Members.Add(Syntax.PropertyDeclaration(
                     modifiers: Modifiers.Public,
@@ -232,17 +239,35 @@ namespace GenerateRPCCode
             ParameterListSyntax rpcInParams = new ParameterListSyntax();
 
             // 入参消息
+            var msgInProtoID = Syntax.EnumMemberDeclaration("E" + szMiName + "MsgIn");
+            s_EDSProtoID.Members.Add(msgInProtoID);
 
             StructDeclarationSyntax MsgInStruct = new StructDeclarationSyntax
             {
                 Identifier = szMiName + "MsgIn"
             };
             MsgInStruct.AttributeLists.Add(GetMsgAttribute());
-            nodes.Add(MsgInStruct);
+            s_NameSpace.Members.Add(MsgInStruct);
+
+            {
+                var field = Syntax.FieldDeclaration(
+                    modifiers: Modifiers.Public,
+                    declaration: Syntax.VariableDeclaration(
+                        Syntax.ParseName(s_EDSProtoID.Identifier),
+                        new[] { Syntax.VariableDeclarator(
+                            identifier: "eProtoID",
+                            initializer: Syntax.EqualsValueClause(Syntax.ParseName("ProtoID."+msgInProtoID.Identifier))
+                            ) }
+                    )
+                );
+                field.AttributeLists.Add(GetMsgFieldAttribute(1));
+                MsgInStruct.Members.Add(field);
+            }
+
 
             // 入参
             ParameterInfo[] aPiIn = mi.GetParameters();
-            int i = 0;
+            int i = 1;
             foreach(var pi in aPiIn)
             {
                 ++i;
@@ -277,21 +302,42 @@ namespace GenerateRPCCode
             }
             else if (typeRet.GetGenericTypeDefinition() == (typeof(Task<>)) && typeRet.GenericTypeArguments[0].GetGenericTypeDefinition().ToString().StartsWith("System.ValueTuple"))
             {
+                var msgOutProtoID = Syntax.EnumMemberDeclaration("E" + szMiName + "MsgOut");
+                s_EDSProtoID.Members.Add(msgOutProtoID);
+
                 MsgOutStruct.AttributeLists.Add(GetMsgAttribute());
-                nodes.Add(MsgOutStruct);
+                s_NameSpace.Members.Add(MsgOutStruct);
+
+                {
+                    var field = Syntax.FieldDeclaration(
+                        modifiers: Modifiers.Public,
+                        declaration: Syntax.VariableDeclaration(
+                            Syntax.ParseName(s_EDSProtoID.Identifier),
+                            new[] { Syntax.VariableDeclarator(
+                            identifier: "eProtoID",
+                            initializer: Syntax.EqualsValueClause(Syntax.ParseName("ProtoID."+msgOutProtoID.Identifier))
+                            ) }
+                        )
+                    );
+                    field.AttributeLists.Add(GetMsgFieldAttribute(1));
+                    MsgOutStruct.Members.Add(field);
+                }
 
 
                 string retValues = GetRetValues(typeRet);
 
-                var field = Syntax.FieldDeclaration(
-                    modifiers: Modifiers.Public,
-                    declaration: Syntax.VariableDeclaration(
-                        Syntax.ParseName(retValues),
-                        new[] { Syntax.VariableDeclarator("Value") }
-                    )
-                );
-                field.AttributeLists.Add(GetMsgFieldAttribute(1));
-                MsgOutStruct.Members.Add(field);
+                {
+                    var field = Syntax.FieldDeclaration(
+                        modifiers: Modifiers.Public,
+                        declaration: Syntax.VariableDeclaration(
+                            Syntax.ParseName(retValues),
+                            new[] { Syntax.VariableDeclarator("Value") }
+                        )
+                    );
+                    field.AttributeLists.Add(GetMsgFieldAttribute(2));
+                    MsgOutStruct.Members.Add(field);
+                }
+
             }
             else
             {
