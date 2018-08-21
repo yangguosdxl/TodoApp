@@ -16,9 +16,20 @@ namespace GenerateRPCCode
 {
     class Program
     {
+        static EnumDeclarationSyntax s_EDSProtoID;
+        static CompilationUnitSyntax s_CompilationUnitSyntax;
+
         static void Main(string[] args)
         {
             List<SyntaxNode> nodes = new List<SyntaxNode>();
+
+            s_CompilationUnitSyntax = new CompilationUnitSyntax
+            {
+
+            };
+
+            s_EDSProtoID = Syntax.EnumDeclaration(identifier: "ProtoID", modifiers: Modifiers.Public);
+
             foreach (Type t in typeof(IHelloService).Assembly.GetTypes())
             {
                 if (t.IsInterface && typeof(ICoolRpc).IsAssignableFrom(t))
