@@ -7,7 +7,7 @@ namespace CoolRpcInterface
 {
     public interface ICallAsync
     {
-        Task Send(byte[] bytes, int iStart, int len);
+        Task SendWithoutResponse(byte[] bytes, int iStart, int len);
         Task<(byte[], int, int)> SendWithResponse(byte[] bytes, int iStart, int len);
     }
 }

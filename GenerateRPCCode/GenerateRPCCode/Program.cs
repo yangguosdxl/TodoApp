@@ -24,10 +24,15 @@ namespace GenerateRPCCode
         {
             List<SyntaxNode> nodes = new List<SyntaxNode>();
 
-            s_CompilationUnitSyntax = new CompilationUnitSyntax
-            {
-                
-            };
+            s_CompilationUnitSyntax = Syntax.CompilationUnit(
+            
+                usings: new[]
+                    {
+                        Syntax.UsingDirective((NameSyntax)Syntax.ParseName("System")),
+                        Syntax.UsingDirective((NameSyntax)Syntax.ParseName("CoolRpcInterface")),
+                        Syntax.UsingDirective((NameSyntax)Syntax.ParseName("System.Threading.Tasks")),
+                    }
+            );
             s_NameSpace = Syntax.NamespaceDeclaration((NameSyntax)Syntax.ParseName("CSRPC"));
             s_CompilationUnitSyntax.Members.Add(s_NameSpace);
 
@@ -47,6 +52,7 @@ namespace GenerateRPCCode
 
             string s = GenerateCode(nodes, new CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration());
             Console.Write(s);
+            File.WriteAllText(@"F:\home\wann\TodoApp\GenerateRPCCode\ClientTest\" + "RpcImpl.cs", s);
         }
 
         protected static string GenerateCode(IEnumerable<SyntaxNode> nodes, CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration configuration)
@@ -77,12 +83,13 @@ namespace GenerateRPCCode
 
             ClassDeclarationSyntax classRpcImpl = new ClassDeclarationSyntax
             {
+                Modifiers = Modifiers.Public,
                 Identifier = t.Name.Substring(1),
                 BaseList = new BaseListSyntax
                 {
                     Types =
                         {
-                            Syntax.ParseName(t.Name)
+                            Syntax.ParseName(t.FullName)
                         }
                 }
             };
@@ -100,12 +107,12 @@ namespace GenerateRPCCode
                             new AccessorDeclarationSyntax
                             {
                                 Kind = AccessorDeclarationKind.Get,
-                                Body = new BlockSyntax()
+                                //Body = new BlockSyntax()
                             },
                             new AccessorDeclarationSyntax
                             {
                                 Kind = AccessorDeclarationKind.Set,
-                                Body = new BlockSyntax()
+                                //Body = new BlockSyntax()
                             }
                         }
                     }
@@ -114,7 +121,7 @@ namespace GenerateRPCCode
             classRpcImpl.Members.Add(Syntax.PropertyDeclaration(
                     modifiers: Modifiers.Public,
                     identifier: "Serializer",
-                    type: Syntax.ParseName("ICallAsync"),
+                    type: Syntax.ParseName("ISerializer"),
                     accessorList: new AccessorListSyntax
                     {
                         Accessors =
@@ -122,12 +129,12 @@ namespace GenerateRPCCode
                             new AccessorDeclarationSyntax
                             {
                                 Kind = AccessorDeclarationKind.Get,
-                                Body = new BlockSyntax()
+                                //Body = new BlockSyntax()
                             },
                             new AccessorDeclarationSyntax
                             {
                                 Kind = AccessorDeclarationKind.Set,
-                                Body = new BlockSyntax()
+                                //Body = new BlockSyntax()
                             }
                         }
                     }
@@ -163,8 +170,8 @@ namespace GenerateRPCCode
                             )),
                         Syntax.ExpressionStatement(Syntax.BinaryExpression(
                             @operator: BinaryOperator.Equals,
-                            left: Syntax.ParseName("CallAsync"),
-                            right: Syntax.ParseName("callAsync")
+                            left: Syntax.ParseName("Serializer"),
+                            right: Syntax.ParseName("serializer")
                             ))
                     }
                 }
@@ -242,8 +249,9 @@ namespace GenerateRPCCode
             var msgInProtoID = Syntax.EnumMemberDeclaration("E" + szMiName + "MsgIn");
             s_EDSProtoID.Members.Add(msgInProtoID);
 
-            StructDeclarationSyntax MsgInStruct = new StructDeclarationSyntax
+            ClassDeclarationSyntax MsgInStruct = new ClassDeclarationSyntax
             {
+                Modifiers = Modifiers.Public,
                 Identifier = szMiName + "MsgIn"
             };
             MsgInStruct.AttributeLists.Add(GetMsgAttribute());
@@ -291,8 +299,9 @@ namespace GenerateRPCCode
             bool bIsReturnValue = true;
             Type typeRet = mi.ReturnType;
 
-            StructDeclarationSyntax MsgOutStruct = new StructDeclarationSyntax
+            ClassDeclarationSyntax MsgOutStruct = new ClassDeclarationSyntax
             {
+                Modifiers = Modifiers.Public,
                 Identifier = szMiName + "MsgOut"
             };
 
@@ -416,25 +425,26 @@ namespace GenerateRPCCode
             var sendExpression = Syntax.AwaitExpression(Syntax.InvocationExpression(
                 expression: Syntax.ParseName(sendMsgSyntax),
                 argumentList: Syntax.ArgumentList(
-                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.item1")),
-                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.item2")),
-                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.item3"))
+                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item1")),
+                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item2")),
+                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item3"))
                     )
                 ));
-            rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
-                declaration: Syntax.VariableDeclaration(
-                    Syntax.ParseName("var"),
-                    new[] {Syntax.VariableDeclarator(
-                                    "ret",
-                                    initializer: Syntax.EqualsValueClause(
-                                        sendExpression
-                                    )) }
-                    )
-                 )
-             );
 
             if (bIsReturnValue)
             {
+                rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
+                    declaration: Syntax.VariableDeclaration(
+                        Syntax.ParseName("var"),
+                        new[] {Syntax.VariableDeclarator(
+                                        "ret",
+                                        initializer: Syntax.EqualsValueClause(
+                                            sendExpression
+                                        )) }
+                        )
+                     )
+                );
+
                 // var retMsg = m_Serializer.Deserialize<MsgHelloIntRet>(byteRet, indexRet, lenRet);
                 rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
                 declaration: Syntax.VariableDeclaration(
@@ -445,9 +455,9 @@ namespace GenerateRPCCode
                                         Syntax.InvocationExpression(
                                             Syntax.ParseName(string.Format("Serializer.Deserialize<{0}>", MsgOutStruct.Identifier)),
                                             argumentList: Syntax.ArgumentList(
-                                                Syntax.Argument(Syntax.ParseName("ret.item1")),
-                                                Syntax.Argument(Syntax.ParseName("ret.item2")),
-                                                Syntax.Argument(Syntax.ParseName("ret.item3"))
+                                                Syntax.Argument(Syntax.ParseName("ret.Item1")),
+                                                Syntax.Argument(Syntax.ParseName("ret.Item2")),
+                                                Syntax.Argument(Syntax.ParseName("ret.Item3"))
                                             )
                                         )
                                     )
@@ -457,12 +467,13 @@ namespace GenerateRPCCode
 
                 // return await Task.FromResult((ret.a, ret.a));
                 rpcCallMDS.Body.Statements.Add(Syntax.ReturnStatement(
-                    Syntax.InvocationExpression(
+                    
+                    Syntax.AwaitExpression( Syntax.InvocationExpression(
                         expression: Syntax.ParseName("Task.FromResult"),
                         argumentList: Syntax.ArgumentList(
                             Syntax.Argument(Syntax.ParseName("retMsg.Value"))
                             )
-                        )
+                        ))
                     ));
                 //rpcCallMDS.Body.Statements.Add(Syntax.ReturnStatement(
                 //    Syntax.AwaitExpression(Syntax.InvocationExpression(
@@ -477,8 +488,8 @@ namespace GenerateRPCCode
             }
             else
             {
-                rpcCallMDS.Body.Statements.Add(Syntax.ReturnStatement(
-                    Syntax.ParseName("ret")
+                rpcCallMDS.Body.Statements.Add(Syntax.ExpressionStatement(
+                    sendExpression
                     ));
             }
 

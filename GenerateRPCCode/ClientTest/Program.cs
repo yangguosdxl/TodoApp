@@ -1,6 +1,7 @@
 ﻿using CoolRpcInterface;
+using CSRPC;
 using Microsoft.Extensions.DependencyInjection;
-using RpcTestImpl;
+
 using RpcTestInterface;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,19 @@ namespace ClientTest
     {
         int rpcResponseIndex = 0;
         Dictionary<int, Action> m_MapRpcResponseProcessor = new Dictionary<int, Action>();
-        public Task Send(byte[] bytes, int iStart, int len)
+
+        public async Task SendWithoutResponse(byte[] bytes, int iStart, int len)
         {
-            throw new NotImplementedException();
+            
         }
 
-        public Task<(byte[], int, int)> SendWithResponse(byte[] bytes, int iStart, int len)
+        public async Task<(byte[], int, int)> SendWithResponse(byte[] bytes, int iStart, int len)
         {
-            throw new NotImplementedException();
+            HelloIntMsgOut ret = new HelloIntMsgOut();
+            ret.Value = (1,2);
+            Serializer serializer = new Serializer();
+
+            return await Task.FromResult(serializer.Serialize(ret));
         }
     }
 
@@ -34,12 +40,16 @@ namespace ClientTest
 
             MemoryStream msRet = new MemoryStream(bytes, iStartIndex, iCount, false);
 
-            return  ProtoBuf.Serializer.Deserialize<T>(msRet);
+            return MessagePack.MessagePackSerializer.Deserialize<T>(msRet);
         }
 
         public (byte[], int, int) Serialize<T>(T o)
         {
-            throw new NotImplementedException();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                MessagePack.MessagePackSerializer.Serialize(ms, o);
+                return (ms.GetBuffer(), 0, (int)ms.Position);
+            }
         }
     }
 
@@ -47,7 +57,7 @@ namespace ClientTest
     {
         static void Main(string[] args)
         {
-            
+
 #if false
             ServiceCollection collection = new ServiceCollection();
             collection.AddSingleton<ICallAsync, CallAsync>();
@@ -59,6 +69,16 @@ namespace ClientTest
             var hs = serviceProvider.GetService<IHelloService>();
             var (a, b) = hs.HelloInt(1).GetAwaiter().GetResult();
 #endif
+
+            Hello().GetAwaiter().GetResult();
+
+        }
+
+        static async Task Hello()
+        {
+            var helloServer = new CSRPC.HelloService(new CallAsync(), new Serializer());
+            var ret = await helloServer.HelloInt(1);
+            Console.WriteLine("" + ret.Item1 + ", " + ret.Item2);
         }
 
         static void AddServices(IServiceCollection sc)
