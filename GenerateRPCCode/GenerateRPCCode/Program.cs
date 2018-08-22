@@ -19,6 +19,7 @@ namespace GenerateRPCCode
         static EnumDeclarationSyntax s_EDSProtoID;
         static CompilationUnitSyntax s_CompilationUnitSyntax;
         static NamespaceDeclarationSyntax s_NameSpace;
+        static ClassDeclarationSyntax s_CDSRegistAllRpcService;
 
         static void Main(string[] args)
         {
@@ -182,6 +183,7 @@ namespace GenerateRPCCode
                 var nodes2 = ParseInterfaceMethod(classRpcImpl, mi);
                 nodes.AddRange(nodes2);
             }
+
             return nodes;
         }
 

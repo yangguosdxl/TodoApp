@@ -9,12 +9,28 @@ namespace CoolRpcInterface
         public ISerializer serializer { get; set; }
         public ICallAsync callAsync { get; set; }
 
-        public IServiceProvider serviceProvider { get; set; }
+        Dictionary<Type, ICoolRpc> m_RpcServices = new Dictionary<Type, ICoolRpc>();
+        IServiceProvider serviceProvider { get; set; }
 
-        public T Get<T>()
+        public DefaultRpcFactory(ISerializer serializer, ICallAsync callAsync, IServiceProvider serviceProvider)
         {
-            object o;
-            if (m_RpcServices.TryGetValue(typeof(T)))
+            this.serializer = serializer;
+            this.callAsync = callAsync;
+            this.serviceProvider = serviceProvider;
+        }
+
+        public T Get<T>() where T : class, ICoolRpc
+        {
+            ICoolRpc rpcService;
+            Type rpcType = typeof(T);
+            if (m_RpcServices.TryGetValue(rpcType, out rpcService) == false)
+            {
+                rpcService = serviceProvider.GetService(rpcType) as T;
+
+                m_RpcServices.Add(rpcType, rpcService);
+            }
+
+            return rpcService as T;
         }
     }
 }

@@ -8,6 +8,6 @@ namespace CoolRpcInterface
     {
         ISerializer serializer { get; set; }
         ICallAsync callAsync { get; set; }
-        T Get<T>();
+        T Get<T>() where T : class, ICoolRpc;
     }
 }
