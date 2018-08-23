@@ -20,6 +20,7 @@ namespace GenerateRPCCode
         static CompilationUnitSyntax s_CompilationUnitSyntax;
         static NamespaceDeclarationSyntax s_NameSpace;
         static ClassDeclarationSyntax s_CDSRegistAllRpcService;
+        static BlockSyntax s_AddAllRpcServicesBody;
 
         static void Main(string[] args)
         {
@@ -32,6 +33,7 @@ namespace GenerateRPCCode
                         Syntax.UsingDirective((NameSyntax)Syntax.ParseName("System")),
                         Syntax.UsingDirective((NameSyntax)Syntax.ParseName("CoolRpcInterface")),
                         Syntax.UsingDirective((NameSyntax)Syntax.ParseName("System.Threading.Tasks")),
+                        Syntax.UsingDirective((NameSyntax)Syntax.ParseName("Microsoft.Extensions.DependencyInjection")),
                     }
             );
             s_NameSpace = Syntax.NamespaceDeclaration((NameSyntax)Syntax.ParseName("CSRPC"));
@@ -39,6 +41,28 @@ namespace GenerateRPCCode
 
             s_EDSProtoID = Syntax.EnumDeclaration(identifier: "ProtoID", modifiers: Modifiers.Public);
             s_NameSpace.Members.Add(s_EDSProtoID);
+
+            s_CDSRegistAllRpcService = new ClassDeclarationSyntax
+            {
+                Modifiers = Modifiers.Public | Modifiers.Static,
+                Identifier = "RpcServicesConfiguration",
+            };
+            MethodDeclarationSyntax mdsAddAllRpcServices = new MethodDeclarationSyntax
+            {
+                Modifiers = Modifiers.Public | Modifiers.Static,
+                ReturnType = Syntax.ParseName("void"),
+                Identifier = "AddAllRpcServices",
+                ParameterList = Syntax.ParameterList(Syntax.Parameter(
+                    type: Syntax.ParseName("IServiceCollection"),
+                    identifier: "ServiceCollection"
+                    )),
+                Body = new BlockSyntax()
+            };
+            //mdsAddAllRpcServices.AttributeLists.Add(Syntax.AttributeList(
+            //    attributes: new[] { Syntax.Attribute((NameSyntax)Syntax.ParseName("Extension")) }));
+            s_AddAllRpcServicesBody = mdsAddAllRpcServices.Body;
+            s_CDSRegistAllRpcService.Members.Add(mdsAddAllRpcServices);
+            s_NameSpace.Members.Add(s_CDSRegistAllRpcService);
 
             foreach (Type t in typeof(IHelloService).Assembly.GetTypes())
             {
@@ -177,6 +201,12 @@ namespace GenerateRPCCode
                     }
                 }
                 ));
+
+            s_AddAllRpcServicesBody.Statements.Add(Syntax.ExpressionStatement(
+                Syntax.InvocationExpression(
+                Syntax.ParseName(string.Format("ServiceCollection.AddSingleton<{0}, {1}>", t.FullName, classRpcImpl.Identifier)),
+                Syntax.ArgumentList()
+                )));
 
             foreach (MethodInfo mi in t.GetMethods())
             {

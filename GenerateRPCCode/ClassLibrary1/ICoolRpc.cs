@@ -4,7 +4,7 @@ namespace CoolRpcInterface
 {
     public interface ICoolRpc
     {
-        ISerializer serializer { get; set; }
-        ICallAsync callAsync { get; set; }
+        ISerializer Serializer { get; set; }
+        ICallAsync CallAsync { get; set; }
     }
 }

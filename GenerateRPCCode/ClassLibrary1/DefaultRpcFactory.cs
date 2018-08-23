@@ -27,6 +27,9 @@ namespace CoolRpcInterface
             {
                 rpcService = serviceProvider.GetService(rpcType) as T;
 
+                rpcService.Serializer = serializer;
+                rpcService.CallAsync = callAsync;
+
                 m_RpcServices.Add(rpcType, rpcService);
             }
 

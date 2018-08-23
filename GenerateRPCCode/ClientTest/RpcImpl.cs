@@ -1,14 +1,23 @@
 using System;
 using CoolRpcInterface;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CSRPC
 {
-    public enum ProtoID : byte
+    public enum ProtoID
     {
         EHelloMsgIn,
         EHelloIntMsgIn,
         EHelloIntMsgOut
+    }
+
+    public static class RpcServicesConfiguration
+    {
+        public static void AddAllRpcServices(IServiceCollection ServiceCollection)
+        {
+            ServiceCollection.AddSingleton<RpcTestInterface.IHelloService, HelloService>();
+        }
     }
 
     public class HelloService : RpcTestInterface.IHelloService
