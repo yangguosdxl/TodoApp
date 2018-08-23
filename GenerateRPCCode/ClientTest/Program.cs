@@ -25,9 +25,13 @@ namespace ClientTest
 
         public async Task<(byte[], int, int)> SendWithResponse(byte[] bytes, int iStart, int len)
         {
-            HelloIntMsgOut ret = new HelloIntMsgOut();
-            ret.Value = (1,2);
             Serializer serializer = new Serializer();
+            var msgIn = serializer.Deserialize<HelloIntMsgIn>(bytes, iStart, len);
+
+            Console.WriteLine("process msg: " + msgIn.eProtoID + ", " + msgIn.a);
+
+            HelloIntMsgOut ret = new HelloIntMsgOut();
+            ret.Value = (msgIn.a + 100, 2);
 
             return await Task.FromResult(serializer.Serialize(ret));
         }
@@ -55,16 +59,19 @@ namespace ClientTest
 
     class Program
     {
+        static IRpcFactory rpcFactory;
         static void Main(string[] args)
         {
-
-#if false
             ServiceCollection collection = new ServiceCollection();
-            collection.AddSingleton<ICallAsync, CallAsync>();
-            collection.AddSingleton<ISerializer, Serializer>();
-            ConfigServices.AddAllRpcService(collection);
 
-            ServiceProvider serviceProvider = collection.BuildServiceProvider();
+            CSRPC.RpcServicesConfiguration.AddAllRpcServices(collection);
+            collection.AddSingleton<IRpcFactory, DefaultRpcFactory>();
+
+            var serviceProvider = collection.BuildServiceProvider();
+
+            rpcFactory = new DefaultRpcFactory(new Serializer(), new CallAsync(), serviceProvider);
+#if false
+
 
             var hs = serviceProvider.GetService<IHelloService>();
             var (a, b) = hs.HelloInt(1).GetAwaiter().GetResult();
@@ -76,7 +83,7 @@ namespace ClientTest
 
         static async Task Hello()
         {
-            var helloServer = new CSRPC.HelloService(new CallAsync(), new Serializer());
+            var helloServer = rpcFactory.Get<IHelloService>();
             var ret = await helloServer.HelloInt(1);
             Console.WriteLine("" + ret.Item1 + ", " + ret.Item2);
         }

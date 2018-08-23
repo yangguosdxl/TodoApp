@@ -165,6 +165,7 @@ namespace GenerateRPCCode
                     }
                     ));
 
+#if false
             classRpcImpl.Members.Add(Syntax.ConstructorDeclaration(
                 modifiers: Modifiers.Public,
                 identifier: classRpcImpl.Identifier,
@@ -201,6 +202,7 @@ namespace GenerateRPCCode
                     }
                 }
                 ));
+#endif
 
             s_AddAllRpcServicesBody.Statements.Add(Syntax.ExpressionStatement(
                 Syntax.InvocationExpression(

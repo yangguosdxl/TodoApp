@@ -26,12 +26,6 @@ namespace CSRPC
 
         public ISerializer Serializer { get; set; }
 
-        public HelloService(ICallAsync callAsync, ISerializer serializer)
-        {
-            CallAsync = callAsync;
-            Serializer = serializer;
-        }
-
         public async Task Hello()
         {
             HelloMsgIn msg = new HelloMsgIn();
