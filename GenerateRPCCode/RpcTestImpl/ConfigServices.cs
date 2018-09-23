@@ -8,7 +8,7 @@ namespace RpcTestImpl
 {
     public static class ConfigServices
     {
-        public static void AddAllRpcService(IServiceCollection sc)
+        public static void AddAllRpcService(this IServiceCollection sc)
         {
             sc.AddSingleton<IHelloService, HelloServiceRpc>();
         }
