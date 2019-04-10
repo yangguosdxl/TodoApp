@@ -56,16 +56,16 @@ namespace RpcTestImpl
 
             (byte[] bytes, int iStart, int len) = m_Serializer.Serialize(msg);
 
-            await m_CallAsync.Send(bytes, iStart, len);
+            await m_CallAsync.SendWithoutResponse(bytes, iStart, len);
         }
 
         public async Task<(int, int)> HelloInt(int a)
         {
             var msg = new MsgHelloInt();
 
-            //var (bytes, iStart, len ) = m_Serializer.Serialize(msg);
-            var sz = m_Serializer.Serialize(msg);
-            sz.
+            var (bytes, iStart, len ) = m_Serializer.Serialize(msg);
+            //var sz = m_Serializer.Serialize(msg);
+            //sz.
 
             var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse(bytes, iStart, len);
 
