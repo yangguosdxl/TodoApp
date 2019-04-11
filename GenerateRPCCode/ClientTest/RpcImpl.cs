@@ -9,7 +9,10 @@ namespace CSRPC
     {
         EHelloMsgIn,
         EHelloIntMsgIn,
-        EHelloIntMsgOut
+        EHelloIntMsgOut,
+        EHello2MsgIn,
+        EHello3MsgIn,
+        EHello3MsgOut
     }
 
     public static class RpcServicesConfiguration
@@ -33,13 +36,31 @@ namespace CSRPC
             await CallAsync.SendWithoutResponse(msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
         }
 
-        public async Task<ValueTuple<System.Int32, System.Int32>> HelloInt(Int32 a)
+        public async Task<ValueTuple<System.Int32, System.Int32>> HelloInt(System.Int32 a)
         {
             HelloIntMsgIn msg = new HelloIntMsgIn();
             msg.a = a;
             var msgSerializeInfo = Serializer.Serialize(msg);
             var ret = await CallAsync.SendWithResponse(msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
             var retMsg = Serializer.Deserialize<HelloIntMsgOut>(ret.Item1, ret.Item2, ret.Item3);
+            return await Task.FromResult(retMsg.Value);
+        }
+
+        public async Task Hello2(RpcTestInterface.Param p)
+        {
+            Hello2MsgIn msg = new Hello2MsgIn();
+            msg.p = p;
+            var msgSerializeInfo = Serializer.Serialize(msg);
+            await CallAsync.SendWithoutResponse(msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
+        }
+
+        public async Task<RpcTestInterface.Param> Hello3(RpcTestInterface.Param p)
+        {
+            Hello3MsgIn msg = new Hello3MsgIn();
+            msg.p = p;
+            var msgSerializeInfo = Serializer.Serialize(msg);
+            var ret = await CallAsync.SendWithResponse(msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
+            var retMsg = Serializer.Deserialize<Hello3MsgOut>(ret.Item1, ret.Item2, ret.Item3);
             return await Task.FromResult(retMsg.Value);
         }
     }
@@ -67,5 +88,32 @@ namespace CSRPC
         public ProtoID eProtoID = ProtoID.EHelloIntMsgOut;
         [MessagePack.Key(2)]
         public ValueTuple<System.Int32, System.Int32> Value;
+    }
+
+    [MessagePack.MessagePackObject]
+    public class Hello2MsgIn
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHello2MsgIn;
+        [MessagePack.Key(2)]
+        public RpcTestInterface.Param p;
+    }
+
+    [MessagePack.MessagePackObject]
+    public class Hello3MsgIn
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHello3MsgIn;
+        [MessagePack.Key(2)]
+        public RpcTestInterface.Param p;
+    }
+
+    [MessagePack.MessagePackObject]
+    public class Hello3MsgOut
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHello3MsgOut;
+        [MessagePack.Key(2)]
+        public RpcTestInterface.Param Value;
     }
 }

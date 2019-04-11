@@ -1,77 +1,119 @@
-﻿using CoolRpcInterface;
-using RpcTestInterface;
-using System;
-using System.IO;
+﻿using System;
+using CoolRpcInterface;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace RpcTestImpl
+namespace CSRPC
 {
-    public enum MsgID
+    public enum ProtoID
     {
-        Hello,
-        HelloInt,
-        HelloIntRet,
+        EHelloMsgIn,
+        EHelloIntMsgIn,
+        EHelloIntMsgOut,
+        EHello2MsgIn,
+        EHello3MsgIn,
+        EHello3MsgOut
     }
 
-    [MessagePack.MessagePackObject]
-    public class MsgHello
+    public static class RpcServicesConfiguration
     {
-        [MessagePack.Key(1)]
-        public MsgID id = MsgID.Hello;
-
-    }
-
-    [MessagePack.MessagePackObject]
-    public class MsgHelloInt
-    {
-        [MessagePack.Key(1)]
-        public MsgID id = MsgID.HelloInt;
-
-        [MessagePack.Key(2)]
-        public int a;
-    }
-
-    [MessagePack.MessagePackObject]
-    public class MsgHelloIntRet
-    {
-        [MessagePack.Key(1)]
-        public MsgID id = MsgID.HelloIntRet;
-
-        [MessagePack.Key(2)]
-        public int a;
-    }
-
-
-    public class HelloServiceRpc : IHelloService
-    {
-        private ICallAsync m_CallAsync;
-        private ISerializer m_Serializer;
-        public HelloServiceRpc(ICallAsync callAsync, ISerializer serializer)
+        public static void AddAllRpcServices(IServiceCollection ServiceCollection)
         {
-            m_CallAsync = callAsync;
+            ServiceCollection.AddSingleton<RpcTestInterface.IHelloService, HelloService>();
         }
+    }
+
+    public class HelloService : RpcTestInterface.IHelloService
+    {
+        public ICallAsync CallAsync { get; set; }
+
+        public ISerializer Serializer { get; set; }
+
         public async Task Hello()
         {
-            var msg = new MsgHello();
-
-            (byte[] bytes, int iStart, int len) = m_Serializer.Serialize(msg);
-
-            await m_CallAsync.SendWithoutResponse(bytes, iStart, len);
+            HelloMsgIn msg = new HelloMsgIn();
+            var msgSerializeInfo = Serializer.Serialize(msg);
+            await CallAsync.SendWithoutResponse(msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
         }
 
-        public async Task<(int, int)> HelloInt(int a)
+        public async Task<ValueTuple<System.Int32, System.Int32>> HelloInt(System.Int32 a)
         {
-            var msg = new MsgHelloInt();
-
-            var (bytes, iStart, len ) = m_Serializer.Serialize(msg);
-            //var sz = m_Serializer.Serialize(msg);
-            //sz.
-
-            var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse(bytes, iStart, len);
-
-            var ret = m_Serializer.Deserialize<MsgHelloIntRet>(byteRet, indexRet, lenRet);
-            
-            return await Task.FromResult((ret.a, ret.a));
+            HelloIntMsgIn msg = new HelloIntMsgIn();
+            msg.a = a;
+            var msgSerializeInfo = Serializer.Serialize(msg);
+            var ret = await CallAsync.SendWithResponse(msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
+            var retMsg = Serializer.Deserialize<HelloIntMsgOut>(ret.Item1, ret.Item2, ret.Item3);
+            return await Task.FromResult(retMsg.Value);
         }
+
+        public async Task Hello2(RpcTestInterface.Param p)
+        {
+            Hello2MsgIn msg = new Hello2MsgIn();
+            msg.p = p;
+            var msgSerializeInfo = Serializer.Serialize(msg);
+            await CallAsync.SendWithoutResponse(msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
+        }
+
+        public async Task<RpcTestInterface.Param> Hello3(RpcTestInterface.Param p)
+        {
+            Hello3MsgIn msg = new Hello3MsgIn();
+            msg.p = p;
+            var msgSerializeInfo = Serializer.Serialize(msg);
+            var ret = await CallAsync.SendWithResponse(msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
+            var retMsg = Serializer.Deserialize<Hello3MsgOut>(ret.Item1, ret.Item2, ret.Item3);
+            return await Task.FromResult(retMsg.Value);
+        }
+    }
+
+    [MessagePack.MessagePackObject]
+    public class HelloMsgIn
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHelloMsgIn;
+    }
+
+    [MessagePack.MessagePackObject]
+    public class HelloIntMsgIn
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHelloIntMsgIn;
+        [MessagePack.Key(2)]
+        public System.Int32 a;
+    }
+
+    [MessagePack.MessagePackObject]
+    public class HelloIntMsgOut
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHelloIntMsgOut;
+        [MessagePack.Key(2)]
+        public ValueTuple<System.Int32, System.Int32> Value;
+    }
+
+    [MessagePack.MessagePackObject]
+    public class Hello2MsgIn
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHello2MsgIn;
+        [MessagePack.Key(2)]
+        public RpcTestInterface.Param p;
+    }
+
+    [MessagePack.MessagePackObject]
+    public class Hello3MsgIn
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHello3MsgIn;
+        [MessagePack.Key(2)]
+        public RpcTestInterface.Param p;
+    }
+
+    [MessagePack.MessagePackObject]
+    public class Hello3MsgOut
+    {
+        [MessagePack.Key(1)]
+        public ProtoID eProtoID = ProtoID.EHello3MsgOut;
+        [MessagePack.Key(2)]
+        public RpcTestInterface.Param Value;
     }
 }

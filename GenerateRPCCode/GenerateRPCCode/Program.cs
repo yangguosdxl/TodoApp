@@ -260,12 +260,29 @@ namespace GenerateRPCCode
         static string GetRetValues(Type typeRet)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("ValueTuple<");
-            foreach (Type t in typeRet.GenericTypeArguments[0].GenericTypeArguments)
+
+            Type argument = typeRet.GenericTypeArguments[0];
+            if (argument.IsGenericType)
             {
-                sb.Append(t.ToString()).Append(",");
+                if (argument.GetGenericTypeDefinition().ToString().StartsWith("System.ValueTuple"))
+                {
+                    sb.Append("ValueTuple<");
+                    foreach (Type t in typeRet.GenericTypeArguments[0].GenericTypeArguments)
+                    {
+                        sb.Append(t.ToString()).Append(",");
+                    }
+                    sb.Remove(sb.Length - 1, 1).Append(">");
+                }
+                else
+                {
+                    Console.WriteLine("Task<T>, T Must ValueTuple or Non-Generic");
+                    return "";
+                }
             }
-            sb.Remove(sb.Length - 1, 1).Append(">");
+            else
+            {
+                sb.Append(argument.ToString());
+            }
 
             return sb.ToString();
         }
@@ -325,7 +342,7 @@ namespace GenerateRPCCode
 
                 rpcInParams.Parameters.Add(Syntax.Parameter(
                     identifier: pi.Name,
-                    type: Syntax.ParseName(pi.ParameterType.Name)
+                    type: Syntax.ParseName(pi.ParameterType.ToString())
                     ));
             }
 
@@ -343,8 +360,9 @@ namespace GenerateRPCCode
             {
                 bIsReturnValue = false;
             }
-            else if (typeRet.GetGenericTypeDefinition() == (typeof(Task<>)) && typeRet.GenericTypeArguments[0].GetGenericTypeDefinition().ToString().StartsWith("System.ValueTuple"))
+            else if (typeRet.GetGenericTypeDefinition() == (typeof(Task<>)))
             {
+
                 var msgOutProtoID = Syntax.EnumMemberDeclaration("E" + szMiName + "MsgOut");
                 s_EDSProtoID.Members.Add(msgOutProtoID);
 
@@ -366,9 +384,7 @@ namespace GenerateRPCCode
                     MsgOutStruct.Members.Add(field);
                 }
 
-
                 string retValues = GetRetValues(typeRet);
-
                 {
                     var field = Syntax.FieldDeclaration(
                         modifiers: Modifiers.Public,
