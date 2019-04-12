@@ -86,6 +86,8 @@ namespace ClientTest
             var helloServer = rpcFactory.Get<IHelloService>();
             var ret = await helloServer.HelloInt(1);
             Console.WriteLine("" + ret.Item1 + ", " + ret.Item2);
+
+            await helloServer.Hello2(new Param());
         }
 
         static void AddServices(IServiceCollection sc)

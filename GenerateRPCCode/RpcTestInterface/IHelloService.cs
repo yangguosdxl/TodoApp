@@ -16,5 +16,7 @@ namespace RpcTestInterface
 
         Task Hello2(Param p);
         Task<Param> Hello3(Param p);
+
+        delegate void ServerRequest();
     }
 }
