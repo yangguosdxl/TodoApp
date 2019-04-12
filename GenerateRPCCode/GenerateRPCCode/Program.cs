@@ -80,7 +80,7 @@ namespace GenerateRPCCode
             string s = GenerateCode(nodes, new CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration());
             Console.Write(s);
             Console.Write(Directory.GetCurrentDirectory());
-            File.WriteAllText(@"..\..\..\ClientTest\" + "RpcImpl.cs", s);
+            File.WriteAllText(@"..\..\..\RpcTestImpl\" + "RpcImpl.cs", s);
         }
 
         protected static string GenerateCode(IEnumerable<SyntaxNode> nodes, CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration configuration)
