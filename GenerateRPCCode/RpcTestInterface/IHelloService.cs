@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 
 namespace RpcTestInterface
 {
+    [MessagePack.MessagePackObject]
     public class Param
     {
+        [MessagePack.Key(1)]
         public int a;
     }
-    public interface IHelloService : ICoolRpc
+    public interface ICHelloService : ICoolRpc
     {
         Task Hello();
 
@@ -16,7 +18,15 @@ namespace RpcTestInterface
 
         Task Hello2(Param p);
         Task<Param> Hello3(Param p);
+    }
 
-        delegate void ServerRequest();
+    public interface ISHelloService : ICoolRpc
+    {
+        Task Hello();
+
+        Task<(int, int)> HelloInt(int a);
+
+        Task Hello2(Param p);
+        Task<Param> Hello3(Param p);
     }
 }

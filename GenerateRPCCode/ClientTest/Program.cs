@@ -25,15 +25,19 @@ namespace ClientTest
 
         public async Task<(byte[], int, int)> SendWithResponse(byte[] bytes, int iStart, int len)
         {
-            Serializer serializer = new Serializer();
-            var msgIn = serializer.Deserialize<HelloIntMsgIn>(bytes, iStart, len);
+            //Serializer serializer = new Serializer();
 
-            Console.WriteLine("process msg: " + msgIn.eProtoID + ", " + msgIn.a);
+            //var msgIn = serializer.Deserialize<HelloIntMsgIn>(bytes, iStart, len);
 
-            HelloIntMsgOut ret = new HelloIntMsgOut();
-            ret.Value = (msgIn.a + 100, 2);
+            //Console.WriteLine("process msg: " + msgIn.eProtoID + ", " + msgIn.a);
 
-            return await Task.FromResult(serializer.Serialize(ret));
+            //HelloIntMsgOut ret = new HelloIntMsgOut();
+            //ret.Value = (msgIn.a + 100, 2);
+
+            //return await Task.FromResult(serializer.Serialize(ret));
+
+            var ret = ((byte[])null, 0, 0);
+            return await Task.FromResult(ret);
         }
     }
 
@@ -83,7 +87,7 @@ namespace ClientTest
 
         static async Task Hello()
         {
-            var helloServer = rpcFactory.Get<IHelloService>();
+            var helloServer = rpcFactory.Get<ISHelloService>();
             var ret = await helloServer.HelloInt(1);
             Console.WriteLine("" + ret.Item1 + ", " + ret.Item2);
 

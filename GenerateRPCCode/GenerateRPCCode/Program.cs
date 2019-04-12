@@ -64,11 +64,13 @@ namespace GenerateRPCCode
             s_CDSRegistAllRpcService.Members.Add(mdsAddAllRpcServices);
             s_NameSpace.Members.Add(s_CDSRegistAllRpcService);
 
-            foreach (Type t in typeof(IHelloService).Assembly.GetTypes())
+            foreach (Type t in typeof(RpcTestInterface.RpcTestInterface).Assembly.GetTypes())
             {
                 if (t.IsInterface && typeof(ICoolRpc).IsAssignableFrom(t))
                 {
+                    Console.WriteLine($"PROCESS {t.ToString()}");
                     var nodes2 = ParseInterface(t);
+
                     //nodes.AddRange(nodes2);
                 }
             }
@@ -213,7 +215,7 @@ namespace GenerateRPCCode
 
             foreach (MethodInfo mi in t.GetMethods())
             {
-                var nodes2 = ParseInterfaceMethod(classRpcImpl, mi);
+                var nodes2 = ParseInterfaceMethod(classRpcImpl, t, mi);
                 nodes.AddRange(nodes2);
             }
 
@@ -289,7 +291,7 @@ namespace GenerateRPCCode
         }
 
 
-        static List<SyntaxNode> ParseInterfaceMethod(ClassDeclarationSyntax rpcClassImplNode, MethodInfo mi)
+        static List<SyntaxNode> ParseInterfaceMethod(ClassDeclarationSyntax rpcClassImplNode, Type t, MethodInfo mi)
         {
             List<SyntaxNode> nodes = new List<SyntaxNode>();
 
@@ -298,13 +300,13 @@ namespace GenerateRPCCode
             ParameterListSyntax rpcInParams = new ParameterListSyntax();
 
             // 入参消息
-            var msgInProtoID = Syntax.EnumMemberDeclaration("E" + szMiName + "MsgIn");
+            var msgInProtoID = Syntax.EnumMemberDeclaration("E" + t.Name + "_" + szMiName + "_MsgIn");
             s_EDSProtoID.Members.Add(msgInProtoID);
 
             ClassDeclarationSyntax MsgInStruct = new ClassDeclarationSyntax
             {
                 Modifiers = Modifiers.Public,
-                Identifier = szMiName + "MsgIn"
+                Identifier = t.Name + "_" + szMiName + "_MsgIn"
             };
             MsgInStruct.AttributeLists.Add(GetMsgAttribute());
             s_NameSpace.Members.Add(MsgInStruct);
@@ -354,7 +356,7 @@ namespace GenerateRPCCode
             ClassDeclarationSyntax MsgOutStruct = new ClassDeclarationSyntax
             {
                 Modifiers = Modifiers.Public,
-                Identifier = szMiName + "MsgOut"
+                Identifier = t.Name + "_" + szMiName + "_MsgOut"
             };
 
             if (typeRet == typeof(Task))
@@ -364,7 +366,7 @@ namespace GenerateRPCCode
             else if (typeRet.GetGenericTypeDefinition() == (typeof(Task<>)))
             {
 
-                var msgOutProtoID = Syntax.EnumMemberDeclaration("E" + szMiName + "MsgOut");
+                var msgOutProtoID = Syntax.EnumMemberDeclaration("E" + t.Name + "_" + szMiName + "_MsgOut");
                 s_EDSProtoID.Members.Add(msgOutProtoID);
 
                 MsgOutStruct.AttributeLists.Add(GetMsgAttribute());
