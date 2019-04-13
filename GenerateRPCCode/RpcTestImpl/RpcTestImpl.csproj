@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Remove="HelloServiceRpc.cs" />
+    <Compile Remove="RpcImpl.cs" />
   </ItemGroup>
 
   <ItemGroup>

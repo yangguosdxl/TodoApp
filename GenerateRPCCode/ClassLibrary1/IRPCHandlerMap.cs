@@ -8,6 +8,6 @@ namespace CoolRpcInterface
 
     public interface IRPCHandlerMap
     {
-        handler Get(int id);
+        //handler Get(int id);
     }
 }

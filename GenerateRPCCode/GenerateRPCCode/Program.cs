@@ -26,6 +26,7 @@ namespace GenerateRPCCode
         static void Main(string[] args)
         {
             List<SyntaxNode> nodes = new List<SyntaxNode>();
+            List<BaseTypeDeclarationSyntax> aGenTypes = new List<BaseTypeDeclarationSyntax>();
 
             s_CompilationUnitSyntax = Syntax.CompilationUnit(
 
@@ -41,7 +42,8 @@ namespace GenerateRPCCode
             s_CompilationUnitSyntax.Members.Add(s_NameSpace);
 
             s_EDSProtoID = Syntax.EnumDeclaration(identifier: "ProtoID", modifiers: Modifiers.Public);
-            s_NameSpace.Members.Add(s_EDSProtoID);
+            aGenTypes.Add(s_EDSProtoID);
+            
 
             s_CDSRegistAllRpcService = new ClassDeclarationSyntax
             {
@@ -63,16 +65,16 @@ namespace GenerateRPCCode
             //    attributes: new[] { Syntax.Attribute((NameSyntax)Syntax.ParseName("Extension")) }));
             s_AddAllRpcServicesBody = mdsAddAllRpcServices.Body;
             s_CDSRegistAllRpcService.Members.Add(mdsAddAllRpcServices);
-            s_NameSpace.Members.Add(s_CDSRegistAllRpcService);
+            aGenTypes.Add(s_CDSRegistAllRpcService);
 
             foreach (Type t in typeof(RpcTestInterface.RpcTestInterface).Assembly.GetTypes())
             {
                 if (t.IsInterface && typeof(ICoolRpc).IsAssignableFrom(t))
                 {
                     Console.WriteLine($"PROCESS {t.ToString()}");
-                    var nodes2 = ParseInterface(t);
+                    var aGenTypes2 = ParseInterface(t);
 
-                    //nodes.AddRange(nodes2);
+                    aGenTypes.AddRange(aGenTypes2);
                 }
             }
 
@@ -81,10 +83,16 @@ namespace GenerateRPCCode
 
             nodes.Add(s_CompilationUnitSyntax);
 
-            string s = GenerateCode(nodes, new CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration());
-            Console.Write(s);
-            Console.Write(Directory.GetCurrentDirectory());
-            File.WriteAllText(@"..\..\..\RpcTestImpl\" + "RpcImpl.cs", s);
+            foreach(BaseTypeDeclarationSyntax genType in aGenTypes)
+            {
+                s_NameSpace.Members.Clear();
+                s_NameSpace.Members.Add(genType);
+                string s = GenerateCode(nodes, new CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration());
+                Console.Write(s);
+                Console.Write(Directory.GetCurrentDirectory());
+                File.WriteAllText($"../../../RpcTestImpl/{genType.Identifier}.cs", s);
+            }
+
         }
 
         protected static string GenerateCode(IEnumerable<SyntaxNode> nodes, CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration configuration)
@@ -104,14 +112,14 @@ namespace GenerateRPCCode
         }
 
 
-        static List<SyntaxNode> ParseInterface(Type t)
+        static List<TypeDeclarationSyntax> ParseInterface(Type t)
         {
             if (t.Name.StartsWith("I") == false)
             {
                 throw new Exception("rpc interface must start with I: " + t.Name);
             }
 
-            List<SyntaxNode> nodes = new List<SyntaxNode>();
+            List<TypeDeclarationSyntax> nodes = new List<TypeDeclarationSyntax>();
 
             #region RPC代理类
             ClassDeclarationSyntax classRpcImpl = new ClassDeclarationSyntax
@@ -126,8 +134,7 @@ namespace GenerateRPCCode
                         }
                 }
             };
-            s_NameSpace.Members.Add(classRpcImpl);
-            //nodes.Add(classRpcImpl);
+            nodes.Add(classRpcImpl);
 
             classRpcImpl.Members.Add(Syntax.PropertyDeclaration(
                     modifiers: Modifiers.Public,
@@ -184,11 +191,11 @@ namespace GenerateRPCCode
                 {
                     Types =
                         {
-                            Syntax.ParseName("DefaultRPCHandlerMap")
+                            Syntax.ParseName("IRPCHandlerMap")
                         }
                 }
             };
-            s_NameSpace.Members.Add(classHandlerMapImpl);
+            nodes.Add(classHandlerMapImpl);
 
             classHandlerMapImpl.Members.Add(Syntax.FieldDeclaration(
                     modifiers: Modifiers.Private,
@@ -207,10 +214,10 @@ namespace GenerateRPCCode
                         Syntax.Parameter(
                             type: Syntax.ParseName(t.ToString()), identifier: "service"
                             )
-                        ),
+                        )/*,
                     initializer: Syntax.ConstructorInitializer(ThisOrBase.Base, Syntax.ArgumentList(
                         Syntax.Argument(Syntax.CastExpression("int", Syntax.ParseName(s_EDSProtoID.Identifier + ".COUNT")))
-                        ))
+                        ))*/
 
                     ));
             s_HandlerMapConstructorBody.Statements.Add(Syntax.ExpressionStatement(Syntax.BinaryExpression(
@@ -268,85 +275,19 @@ namespace GenerateRPCCode
 
             foreach (MethodInfo mi in t.GetMethods())
             {
-                var nodes2 = ParseInterfaceMethod(classRpcImpl, classHandlerMapImpl, t, mi);
-                nodes.AddRange(nodes2);
+                var aNewTypes = ParseInterfaceMethod(classRpcImpl, classHandlerMapImpl, t, mi);
+                nodes.AddRange(aNewTypes);
             }
 
             return nodes;
         }
 
-        static AttributeListSyntax GetMsgAttribute()
+        
+
+
+        static List<TypeDeclarationSyntax> ParseInterfaceMethod(ClassDeclarationSyntax rpcClassImplNode, ClassDeclarationSyntax handlerMapClassImplNode, Type t, MethodInfo mi)
         {
-            return new AttributeListSyntax
-            {
-                Attributes =
-                    {
-                        new AttributeSyntax
-                        {
-                            Name = (NameSyntax)Syntax.ParseName("MessagePack.MessagePackObject")
-                        }
-                    }
-            };
-        }
-
-        static AttributeListSyntax GetMsgFieldAttribute(int key)
-        {
-            return new AttributeListSyntax
-            {
-                Attributes =
-                    {
-                        new AttributeSyntax
-                        {
-                            Name = (NameSyntax)Syntax.ParseName("MessagePack.Key"),
-                            ArgumentList = new AttributeArgumentListSyntax
-                            {
-                                Arguments =
-                                {
-                                    new AttributeArgumentSyntax
-                                    {
-                                        Expression = Syntax.LiteralExpression(key)
-                                    }
-                                }
-                            }
-                        }
-                    }
-            };
-        }
-
-        static string GetRetValues(Type typeRet)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            Type argument = typeRet.GenericTypeArguments[0];
-            if (argument.IsGenericType)
-            {
-                if (argument.GetGenericTypeDefinition().ToString().StartsWith("System.ValueTuple"))
-                {
-                    sb.Append("ValueTuple<");
-                    foreach (Type t in typeRet.GenericTypeArguments[0].GenericTypeArguments)
-                    {
-                        sb.Append(t.ToString()).Append(",");
-                    }
-                    sb.Remove(sb.Length - 1, 1).Append(">");
-                }
-                else
-                {
-                    Console.WriteLine("Task<T>, T Must ValueTuple or Non-Generic");
-                    return "";
-                }
-            }
-            else
-            {
-                sb.Append(argument.ToString());
-            }
-
-            return sb.ToString();
-        }
-
-
-        static List<SyntaxNode> ParseInterfaceMethod(ClassDeclarationSyntax rpcClassImplNode, ClassDeclarationSyntax handlerMapClassImplNode, Type t, MethodInfo mi)
-        {
-            List<SyntaxNode> nodes = new List<SyntaxNode>();
+            List<TypeDeclarationSyntax> nodes = new List<TypeDeclarationSyntax>();
 
             string szMiName = mi.Name;
 
@@ -364,7 +305,7 @@ namespace GenerateRPCCode
                 Identifier = t.Name + "_" + szMiName + "_MsgIn"
             };
             MsgInStruct.AttributeLists.Add(GetMsgAttribute());
-            s_NameSpace.Members.Add(MsgInStruct);
+            nodes.Add(MsgInStruct);
 
             //{
             //    var field = Syntax.FieldDeclaration(
@@ -423,7 +364,7 @@ namespace GenerateRPCCode
                 s_EDSProtoID.Members.Add(msgOutProtoID);
 
                 MsgOutStruct.AttributeLists.Add(GetMsgAttribute());
-                s_NameSpace.Members.Add(MsgOutStruct);
+                nodes.Add(MsgOutStruct);
 
                 //{
                 //    var field = Syntax.FieldDeclaration(
@@ -624,7 +565,7 @@ namespace GenerateRPCCode
             // Add((int)ProtoID.EICHelloService_Hello_MsgIn, Process_ICHelloService_Hello);
             s_HandlerMapConstructorBody.Statements.Add(Syntax.ExpressionStatement(
                 Syntax.InvocationExpression(
-                    Syntax.ParseName("Add"),
+                    Syntax.ParseName("service.CallAsync.AddProtocolHandler"),
                     Syntax.ArgumentList(
                         Syntax.Argument(
                             Syntax.CastExpression("int", Syntax.ParseName($"{s_EDSProtoID.Identifier}.{msgInProtoID.Identifier}"))),
@@ -761,6 +702,74 @@ namespace GenerateRPCCode
 
 
             return nodes;
+        }
+
+        static AttributeListSyntax GetMsgAttribute()
+        {
+            return new AttributeListSyntax
+            {
+                Attributes =
+                    {
+                        new AttributeSyntax
+                        {
+                            Name = (NameSyntax)Syntax.ParseName("MessagePack.MessagePackObject")
+                        }
+                    }
+            };
+        }
+
+        static AttributeListSyntax GetMsgFieldAttribute(int key)
+        {
+            return new AttributeListSyntax
+            {
+                Attributes =
+                    {
+                        new AttributeSyntax
+                        {
+                            Name = (NameSyntax)Syntax.ParseName("MessagePack.Key"),
+                            ArgumentList = new AttributeArgumentListSyntax
+                            {
+                                Arguments =
+                                {
+                                    new AttributeArgumentSyntax
+                                    {
+                                        Expression = Syntax.LiteralExpression(key)
+                                    }
+                                }
+                            }
+                        }
+                    }
+            };
+        }
+
+        static string GetRetValues(Type typeRet)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            Type argument = typeRet.GenericTypeArguments[0];
+            if (argument.IsGenericType)
+            {
+                if (argument.GetGenericTypeDefinition().ToString().StartsWith("System.ValueTuple"))
+                {
+                    sb.Append("ValueTuple<");
+                    foreach (Type t in typeRet.GenericTypeArguments[0].GenericTypeArguments)
+                    {
+                        sb.Append(t.ToString()).Append(",");
+                    }
+                    sb.Remove(sb.Length - 1, 1).Append(">");
+                }
+                else
+                {
+                    Console.WriteLine("Task<T>, T Must ValueTuple or Non-Generic");
+                    return "";
+                }
+            }
+            else
+            {
+                sb.Append(argument.ToString());
+            }
+
+            return sb.ToString();
         }
     }
 }
