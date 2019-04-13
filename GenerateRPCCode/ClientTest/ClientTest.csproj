@@ -65,10 +65,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CallAsync.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CHelloService.cs" />
-    <Compile Include="RpcImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

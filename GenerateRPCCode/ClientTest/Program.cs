@@ -1,4 +1,5 @@
 ﻿using CoolRpcInterface;
+using CSCommon;
 using CSRPC;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,53 +14,6 @@ using System.Threading.Tasks;
 
 namespace ClientTest
 {
-    class CallAsync : ICallAsync
-    {
-        int rpcResponseIndex = 0;
-        Dictionary<int, Action> m_MapRpcResponseProcessor = new Dictionary<int, Action>();
-
-        public async Task SendWithoutResponse(byte[] bytes, int iStart, int len)
-        {
-            
-        }
-
-        public async Task<(byte[], int, int)> SendWithResponse(byte[] bytes, int iStart, int len)
-        {
-            //Serializer serializer = new Serializer();
-
-            //var msgIn = serializer.Deserialize<HelloIntMsgIn>(bytes, iStart, len);
-
-            //Console.WriteLine("process msg: " + msgIn.eProtoID + ", " + msgIn.a);
-
-            //HelloIntMsgOut ret = new HelloIntMsgOut();
-            //ret.Value = (msgIn.a + 100, 2);
-
-            //return await Task.FromResult(serializer.Serialize(ret));
-
-            var ret = ((byte[])null, 0, 0);
-            return await Task.FromResult(ret);
-        }
-    }
-
-    class Serializer : ISerializer
-    {
-        public T Deserialize<T>(byte[] bytes, int iStartIndex, int iCount)
-        {
-
-            MemoryStream msRet = new MemoryStream(bytes, iStartIndex, iCount, false);
-
-            return MessagePack.MessagePackSerializer.Deserialize<T>(msRet);
-        }
-
-        public (byte[], int, int) Serialize<T>(T o)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                MessagePack.MessagePackSerializer.Serialize(ms, o);
-                return (ms.GetBuffer(), 0, (int)ms.Position);
-            }
-        }
-    }
 
     class Program
     {

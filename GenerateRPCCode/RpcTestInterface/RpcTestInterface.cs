@@ -6,5 +6,6 @@ namespace RpcTestInterface
 {
     public interface RpcTestInterface
     {
+
     }
 }

@@ -21,13 +21,14 @@ namespace GenerateRPCCode
         static NamespaceDeclarationSyntax s_NameSpace;
         static ClassDeclarationSyntax s_CDSRegistAllRpcService;
         static BlockSyntax s_AddAllRpcServicesBody;
+        static BlockSyntax s_HandlerMapConstructorBody;
 
         static void Main(string[] args)
         {
             List<SyntaxNode> nodes = new List<SyntaxNode>();
 
             s_CompilationUnitSyntax = Syntax.CompilationUnit(
-            
+
                 usings: new[]
                     {
                         Syntax.UsingDirective((NameSyntax)Syntax.ParseName("System")),
@@ -75,6 +76,9 @@ namespace GenerateRPCCode
                 }
             }
 
+            var protoIDCount = Syntax.EnumMemberDeclaration("COUNT");
+            s_EDSProtoID.Members.Add(protoIDCount);
+
             nodes.Add(s_CompilationUnitSyntax);
 
             string s = GenerateCode(nodes, new CSharpSyntax.Printer.Configuration.SyntaxPrinterConfiguration());
@@ -109,6 +113,7 @@ namespace GenerateRPCCode
 
             List<SyntaxNode> nodes = new List<SyntaxNode>();
 
+            #region RPC代理类
             ClassDeclarationSyntax classRpcImpl = new ClassDeclarationSyntax
             {
                 Modifiers = Modifiers.Public,
@@ -167,6 +172,54 @@ namespace GenerateRPCCode
                         }
                     }
                     ));
+            #endregion
+
+
+            #region 协议处理类
+            ClassDeclarationSyntax classHandlerMapImpl = new ClassDeclarationSyntax
+            {
+                Modifiers = Modifiers.Public,
+                Identifier = t.Name + "_HandlerMap",
+                BaseList = new BaseListSyntax
+                {
+                    Types =
+                        {
+                            Syntax.ParseName("DefaultRPCHandlerMap")
+                        }
+                }
+            };
+            s_NameSpace.Members.Add(classHandlerMapImpl);
+
+            classHandlerMapImpl.Members.Add(Syntax.FieldDeclaration(
+                    modifiers: Modifiers.Private,
+                    declaration: Syntax.VariableDeclaration(
+                        Syntax.ParseName(t.ToString()),
+                        new[] { Syntax.VariableDeclarator("m_service") }
+                    )
+                ));
+
+            s_HandlerMapConstructorBody = new BlockSyntax();
+            classHandlerMapImpl.Members.Add(Syntax.ConstructorDeclaration(
+                    modifiers: Modifiers.Public,
+                    identifier: classHandlerMapImpl.Identifier,
+                    body: s_HandlerMapConstructorBody,
+                    parameterList: Syntax.ParameterList(
+                        Syntax.Parameter(
+                            type: Syntax.ParseName(t.ToString()), identifier: "service"
+                            )
+                        ),
+                    initializer: Syntax.ConstructorInitializer(ThisOrBase.Base, Syntax.ArgumentList(
+                        Syntax.Argument(Syntax.CastExpression("int", Syntax.ParseName(s_EDSProtoID.Identifier + ".COUNT")))
+                        ))
+
+                    ));
+            s_HandlerMapConstructorBody.Statements.Add(Syntax.ExpressionStatement(Syntax.BinaryExpression(
+                BinaryOperator.Equals,
+                Syntax.ParseName("m_service"),
+                Syntax.ParseName("service")
+            )));
+
+            #endregion
 
 #if false
             classRpcImpl.Members.Add(Syntax.ConstructorDeclaration(
@@ -215,7 +268,7 @@ namespace GenerateRPCCode
 
             foreach (MethodInfo mi in t.GetMethods())
             {
-                var nodes2 = ParseInterfaceMethod(classRpcImpl, t, mi);
+                var nodes2 = ParseInterfaceMethod(classRpcImpl, classHandlerMapImpl, t, mi);
                 nodes.AddRange(nodes2);
             }
 
@@ -291,16 +344,18 @@ namespace GenerateRPCCode
         }
 
 
-        static List<SyntaxNode> ParseInterfaceMethod(ClassDeclarationSyntax rpcClassImplNode, Type t, MethodInfo mi)
+        static List<SyntaxNode> ParseInterfaceMethod(ClassDeclarationSyntax rpcClassImplNode, ClassDeclarationSyntax handlerMapClassImplNode, Type t, MethodInfo mi)
         {
             List<SyntaxNode> nodes = new List<SyntaxNode>();
 
             string szMiName = mi.Name;
 
+            #region RPC代理类
             ParameterListSyntax rpcInParams = new ParameterListSyntax();
 
             // 入参消息
             var msgInProtoID = Syntax.EnumMemberDeclaration("E" + t.Name + "_" + szMiName + "_MsgIn");
+            var msgOutProtoID = Syntax.EnumMemberDeclaration("E" + t.Name + "_" + szMiName + "_MsgOut");
             s_EDSProtoID.Members.Add(msgInProtoID);
 
             ClassDeclarationSyntax MsgInStruct = new ClassDeclarationSyntax
@@ -311,26 +366,26 @@ namespace GenerateRPCCode
             MsgInStruct.AttributeLists.Add(GetMsgAttribute());
             s_NameSpace.Members.Add(MsgInStruct);
 
-            {
-                var field = Syntax.FieldDeclaration(
-                    modifiers: Modifiers.Public,
-                    declaration: Syntax.VariableDeclaration(
-                        Syntax.ParseName(s_EDSProtoID.Identifier),
-                        new[] { Syntax.VariableDeclarator(
-                            identifier: "eProtoID",
-                            initializer: Syntax.EqualsValueClause(Syntax.ParseName("ProtoID."+msgInProtoID.Identifier))
-                            ) }
-                    )
-                );
-                field.AttributeLists.Add(GetMsgFieldAttribute(1));
-                MsgInStruct.Members.Add(field);
-            }
+            //{
+            //    var field = Syntax.FieldDeclaration(
+            //        modifiers: Modifiers.Public,
+            //        declaration: Syntax.VariableDeclaration(
+            //            Syntax.ParseName(s_EDSProtoID.Identifier),
+            //            new[] { Syntax.VariableDeclarator(
+            //                identifier: "eProtoID",
+            //                initializer: Syntax.EqualsValueClause(Syntax.ParseName("ProtoID."+msgInProtoID.Identifier))
+            //                ) }
+            //        )
+            //    );
+            //    field.AttributeLists.Add(GetMsgFieldAttribute(1));
+            //    MsgInStruct.Members.Add(field);
+            //}
 
 
             // 入参
             ParameterInfo[] aPiIn = mi.GetParameters();
-            int i = 1;
-            foreach(var pi in aPiIn)
+            int i = 0;
+            foreach (var pi in aPiIn)
             {
                 ++i;
                 var field = Syntax.FieldDeclaration(
@@ -350,7 +405,7 @@ namespace GenerateRPCCode
             }
 
             // 出参
-            bool bIsReturnValue = true;
+            bool bHasReturnValue = true;
             Type typeRet = mi.ReturnType;
 
             ClassDeclarationSyntax MsgOutStruct = new ClassDeclarationSyntax
@@ -361,31 +416,29 @@ namespace GenerateRPCCode
 
             if (typeRet == typeof(Task))
             {
-                bIsReturnValue = false;
+                bHasReturnValue = false;
             }
             else if (typeRet.GetGenericTypeDefinition() == (typeof(Task<>)))
             {
-
-                var msgOutProtoID = Syntax.EnumMemberDeclaration("E" + t.Name + "_" + szMiName + "_MsgOut");
                 s_EDSProtoID.Members.Add(msgOutProtoID);
 
                 MsgOutStruct.AttributeLists.Add(GetMsgAttribute());
                 s_NameSpace.Members.Add(MsgOutStruct);
 
-                {
-                    var field = Syntax.FieldDeclaration(
-                        modifiers: Modifiers.Public,
-                        declaration: Syntax.VariableDeclaration(
-                            Syntax.ParseName(s_EDSProtoID.Identifier),
-                            new[] { Syntax.VariableDeclarator(
-                            identifier: "eProtoID",
-                            initializer: Syntax.EqualsValueClause(Syntax.ParseName("ProtoID."+msgOutProtoID.Identifier))
-                            ) }
-                        )
-                    );
-                    field.AttributeLists.Add(GetMsgFieldAttribute(1));
-                    MsgOutStruct.Members.Add(field);
-                }
+                //{
+                //    var field = Syntax.FieldDeclaration(
+                //        modifiers: Modifiers.Public,
+                //        declaration: Syntax.VariableDeclaration(
+                //            Syntax.ParseName(s_EDSProtoID.Identifier),
+                //            new[] { Syntax.VariableDeclarator(
+                //            identifier: "eProtoID",
+                //            initializer: Syntax.EqualsValueClause(Syntax.ParseName("ProtoID."+msgOutProtoID.Identifier))
+                //            ) }
+                //        )
+                //    );
+                //    field.AttributeLists.Add(GetMsgFieldAttribute(1));
+                //    MsgOutStruct.Members.Add(field);
+                //}
 
                 string retValues = GetRetValues(typeRet);
                 {
@@ -396,7 +449,7 @@ namespace GenerateRPCCode
                             new[] { Syntax.VariableDeclarator("Value") }
                         )
                     );
-                    field.AttributeLists.Add(GetMsgFieldAttribute(2));
+                    field.AttributeLists.Add(GetMsgFieldAttribute(1));
                     MsgOutStruct.Members.Add(field);
                 }
 
@@ -419,7 +472,7 @@ namespace GenerateRPCCode
             rpcClassImplNode.Members.Add(rpcCallMDS);
 
             string sendMsgSyntax = "";
-            if (bIsReturnValue)
+            if (bHasReturnValue)
             {
                 string retValues = GetRetValues(typeRet);
                 rpcCallMDS.ReturnType = Syntax.ParseName(string.Format("Task<{0}>", retValues));
@@ -435,7 +488,7 @@ namespace GenerateRPCCode
 
             rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
                 declaration: Syntax.VariableDeclaration(
-                    Syntax.ParseName(MsgInStruct.Identifier), 
+                    Syntax.ParseName(MsgInStruct.Identifier),
                     new[] {Syntax.VariableDeclarator(
                         "msg",
                         initializer: Syntax.EqualsValueClause(
@@ -474,17 +527,19 @@ namespace GenerateRPCCode
                  )
              );
 
-            // var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse(bytes, iStart, len);
+            // var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse(iCommunicateID, iProtoID, bytes, iStart, len);
             var sendExpression = Syntax.AwaitExpression(Syntax.InvocationExpression(
                 expression: Syntax.ParseName(sendMsgSyntax),
                 argumentList: Syntax.ArgumentList(
+                    Syntax.Argument(Syntax.LiteralExpression(0)),
+                    Syntax.Argument(Syntax.CastExpression("int", Syntax.ParseName("ProtoID." + msgInProtoID.Identifier))),
                     Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item1")),
                     Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item2")),
                     Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item3"))
                     )
                 ));
 
-            if (bIsReturnValue)
+            if (bHasReturnValue)
             {
                 rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
                     declaration: Syntax.VariableDeclaration(
@@ -520,8 +575,8 @@ namespace GenerateRPCCode
 
                 // return await Task.FromResult((ret.a, ret.a));
                 rpcCallMDS.Body.Statements.Add(Syntax.ReturnStatement(
-                    
-                    Syntax.AwaitExpression( Syntax.InvocationExpression(
+
+                    Syntax.AwaitExpression(Syntax.InvocationExpression(
                         expression: Syntax.ParseName("Task.FromResult"),
                         argumentList: Syntax.ArgumentList(
                             Syntax.Argument(Syntax.ParseName("retMsg.Value"))
@@ -545,7 +600,163 @@ namespace GenerateRPCCode
                     sendExpression
                     ));
             }
+            #endregion
 
+            #region 协议处理类
+
+            // 函数名
+            MethodDeclarationSyntax handlerMDS = new MethodDeclarationSyntax
+            {
+                Modifiers = Modifiers.Private,
+                Identifier = "Process_" + szMiName,
+                ParameterList = Syntax.ParameterList(
+                    Syntax.Parameter(type: Syntax.ParseName("int"), identifier: "iCommunicateID"),
+                    Syntax.Parameter(type: Syntax.ParseName("byte[]"), identifier: "bytes"),
+                    Syntax.Parameter(type: Syntax.ParseName("int"), identifier: "iStartIndex"),
+                    Syntax.Parameter(type: Syntax.ParseName("int"), identifier: "iCount")
+                    ),
+                Body = new BlockSyntax(),
+                ReturnType = Syntax.ParseName("void")
+            };
+            handlerMapClassImplNode.Members.Add(handlerMDS);
+
+            // 注册
+            // Add((int)ProtoID.EICHelloService_Hello_MsgIn, Process_ICHelloService_Hello);
+            s_HandlerMapConstructorBody.Statements.Add(Syntax.ExpressionStatement(
+                Syntax.InvocationExpression(
+                    Syntax.ParseName("Add"),
+                    Syntax.ArgumentList(
+                        Syntax.Argument(
+                            Syntax.CastExpression("int", Syntax.ParseName($"{s_EDSProtoID.Identifier}.{msgInProtoID.Identifier}"))),
+                        Syntax.Argument(
+                            Syntax.ParseName(handlerMDS.Identifier))
+                        )
+                    )
+                ));
+
+            // 解析协议
+            //var p = CHelloService.Serializer.Deserialize<Param>(bytes, iStartIndex, iCount);
+            handlerMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
+                        declaration: Syntax.VariableDeclaration(
+                    Syntax.ParseName(MsgInStruct.Identifier),
+                    new[] {Syntax.VariableDeclarator(
+                                    "msg",
+                                    initializer: Syntax.EqualsValueClause(
+                                        Syntax.InvocationExpression(
+                                            Syntax.ParseName($"m_service.Serializer.Deserialize<{MsgInStruct.Identifier}>"),
+                                            argumentList: Syntax.ArgumentList(
+                                                Syntax.Argument(Syntax.ParseName(handlerMDS.ParameterList.Parameters[1].Identifier)),
+                                                Syntax.Argument(Syntax.ParseName(handlerMDS.ParameterList.Parameters[2].Identifier)),
+                                                Syntax.Argument(Syntax.ParseName(handlerMDS.ParameterList.Parameters[3].Identifier))
+                                            )
+                                        )
+                                    )
+                          )}
+                    )
+                ));
+
+            // call logic process function
+            // var ret = m_service.Hello2(p);
+            ArgumentListSyntax argsList = new ArgumentListSyntax();
+            if (aPiIn.Length == 1)
+            {
+                argsList.Arguments.Add(Syntax.Argument(Syntax.ParseName($"msg.{aPiIn[0].Name}")));
+            }
+            else
+            {
+                for (int j = 0; j < aPiIn.Length; j++)
+                {
+                    argsList.Arguments.Add(Syntax.Argument(Syntax.ParseName($"msg.Value.Item{i}")));
+                }
+            }
+
+            InvocationExpressionSyntax callLogicProcessFunc =
+                Syntax.InvocationExpression(
+                                            Syntax.ParseName($"m_service.{szMiName}"),
+                                            argumentList: argsList
+                                        );
+
+            if (bHasReturnValue)
+            {
+                handlerMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
+                        declaration: Syntax.VariableDeclaration(
+                    Syntax.ParseName("var"),
+                    new[] {Syntax.VariableDeclarator(
+                                    "v1",
+                                    initializer: Syntax.EqualsValueClause(
+                                        callLogicProcessFunc
+                                    )
+                          )}
+                    )
+                ));
+
+                handlerMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
+                        declaration: Syntax.VariableDeclaration(
+                    Syntax.ParseName("var"),
+                    new[] {Syntax.VariableDeclarator(
+                                    "v2",
+                                    initializer: Syntax.EqualsValueClause(
+                                        Syntax.InvocationExpression(Syntax.ParseName("v1.GetAwaiter"), new ArgumentListSyntax())
+                                    )
+                          )}
+                    )
+                ));
+
+
+                handlerMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
+                        declaration: Syntax.VariableDeclaration(
+                    Syntax.ParseName("var"),
+                    new[] {Syntax.VariableDeclarator(
+                                    "ret",
+                                    initializer: Syntax.EqualsValueClause(
+                                        Syntax.InvocationExpression(Syntax.ParseName("v2.GetResult"), new ArgumentListSyntax())
+                                    )
+                          )}
+                    )
+                ));
+
+                // 序列化协议
+                // var ser = CHelloService.Serializer.Serialize(ret);
+                handlerMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
+                        declaration: Syntax.VariableDeclaration(
+                    Syntax.ParseName("var"),
+                    new[] {Syntax.VariableDeclarator(
+                                    "ser",
+                                    initializer: Syntax.EqualsValueClause(
+                                        Syntax.InvocationExpression(
+                                            Syntax.ParseName($"m_service.Serializer.Serialize"),
+                                            argumentList: Syntax.ArgumentList(
+                                                Syntax.Argument(Syntax.ParseName("ret"))
+                                            )
+                                        )
+                                    )
+                          )}
+                    )
+                ));
+
+                // return response protocol if need
+                // m_service.CallAsync.SendWithoutResponse(iCommunicateID, (int)ProtoID.EICHelloService_Hello3_MsgOut, ser.Item1, ser.Item2, ser.Item3);
+                handlerMDS.Body.Statements.Add(Syntax.ExpressionStatement(
+                        Syntax.InvocationExpression(
+                                            Syntax.ParseName($"m_service.CallAsync.SendWithoutResponse"),
+                                            argumentList: Syntax.ArgumentList(
+                                                Syntax.Argument(Syntax.ParseName("iCommunicateID")),
+                                                Syntax.Argument(Syntax.CastExpression("int", Syntax.ParseName($"ProtoID.{msgOutProtoID.Identifier}"))),
+                                                Syntax.Argument(Syntax.ParseName("ser.Item1")),
+                                                Syntax.Argument(Syntax.ParseName("ser.Item2")),
+                                                Syntax.Argument(Syntax.ParseName("ser.Item3"))
+                                            )
+                                        )
+                ));
+            }
+            else
+            {
+                handlerMDS.Body.Statements.Add(
+                    Syntax.ExpressionStatement(callLogicProcessFunc)
+                    );
+            }
+
+            #endregion
 
 
 
