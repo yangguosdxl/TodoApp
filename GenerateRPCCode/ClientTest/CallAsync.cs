@@ -12,9 +12,14 @@ namespace ClientTest
         int rpcResponseIndex = 0;
         Dictionary<int, Action> m_MapRpcResponseProcessor = new Dictionary<int, Action>();
 
-        public async Task SendWithoutResponse(byte[] bytes, int iStart, int len)
+        public void AddProtocolHandler(int iProtoID, handler h)
         {
+            throw new NotImplementedException();
+        }
 
+        public Task SendWithoutResponse(int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<(byte[], int, int)> SendWithResponse(byte[] bytes, int iStart, int len)
@@ -32,6 +37,11 @@ namespace ClientTest
 
             var ret = ((byte[])null, 0, 0);
             return await Task.FromResult(ret);
+        }
+
+        public Task<(byte[], int, int)> SendWithResponse(int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
+        {
+            throw new NotImplementedException();
         }
     }
 
