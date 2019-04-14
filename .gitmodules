@@ -1,3 +1,6 @@
 [submodule "KCP"]
 	path = KCP
 	url = https://github.com/yangguosdxl/KCP.git
+[submodule "socket.core"]
+	path = socket.core
+	url = https://github.com/fengma312/socket.core.git
