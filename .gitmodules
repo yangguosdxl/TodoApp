@@ -4,3 +4,6 @@
 [submodule "socket.core"]
 	path = socket.core
 	url = https://github.com/fengma312/socket.core.git
+[submodule "UniRx"]
+	path = UniRx
+	url = https://github.com/yangguosdxl/UniRx.git
