@@ -29,7 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "socket.core", "..\socket.co
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestAsyncAwait", "TestAsyncAwait", "{342069E2-A600-4E0A-A5A9-F8FFD2BF899F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAsyncAwaitApp", "TestAsyncAwaitApp\TestAsyncAwaitApp.csproj", "{670AB634-0A56-4EAB-A275-24ED0BD1A71D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAsyncAwaitApp", "TestAsyncAwaitApp\TestAsyncAwaitApp.csproj", "{670AB634-0A56-4EAB-A275-24ED0BD1A71D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAsyncTest", "SimpleAsyncTest\SimpleAsyncTest.csproj", "{199E6F6C-CF4E-4520-B85E-FD5C7097F75A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,10 @@ Global
 		{670AB634-0A56-4EAB-A275-24ED0BD1A71D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{670AB634-0A56-4EAB-A275-24ED0BD1A71D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{670AB634-0A56-4EAB-A275-24ED0BD1A71D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{199E6F6C-CF4E-4520-B85E-FD5C7097F75A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{199E6F6C-CF4E-4520-B85E-FD5C7097F75A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{199E6F6C-CF4E-4520-B85E-FD5C7097F75A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{199E6F6C-CF4E-4520-B85E-FD5C7097F75A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +100,7 @@ Global
 		{57F76D5F-6F00-4F34-9CCC-645B5236D075} = {23AA338A-39AE-414C-AD9B-A1C891581EC6}
 		{B4BF4D7F-0E9E-411E-93AF-8664DA19CEE5} = {23AA338A-39AE-414C-AD9B-A1C891581EC6}
 		{670AB634-0A56-4EAB-A275-24ED0BD1A71D} = {342069E2-A600-4E0A-A5A9-F8FFD2BF899F}
+		{199E6F6C-CF4E-4520-B85E-FD5C7097F75A} = {342069E2-A600-4E0A-A5A9-F8FFD2BF899F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {50E7EE6D-5631-474C-9BFC-71144494D678}
