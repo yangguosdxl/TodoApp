@@ -8,7 +8,6 @@ namespace TestAsyncAwaitApp
 {
     class MySynchronizationContext : SynchronizationContext
     {
-        ConcurrentExclusiveSchedulerPair
         List<(SendOrPostCallback, object)> m_Events = new List<(SendOrPostCallback, object)>();
         public override void Send(SendOrPostCallback d, object state)
         {
