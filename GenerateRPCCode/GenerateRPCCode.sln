@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTest", "ServerTest\Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RpcTestInterface", "RpcTestInterface\RpcTestInterface.csproj", "{73BDD8B7-9D62-4A68-AEC0-A664B9D9F391}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{BBE93F94-089E-44AA-8288-C70C3830EF13}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestRPC", "TestRPC", "{BBE93F94-089E-44AA-8288-C70C3830EF13}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RpcTestImpl", "RpcTestImpl\RpcTestImpl.csproj", "{5014766E-C5D7-4007-971A-99BB9A37D0F3}"
 EndProject
@@ -31,7 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestAsyncAwait", "TestAsync
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAsyncAwaitApp", "TestAsyncAwaitApp\TestAsyncAwaitApp.csproj", "{670AB634-0A56-4EAB-A275-24ED0BD1A71D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAsyncTest", "SimpleAsyncTest\SimpleAsyncTest.csproj", "{199E6F6C-CF4E-4520-B85E-FD5C7097F75A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAsyncTest", "SimpleAsyncTest\SimpleAsyncTest.csproj", "{199E6F6C-CF4E-4520-B85E-FD5C7097F75A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
