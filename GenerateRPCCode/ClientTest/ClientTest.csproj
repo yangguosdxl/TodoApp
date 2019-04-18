@@ -75,16 +75,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary1\CoolRpcInterface.csproj">
-      <Project>{EF0ACEAE-4802-4390-B06E-88ACC62E9918}</Project>
-      <Name>CoolRpcInterface</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CSCommon\CSCommon.csproj">
       <Project>{b67f7f56-5155-4463-a5f2-981349974206}</Project>
       <Name>CSCommon</Name>
     </ProjectReference>
     <ProjectReference Include="..\RpcTestImpl\RpcTestImpl.csproj">
-      <Project>{5014766e-c5d7-4007-971a-99bb9a37d0f3}</Project>
+      <Project>{67f3bf48-8052-44df-a80a-6ae7f7cc8090}</Project>
       <Name>RpcTestImpl</Name>
     </ProjectReference>
     <ProjectReference Include="..\RpcTestInterface\RpcTestInterface.csproj">
