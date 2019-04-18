@@ -39,6 +39,18 @@ namespace MyNetWork.Tcp
             Task.Factory.StartNew(SendAsync, m_CTS.Token, m_CTS.Token, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
+        public void Send(byte[] buffer, int start, int len)
+        {
+            byte[] bytes = new byte[len];
+            Array.Copy(buffer, start, bytes, 0, len);
+
+            ArraySegment<byte> seg = new ArraySegment<byte>(bytes, 0, len);
+
+            m_SendQueue.Enqueue(seg);
+
+            // @todo notify send task;
+        }
+
         private async Task RecvAsync(object state)
         {
             CancellationToken cancelToken = (CancellationToken)state;
@@ -64,39 +76,16 @@ namespace MyNetWork.Tcp
                 if (m_SendQueue.TryDequeue(out seg))
                 {
                     int iSendBytes = await m_oSocket.SendAsync(seg, SocketFlags.None);
+                    if (iSendBytes != seg.Count)
+                    {
+                        // @todo what happened
+                    }
                 }
                 else
                 {
                     // @todo wait notfiy
                 }
             }
-        }
-
-        public void Send(byte[] buffer, int start, int len)
-        {
-            byte[] bytes = new byte[len];
-            Array.Copy(buffer, start, bytes, 0, len);
-
-            ArraySegment<byte> seg = new ArraySegment<byte>(bytes, 0, len);
-
-            m_SendQueue.Enqueue(seg);
-
-            // @todo notify send task;
-        }
-
-        public Task SendAsync(byte[] buff, int start, int len)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<(byte[], int, int)> RecvAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public (byte[], int, int) Recv()
-        {
-            throw new NotImplementedException();
         }
 
         public (byte[], int start, int len) Process(byte[] buff, int start, int len)

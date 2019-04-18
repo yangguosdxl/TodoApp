@@ -6,6 +6,6 @@ namespace CoolRpcInterface
 {
     public interface IMessageParser
     {
-        void Process(ArraySegment<byte> seg);
+        void Process(byte[] buff, int start, int len);
     }
 }

@@ -6,13 +6,7 @@ namespace NetWorkInterface
     public interface IChannel
     {
         void Start();
-
-
-        Task SendAsync(byte[] buff, int start, int len);
-        Task<(byte[], int, int)> RecvAsync();
-
-        void Send(byte[] buff, int start, int len);
-        (byte[], int, int) Recv();
+        void Send(byte[] buffer, int start, int len);
 
         event Action ConnectedEvent;
         event Action DisconnectedEvent;
