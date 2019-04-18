@@ -13,14 +13,14 @@ namespace TestAsyncAwaitApp
             MyTaskScheduler scheduler = new MyTaskScheduler();
             MySynchronizationContext context = new MySynchronizationContext();
 
-            SynchronizationContext.SetSynchronizationContext(context);
+            //SynchronizationContext.SetSynchronizationContext(context);
 
-            //Task.Factory.StartNew(Hello, "A:", new CancellationToken(), TaskCreationOptions.None, scheduler);
+            Task.Factory.StartNew(Hello, "A:", new CancellationToken(), TaskCreationOptions.None, scheduler).ConfigureAwait(false);
             //Task.Factory.StartNew(Hello, "B:", new CancellationToken(), TaskCreationOptions.None, scheduler);
             //Task.Factory.StartNew(Hello, "C:", new CancellationToken(), TaskCreationOptions.None, scheduler);
 
-            //Task.Factory.StartNew(Hello, "PoolA:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default).ConfigureAwait(false);
-            Task.Factory.StartNew(Hello, "PoolB:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
+           // Task.Factory.StartNew(Hello, "PoolA:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
+            //Task.Factory.StartNew(Hello, "PoolB:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
             //Task.Factory.StartNew(Hello, "PoolC:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
 
             //Hello("E");
@@ -30,7 +30,7 @@ namespace TestAsyncAwaitApp
             while(Console.KeyAvailable == false)
             {
                 scheduler.Update();
-                context.Update();
+                //context.Update();
             }
         }
 
