@@ -7,3 +7,6 @@
 [submodule "UniRx"]
 	path = UniRx
 	url = https://github.com/yangguosdxl/UniRx.git
+[submodule "MineCase"]
+	path = MineCase
+	url = https://github.com/dotnetGame/MineCase.git
