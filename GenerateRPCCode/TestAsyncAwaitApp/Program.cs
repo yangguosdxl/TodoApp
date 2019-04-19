@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,6 +7,11 @@ namespace TestAsyncAwaitApp
 {
     class Program
     {
+        struct StructA
+        {
+
+        }
+        static StructA[] alist = new StructA[10];
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
@@ -32,6 +38,8 @@ namespace TestAsyncAwaitApp
                 scheduler.Update();
                 //context.Update();
             }
+
+            ref StructA a = ref alist[0];
         }
 
         static async Task Hello(object prefix)

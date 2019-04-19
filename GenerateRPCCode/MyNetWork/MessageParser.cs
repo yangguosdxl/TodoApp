@@ -7,16 +7,14 @@ namespace MyNetWork
 {
     public class MessageParser : IMessageParser
     {
-        
-
         byte[] m_OneMessgeBuffer;
         int m_iMessageBufferLen;
 
         int m_iBodyLeftBytes = 0;
-        int m_iHeaderLeftBytes = 6;
         int m_iProtocolID;
-        uint m_iResponseIndex = 0;
-        bool m_bIsReadHead = true;
+        int m_iResponseIndex = 0;
+
+        public event Action<int, int, byte[], int, int> OnMessage;
 
         public MessageParser()
         {
@@ -30,7 +28,7 @@ namespace MyNetWork
                 {
                     int left = NetworkConfig.MESSAGE_HEAD_BYTES - m_iMessageBufferLen;
                     int iCopyLen = Math.Min(len, left);
-                    Array.Copy(buff, m_OneMessgeBuffer, iCopyLen);
+                    Array.Copy(buff, start, m_OneMessgeBuffer, m_iMessageBufferLen, iCopyLen);
                     m_iMessageBufferLen += iCopyLen;
                     len -= iCopyLen;
                     start += iCopyLen;
@@ -49,27 +47,29 @@ namespace MyNetWork
                             m_iProtocolID = ReadUShortLittleEndian(bytes + 2);
                             m_iResponseIndex = ReadUShortLittleEndian(bytes + 2);
                         }
-                         
                     }
                 }
 
+                if (len == 0)
+                    return;
 
-
-
-                if (m_iLeftBytes != 0)
+                // 可以解析MessageBody了
                 {
+                    int iCopyLen = Math.Min(len, m_iBodyLeftBytes);
+                    Array.Copy(buff, start, m_OneMessgeBuffer, m_iMessageBufferLen, iCopyLen);
+                    start += iCopyLen;
+                    len -= iCopyLen;
+                    m_iMessageBufferLen += iCopyLen;
+                    m_iBodyLeftBytes -= iCopyLen;
 
-                }
+                    if (m_iBodyLeftBytes == 0)
+                    { // 完整的协议已解析出来
+                        OnMessage(m_iProtocolID, m_iResponseIndex, m_OneMessgeBuffer, NetworkConfig.MESSAGE_HEAD_BYTES, m_iMessageBufferLen);
 
-                if (m_iLeftBytes == 0)
-                { // 下一个协议开始
-                    unsafe
-                    {
-                        fixed(byte* bytes = seg.Array)
-                        {
-                            m_iLeftBytes = ReadLittleEndian(seg.Array);
-                        }
-                        
+                        // 清理
+                        m_iMessageBufferLen = 0;
+                        m_iProtocolID = 0;
+                        m_iResponseIndex = 0;
                     }
                 }
             }
