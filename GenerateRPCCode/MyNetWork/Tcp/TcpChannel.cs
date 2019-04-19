@@ -16,7 +16,7 @@ namespace MyNetWork.Tcp
         
         CancellationTokenSource m_CTS = new CancellationTokenSource();
 
-        ArraySegment<byte> m_RecvBuffer = new ArraySegment<byte>();
+        byte[] m_RecvBuffer;
 
         ConcurrentQueue<ArraySegment<byte>> m_SendQueue = new ConcurrentQueue<ArraySegment<byte>>();
 
@@ -25,12 +25,29 @@ namespace MyNetWork.Tcp
 
         IMessageParser m_MessageParser;
 
+        ISerializer m_Serializer;
+
+        public IMessageParser MessageParser
+        {
+            get => m_MessageParser;
+            set
+            {
+                m_MessageParser = value;
+
+                m_MessageParser.OnMessage += OnMessage;
+            }
+        }
+
+        private void OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
+        {
+            m_Serializer.Deserialize<>
+        }
+
         public TcpChannel(Socket socket)
         {
             m_oSocket = socket;
 
-            byte[] buffer = new byte[512];
-            m_RecvBuffer = new ArraySegment<byte>(buffer);
+            m_RecvBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
         }
 
         public void Start()
@@ -58,10 +75,12 @@ namespace MyNetWork.Tcp
             {
                 cancelToken.ThrowIfCancellationRequested();
 
-                int iRecvBytes = await m_oSocket.ReceiveAsync(m_RecvBuffer, SocketFlags.None);
+                ArraySegment<byte> seg = new ArraySegment<byte>(m_RecvBuffer);
+
+                int iRecvBytes = await m_oSocket.ReceiveAsync(seg, SocketFlags.None);
 
                 if (iRecvBytes > 0)
-                    m_MessageParser.Process(m_RecvBuffer);
+                    m_MessageParser.Process(m_RecvBuffer, 0, iRecvBytes);
             }
         }
 

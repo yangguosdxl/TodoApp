@@ -6,7 +6,8 @@ namespace CoolRpcInterface
 {
     public interface IMessageParser
     {
-        // protocol id, response index, buffer, buffer start, buffer len
+        // protocol id, iCommunicateID, buffer, buffer start, buffer len
+        // after this message be called, buffer will be change
         event Action<int, int, byte[], int, int> OnMessage;
 
         void Process(byte[] buff, int start, int len);

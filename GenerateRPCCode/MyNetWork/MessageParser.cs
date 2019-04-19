@@ -12,7 +12,7 @@ namespace MyNetWork
 
         int m_iBodyLeftBytes = 0;
         int m_iProtocolID;
-        int m_iResponseIndex = 0;
+        int m_iCommunicateID = 0;
 
         public event Action<int, int, byte[], int, int> OnMessage;
 
@@ -45,7 +45,7 @@ namespace MyNetWork
                             if (m_iBodyLeftBytes > NetworkConfig.MESSAGE_BODY_BYTES)
                                 throw new ErrMessageBodyLenException();
                             m_iProtocolID = ReadUShortLittleEndian(bytes + 2);
-                            m_iResponseIndex = ReadUShortLittleEndian(bytes + 2);
+                            m_iCommunicateID = ReadUShortLittleEndian(bytes + 2);
                         }
                     }
                 }
@@ -64,12 +64,12 @@ namespace MyNetWork
 
                     if (m_iBodyLeftBytes == 0)
                     { // 完整的协议已解析出来
-                        OnMessage(m_iProtocolID, m_iResponseIndex, m_OneMessgeBuffer, NetworkConfig.MESSAGE_HEAD_BYTES, m_iMessageBufferLen);
+                        OnMessage(m_iProtocolID, m_iCommunicateID, m_OneMessgeBuffer, NetworkConfig.MESSAGE_HEAD_BYTES, m_iMessageBufferLen);
 
                         // 清理
                         m_iMessageBufferLen = 0;
                         m_iProtocolID = 0;
-                        m_iResponseIndex = 0;
+                        m_iCommunicateID = 0;
                     }
                 }
             }
