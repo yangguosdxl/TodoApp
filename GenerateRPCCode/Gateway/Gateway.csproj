@@ -9,4 +9,9 @@
     <PackageReference Include="Microsoft.Orleans.Client" Version="2.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />
+    <ProjectReference Include="..\MyNetWork\MyNetWork.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -16,6 +16,9 @@ namespace MyNetWork
     public class DefaultNetListener
     {
         ISocketAcceptorTask m_Acceptor;
+
+        public event Action<ISocketTask> OnNewConnection;
+
         public void Init(EndPoint endPonit, NetType netType)
         {
             if (netType == NetType.KCP)
@@ -25,13 +28,13 @@ namespace MyNetWork
             else
                 throw new Exception($"Unknow net type {netType}");
 
-            m_Acceptor.OnNewConnection += OnNewConnection;
+            m_Acceptor.OnNewConnection += _OnNewConnection;
         }
 
         // 是可重入
-        private void OnNewConnection(ISocketTask obj)
+        private void _OnNewConnection(ISocketTask socket)
         {
-            throw new NotImplementedException();
+            OnNewConnection?.Invoke(socket);
         }
 
         public void Startup()
