@@ -19,8 +19,8 @@ namespace Gateway
                         // Clustering information
                         .Configure<ClusterOptions>(options =>
                         {
-                            options.ClusterId = "my-first-cluster";
-                            options.ServiceId = "MyOrleansService";
+                            options.ClusterId = "dev";
+                            options.ServiceId = "RpcTest";
                         })
                         // Clustering provider
                         //.UseAzureStorageClustering(options => options.ConnectionString = connectionString)
