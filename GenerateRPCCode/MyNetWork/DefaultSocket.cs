@@ -2,17 +2,14 @@
 using NetWorkInterface;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MyNetWork.Tcp
+namespace MyNetWork
 {
-    public class TcpChannel : IChannel, IProtocolUnit
+    public class DefaultSocket : ISocketTask
     {
-        Socket m_oSocket;
+        ISocket m_Socket;
         
         CancellationTokenSource m_CTS = new CancellationTokenSource();
 
@@ -20,12 +17,11 @@ namespace MyNetWork.Tcp
 
         ConcurrentQueue<ArraySegment<byte>> m_SendQueue = new ConcurrentQueue<ArraySegment<byte>>();
 
-        public event Action ConnectedEvent;
-        public event Action DisconnectedEvent;
+        public event Action OnDisconnect;
+
+        //TaskCompletionSource<bool> m_SendEvent = new TaskCompletionSource<bool>(false);
 
         IMessageParser m_MessageParser;
-
-        ISerializer m_Serializer;
 
         public IMessageParser MessageParser
         {
@@ -40,20 +36,20 @@ namespace MyNetWork.Tcp
 
         private void OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
-            m_Serializer.Deserialize<>
+            
         }
 
-        public TcpChannel(Socket socket)
+        public DefaultSocket(ISocket socket)
         {
-            m_oSocket = socket;
+            m_Socket = socket;
 
             m_RecvBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
         }
 
-        public void Start()
+        public void Startup()
         {
-            Task.Factory.StartNew(RecvAsync, m_CTS.Token, m_CTS.Token, TaskCreationOptions.None, TaskScheduler.Default);
-            Task.Factory.StartNew(SendAsync, m_CTS.Token, m_CTS.Token, TaskCreationOptions.None, TaskScheduler.Default);
+            Task.Factory.StartNew(RecvLoopAsync, m_CTS.Token, m_CTS.Token, TaskCreationOptions.None, TaskScheduler.Default);
+            Task.Factory.StartNew(SendLoopAsync, m_CTS.Token, m_CTS.Token, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         public void Send(byte[] buffer, int start, int len)
@@ -66,9 +62,10 @@ namespace MyNetWork.Tcp
             m_SendQueue.Enqueue(seg);
 
             // @todo notify send task;
+            //m_SendEvent.SetResult(true);
         }
 
-        private async Task RecvAsync(object state)
+        private async Task RecvLoopAsync(object state)
         {
             CancellationToken cancelToken = (CancellationToken)state;
             while (true)
@@ -77,14 +74,14 @@ namespace MyNetWork.Tcp
 
                 ArraySegment<byte> seg = new ArraySegment<byte>(m_RecvBuffer);
 
-                int iRecvBytes = await m_oSocket.ReceiveAsync(seg, SocketFlags.None);
+                int iRecvBytes = await m_Socket.RecvAsync(seg);
 
                 if (iRecvBytes > 0)
                     m_MessageParser.Process(m_RecvBuffer, 0, iRecvBytes);
             }
         }
 
-        private async Task SendAsync(object state)
+        private async Task SendLoopAsync(object state)
         {
             CancellationToken cancelToken = (CancellationToken)state;
             while (true)
@@ -94,7 +91,7 @@ namespace MyNetWork.Tcp
                 ArraySegment<byte> seg;
                 if (m_SendQueue.TryDequeue(out seg))
                 {
-                    int iSendBytes = await m_oSocket.SendAsync(seg, SocketFlags.None);
+                    int iSendBytes = await m_Socket.SendAsync(seg);
                     if (iSendBytes != seg.Count)
                     {
                         // @todo what happened
@@ -103,13 +100,10 @@ namespace MyNetWork.Tcp
                 else
                 {
                     // @todo wait notfiy
+
+                    await Task.Delay(1);
                 }
             }
-        }
-
-        public (byte[], int start, int len) Process(byte[] buff, int start, int len)
-        {
-            throw new NotImplementedException();
         }
     }
 }

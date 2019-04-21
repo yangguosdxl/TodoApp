@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetWorkInterface
 {
-    public interface IChannel
+    public interface ISocketTask
     {
-        void Start();
+        void Startup();
         void Send(byte[] buffer, int start, int len);
 
-        event Action ConnectedEvent;
-        event Action DisconnectedEvent;
+        event Action OnDisconnect;
     }
 }
