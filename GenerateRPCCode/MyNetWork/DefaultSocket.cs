@@ -18,6 +18,7 @@ namespace MyNetWork
         ConcurrentQueue<ArraySegment<byte>> m_SendQueue = new ConcurrentQueue<ArraySegment<byte>>();
 
         public event Action OnDisconnect;
+        public event Action<int, int, byte[], int, int> OnMessage;
 
         //TaskCompletionSource<bool> m_SendEvent = new TaskCompletionSource<bool>(false);
 
@@ -30,13 +31,13 @@ namespace MyNetWork
             {
                 m_MessageParser = value;
 
-                m_MessageParser.OnMessage += OnMessage;
+                m_MessageParser.OnMessage += _OnMessage;
             }
         }
 
-        private void OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
+        private void _OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
-            
+            OnMessage(iProtocolID, iCommunicateID, messageBuff, start, len);
         }
 
         public DefaultSocket(ISocket socket)
@@ -44,7 +45,7 @@ namespace MyNetWork
             m_Socket = socket;
 
             m_RecvBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
-        }
+        }  
 
         public void Startup()
         {

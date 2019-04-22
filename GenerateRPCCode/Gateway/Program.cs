@@ -11,6 +11,8 @@ namespace Gateway
 {
     class Program
     {
+        static IClusterClient client;
+        
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
@@ -25,7 +27,7 @@ namespace Gateway
                         // Clustering provider
                         //.UseAzureStorageClustering(options => options.ConnectionString = connectionString)
                         // Application parts: just reference one of the grain interfaces that we use
-                        .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(IClientSession).Assembly))
+                        .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(IClientSessionGrain).Assembly))
                         .Build();
 
             client.Connect().GetAwaiter().GetResult();
@@ -43,9 +45,10 @@ namespace Gateway
 
         }
 
-        private static void OnNewConnection(ISocketTask obj)
+        private static void OnNewConnection(ISocketTask socket)
         {
-            throw new NotImplementedException();
+            ClientSession session = new ClientSession(socket, Guid.NewGuid(), client);
+            SessionMgr.Inst.TryAdd(session.SessionID, session);
         }
     }
 }

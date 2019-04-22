@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GrainsTest
 {
-    public class MessageRouter : IMessageRouter
+    public class MessageRouter : IGatewayGrainObserver
     {
     }
 }

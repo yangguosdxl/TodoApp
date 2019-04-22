@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Orleans;
 
 namespace GrainsTest
 {
-    public interface IChunkGrain
+    public interface IBattleChunkMgrGrain : IGrainWithGuidKey
     {
     }
 }

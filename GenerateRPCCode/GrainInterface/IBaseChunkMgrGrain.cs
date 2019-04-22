@@ -5,8 +5,7 @@ using System.Text;
 
 namespace GrainInterface
 {
-    public interface IMessageRouter : IGrainWithIntegerKey
+    public interface IBaseChunkMgrGrain : IGrainWithGuidKey
     {
-
     }
 }
