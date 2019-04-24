@@ -1,4 +1,5 @@
 ﻿using CoolRpcInterface;
+using CSRPC;
 using MyNetWork;
 using NetWorkInterface;
 using System;
@@ -12,10 +13,21 @@ namespace ClientTest
 {
     class CallAsync : ICallAsync
     {
-        int rpcResponseIndex = 0;
-        Dictionary<int, Action> m_MapRpcResponseProcessor = new Dictionary<int, Action>();
+        int m_iRpcCommuniationID = 0;
+        Dictionary<int, TaskCompletionSource<(byte[], int, int)>> m_MapRpcResponseProcessor = new Dictionary<int, TaskCompletionSource<(byte[], int, int)>>();
 
         ISocketTask m_Socket;
+
+        IMessageEncoder m_MessageCoder = new MessageEncoder();
+
+        handler[] m_ProtocoHandlers = new handler[(int)ProtoID.COUNT]; 
+
+        int GetNextRpcCommuniationID()
+        {
+            if (m_iRpcCommuniationID == int.MaxValue)
+                m_iRpcCommuniationID = 0;
+            return ++m_iRpcCommuniationID;
+        }
 
         public CallAsync(string ip, int port, NetType netType)
         {
@@ -24,38 +36,64 @@ namespace ClientTest
 
             if (m_Socket == null)
                 throw new Exception($"failed connect to socket {ip}:{port}:{netType}");
+
+            m_Socket.OnMessage += OnMessage;
+            m_Socket.OnDisconnect += OnDisconnect;
+        }
+
+        private void OnDisconnect()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
+        {
+            if (iCommunicateID != 0)
+            {
+                TaskCompletionSource<(byte[], int, int)> taskCompletionSource;
+                if (m_MapRpcResponseProcessor.TryGetValue(iCommunicateID, out taskCompletionSource))
+                {
+                    taskCompletionSource.SetResult((messageBuff, start, len));
+                }
+                else
+                {
+                    Console.WriteLine($"Can not find communicate id's processor, {iCommunicateID}");
+                }
+            }
+            else
+            {
+                if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
+                {
+                    handler h = m_ProtocoHandlers[iProtocolID];
+                    h(iCommunicateID, messageBuff, start, len);
+                }
+            }
         }
 
         public void AddProtocolHandler(int iProtoID, handler h)
         {
-            throw new NotImplementedException();
+            m_ProtocoHandlers[iProtoID] = h;
         }
 
-        public Task SendWithoutResponse(int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
+        public async Task SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
         {
-            throw new NotImplementedException();
+            (byte[] bytes2, int start2, int len2) = m_MessageCoder.Encode(iChunkType, iCommunicateID, iProtoID, bytes, iStart, len);
+            m_Socket.Send(bytes2, start2, len2);
+            await Task.CompletedTask;
         }
 
-        public async Task<(byte[], int, int)> SendWithResponse(byte[] bytes, int iStart, int len)
+        public async Task<(byte[], int, int)> SendWithResponse(int iChunkType, int iProtoID, byte[] bytes, int iStart, int len)
         {
-            //Serializer serializer = new Serializer();
+            int iCommunicateID = GetNextRpcCommuniationID();
 
-            //var msgIn = serializer.Deserialize<HelloIntMsgIn>(bytes, iStart, len);
+            (byte[] bytes2, int start2, int len2) = m_MessageCoder.Encode(iChunkType, iCommunicateID, iProtoID, bytes, iStart, len);
+            m_Socket.Send(bytes2, start2, len2);
 
-            //Console.WriteLine("process msg: " + msgIn.eProtoID + ", " + msgIn.a);
+            TaskCompletionSource<(byte[], int, int)> taskCompletionSource = new TaskCompletionSource<(byte[], int, int)>();
 
-            //HelloIntMsgOut ret = new HelloIntMsgOut();
-            //ret.Value = (msgIn.a + 100, 2);
+            m_MapRpcResponseProcessor.Add(iCommunicateID, taskCompletionSource);
 
-            //return await Task.FromResult(serializer.Serialize(ret));
-
-            var ret = ((byte[])null, 0, 0);
-            return await Task.FromResult(ret);
-        }
-
-        public Task<(byte[], int, int)> SendWithResponse(int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
-        {
-            throw new NotImplementedException();
+            return await taskCompletionSource.Task;
         }
     }
 

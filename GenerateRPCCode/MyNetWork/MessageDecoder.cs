@@ -1,11 +1,11 @@
 ﻿
 using NetWorkInterface;
 using System;
-
+using System.Diagnostics.Contracts;
 
 namespace MyNetWork
 {
-    public class MessageCoder : IMessageCoder
+    public class MessageDecoder : IMessageDecoder
     {
         byte[] m_OneMessgeBuffer;
         int m_iMessageBufferLen;
@@ -13,10 +13,11 @@ namespace MyNetWork
         int m_iBodyLeftBytes = 0;
         int m_iProtocolID;
         int m_iCommunicateID = 0;
+        int m_iChunkType = 0;
 
         public event Action<int, int, byte[], int, int> OnMessage;
 
-        public MessageCoder()
+        public MessageDecoder()
         {
             m_OneMessgeBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
         }
@@ -45,7 +46,8 @@ namespace MyNetWork
                             if (m_iBodyLeftBytes > NetworkConfig.MESSAGE_BODY_BYTES)
                                 throw new ErrMessageBodyLenException();
                             m_iProtocolID = ReadUShortLittleEndian(bytes + 2);
-                            m_iCommunicateID = ReadUShortLittleEndian(bytes + 2);
+                            m_iCommunicateID = ReadUShortLittleEndian(bytes + 4);
+                            m_iChunkType = bytes[6];
                         }
                     }
                 }
@@ -74,12 +76,7 @@ namespace MyNetWork
                 }
             }
         }
-
-        public (byte[] buff, int start, int len) Encode(int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
-        {
-            Concat
-            throw new NotImplementedException();
-        }
+        
 
         private unsafe static ushort ReadUShortLittleEndian(byte* bytes)
         {
@@ -92,16 +89,6 @@ namespace MyNetWork
                 value = bytes[0];
 
                 return value;
-            }
-
-        }
-
-        private unsafe static void WriteUShortLittleEndian(byte* bytes, ushort value)
-        {
-            unchecked
-            {
-                bytes[0] = (byte)value;
-                bytes[1] = (byte)(value >> 8);
             }
 
         }

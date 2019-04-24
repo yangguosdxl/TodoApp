@@ -22,9 +22,9 @@ namespace MyNetWork
 
         //TaskCompletionSource<bool> m_SendEvent = new TaskCompletionSource<bool>(false);
 
-        IMessageCoder m_MessageParser;
+        IMessageDecoder m_MessageParser;
 
-        public IMessageCoder MessageParser
+        public IMessageDecoder MessageParser
         {
             get => m_MessageParser;
             set
