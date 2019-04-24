@@ -1,11 +1,11 @@
-﻿using CoolRpcInterface;
+﻿
+using NetWorkInterface;
 using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace MyNetWork
 {
-    public class MessageParser : IMessageParser
+    public class MessageCoder : IMessageCoder
     {
         byte[] m_OneMessgeBuffer;
         int m_iMessageBufferLen;
@@ -16,11 +16,11 @@ namespace MyNetWork
 
         public event Action<int, int, byte[], int, int> OnMessage;
 
-        public MessageParser()
+        public MessageCoder()
         {
             m_OneMessgeBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
         }
-        public void Process(byte[] buff, int start, int len)
+        public void Decode(byte[] buff, int start, int len)
         {
             while(len > 0)
             {
@@ -73,7 +73,12 @@ namespace MyNetWork
                     }
                 }
             }
+        }
 
+        public (byte[] buff, int start, int len) Encode(int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
+        {
+            Concat
+            throw new NotImplementedException();
         }
 
         private unsafe static ushort ReadUShortLittleEndian(byte* bytes)
@@ -91,6 +96,14 @@ namespace MyNetWork
 
         }
 
+        private unsafe static void WriteUShortLittleEndian(byte* bytes, ushort value)
+        {
+            unchecked
+            {
+                bytes[0] = (byte)value;
+                bytes[1] = (byte)(value >> 8);
+            }
 
+        }
     }
 }

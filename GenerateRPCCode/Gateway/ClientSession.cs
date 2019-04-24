@@ -48,9 +48,9 @@ namespace Gateway
             SessionMgr.Inst.TryRemove(SessionID, out session);
         }
 
-        public void Send(Guid sessionID, int iCommunicationID, int iProtocolID, byte[] bytes, int start, int len)
+        public void Send(byte[] bytes, int start, int len)
         {
-            throw new NotImplementedException();
+            m_Socket.Send(bytes, start, len);
         }
     }
 }

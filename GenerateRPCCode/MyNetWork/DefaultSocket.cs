@@ -22,9 +22,9 @@ namespace MyNetWork
 
         //TaskCompletionSource<bool> m_SendEvent = new TaskCompletionSource<bool>(false);
 
-        IMessageParser m_MessageParser;
+        IMessageCoder m_MessageParser;
 
-        public IMessageParser MessageParser
+        public IMessageCoder MessageParser
         {
             get => m_MessageParser;
             set
@@ -78,7 +78,7 @@ namespace MyNetWork
                 int iRecvBytes = await m_Socket.RecvAsync(seg);
 
                 if (iRecvBytes > 0)
-                    m_MessageParser.Process(m_RecvBuffer, 0, iRecvBytes);
+                    m_MessageParser.Decode(m_RecvBuffer, 0, iRecvBytes);
             }
         }
 

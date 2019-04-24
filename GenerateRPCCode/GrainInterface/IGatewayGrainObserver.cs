@@ -7,6 +7,6 @@ namespace GrainInterface
 {
     public interface IGatewayGrainObserver : IGrainObserver
     {
-        void Send(Guid sessionID, int iCommunicationID, int iProtocolID, byte[] bytes, int start, int len);
+        void Send(byte[] bytes, int start, int len);
     }
 }

@@ -28,15 +28,20 @@ namespace GrainsTest
             throw new NotImplementedException();
         }
 
-        public void Send(int iCommunicationID, int iProtocolID, byte[] bytes, int start, int len)
+        public void Send(byte[] bytes, int start, int len)
         {
             if (m_GateWayGrain != null)
-                m_GateWayGrain.Send(SessionID, iCommunicationID, iProtocolID, bytes, start, len);
+                m_GateWayGrain.Send(bytes, start, len);
         }
 
         public void SetSessionID(Guid sessionID)
         {
             SessionID = sessionID;
+        }
+
+        public Task OnDisconnect()
+        {
+            throw new NotImplementedException();
         }
     }
 }

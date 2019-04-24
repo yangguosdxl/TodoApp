@@ -8,11 +8,6 @@ using System.Text;
 
 namespace MyNetWork
 {
-    public enum NetType
-    {
-        KCP,
-        TCP,
-    }
     public class DefaultNetListener
     {
         ISocketAcceptorTask m_Acceptor;
