@@ -6,5 +6,6 @@ namespace CoolRpcInterface
     {
         ISerializer Serializer { get; set; }
         ICallAsync CallAsync { get; set; }
+        int ChunkType { get; set; }
     }
 }
