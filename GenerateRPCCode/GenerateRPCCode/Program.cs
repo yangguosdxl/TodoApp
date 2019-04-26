@@ -179,6 +179,26 @@ namespace GenerateRPCCode
                         }
                     }
                     ));
+
+            classRpcImpl.Members.Add(Syntax.PropertyDeclaration(
+                    modifiers: Modifiers.Public,
+                    identifier: "ChunkType",
+                    type: Syntax.ParseName("int"),
+                    accessorList: new AccessorListSyntax
+                    {
+                        Accessors =
+                        {
+                            new AccessorDeclarationSyntax
+                            {
+                                Kind = AccessorDeclarationKind.Get,
+                            },
+                            new AccessorDeclarationSyntax
+                            {
+                                Kind = AccessorDeclarationKind.Set,
+                            }
+                        }
+                    }
+                    ));
             #endregion
 
 
@@ -468,16 +488,19 @@ namespace GenerateRPCCode
                  )
              );
 
-            // var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse(iCommunicateID, iProtoID, bytes, iStart, len);
+            // var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse(ChunkType, iCommunicateID, iProtoID, bytes, iStart, len);
+            List<ArgumentSyntax> sendMsgArgs = new List<ArgumentSyntax>();
+            sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("ChunkType")));
+            if (!bHasReturnValue)
+                sendMsgArgs.Add(Syntax.Argument(Syntax.LiteralExpression(0)));
+            sendMsgArgs.Add(Syntax.Argument((Syntax.CastExpression("int", Syntax.ParseName("ProtoID." + msgInProtoID.Identifier)))));
+            sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item1")));
+            sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item2")));
+            sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item3")));
+
             var sendExpression = Syntax.AwaitExpression(Syntax.InvocationExpression(
                 expression: Syntax.ParseName(sendMsgSyntax),
-                argumentList: Syntax.ArgumentList(
-                    Syntax.Argument(Syntax.LiteralExpression(0)),
-                    Syntax.Argument(Syntax.CastExpression("int", Syntax.ParseName("ProtoID." + msgInProtoID.Identifier))),
-                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item1")),
-                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item2")),
-                    Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item3"))
-                    )
+                argumentList: Syntax.ArgumentList( sendMsgArgs.ToArray())
                 ));
 
             if (bHasReturnValue)
@@ -681,6 +704,7 @@ namespace GenerateRPCCode
                         Syntax.InvocationExpression(
                                             Syntax.ParseName($"m_service.CallAsync.SendWithoutResponse"),
                                             argumentList: Syntax.ArgumentList(
+                                                Syntax.Argument(Syntax.ParseName("m_service.ChunkType")),
                                                 Syntax.Argument(Syntax.ParseName("iCommunicateID")),
                                                 Syntax.Argument(Syntax.CastExpression("int", Syntax.ParseName($"ProtoID.{msgOutProtoID.Identifier}"))),
                                                 Syntax.Argument(Syntax.ParseName("ser.Item1")),

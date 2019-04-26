@@ -20,6 +20,8 @@ namespace CoolRpcInterface
             this.serviceProvider = serviceProvider;
         }
 
+        
+
         public T Get<T>() where T : class, ICoolRpc
         {
             ICoolRpc rpcService;

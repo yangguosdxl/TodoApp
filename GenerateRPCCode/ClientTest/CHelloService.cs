@@ -10,8 +10,9 @@ namespace ClientTest
 {
     class CHelloService : ICHelloService
     {
-        public ISerializer Serializer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ICallAsync CallAsync { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ISerializer Serializer { get ; set ; }
+        public ICallAsync CallAsync { get ; set ; }
+        public int ChunkType { get ; set ; }
 
         public Task Hello()
         {

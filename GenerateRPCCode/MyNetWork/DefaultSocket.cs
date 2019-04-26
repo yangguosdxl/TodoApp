@@ -20,7 +20,7 @@ namespace MyNetWork
         public event Action OnDisconnect;
         public event Action<int, int, byte[], int, int> OnMessage;
 
-        //TaskCompletionSource<bool> m_SendEvent = new TaskCompletionSource<bool>(false);
+        TaskCompletionSource<bool> m_SendEvent = new TaskCompletionSource<bool>(false);
 
         IMessageDecoder m_MessageParser;
 
@@ -63,7 +63,7 @@ namespace MyNetWork
             m_SendQueue.Enqueue(seg);
 
             // @todo notify send task;
-            //m_SendEvent.SetResult(true);
+            m_SendEvent.SetResult(true);
         }
 
         private async Task RecvLoopAsync(object state)
@@ -101,7 +101,6 @@ namespace MyNetWork
                 else
                 {
                     // @todo wait notfiy
-
                     await Task.Delay(1);
                 }
             }

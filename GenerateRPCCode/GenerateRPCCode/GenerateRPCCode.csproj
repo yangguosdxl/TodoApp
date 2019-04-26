@@ -234,6 +234,10 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CoolRpcInterface\CoolRpcInterface.csproj">
+      <Project>{F7C7FD8A-93A1-4DAC-B519-DFD0A2D3F235}</Project>
+      <Name>CoolRpcInterface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RpcTestInterface\RpcTestInterface.csproj">
       <Project>{8a864662-c34a-4305-9def-29756add5b99}</Project>
       <Name>RpcTestInterface</Name>

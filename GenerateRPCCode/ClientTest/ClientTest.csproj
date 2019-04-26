@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CoolRpcInterface\CoolRpcInterface.csproj" />
     <ProjectReference Include="..\CSCommon\CSCommon.csproj" />
+    <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />
     <ProjectReference Include="..\MyNetWork\MyNetWork.csproj" />
     <ProjectReference Include="..\NetWorkInterface\NetWorkInterface.csproj" />
     <ProjectReference Include="..\RpcTestImpl\RpcTestImpl.csproj" />

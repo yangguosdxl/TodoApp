@@ -1,6 +1,7 @@
 ﻿using CoolRpcInterface;
 using CSCommon;
 using CSRPC;
+using GrainInterface;
 using Microsoft.Extensions.DependencyInjection;
 
 using RpcTestInterface;
@@ -20,23 +21,22 @@ namespace ClientTest
         static IRpcFactory rpcFactory;
         static void Main(string[] args)
         {
-            ServiceCollection collection = new ServiceCollection();
+            ISerializer serializer = new Serializer();
+            ICallAsync callAsync = new CallAsync("127.0.0.1", 1234, NetWorkInterface.NetType.TCP);
 
-            CSRPC.RpcServicesConfiguration.AddAllRpcServices(collection);
-            collection.AddSingleton<IRpcFactory, DefaultRpcFactory>();
+            CHelloService cHelloService = new CHelloService();
+            cHelloService.Serializer = serializer;
+            cHelloService.CallAsync = callAsync;
+            cHelloService.ChunkType = (int)ChunkType.BASE;
 
-            var serviceProvider = collection.BuildServiceProvider();
+            IRPCHandlerMap handlers = new ICHelloService_HandlerMap(cHelloService);
 
-            rpcFactory = new DefaultRpcFactory(new Serializer(), new CallAsync(), serviceProvider);
-#if false
+            ISHelloService sHelloService = new CSRPC.SHelloService();
+            sHelloService.Serializer = serializer;
+            sHelloService.CallAsync = callAsync;
+            sHelloService.ChunkType = (int)ChunkType.BASE;
 
-
-            var hs = serviceProvider.GetService<IHelloService>();
-            var (a, b) = hs.HelloInt(1).GetAwaiter().GetResult();
-#endif
-
-            Hello().GetAwaiter().GetResult();
-
+            sHelloService.Hello();
         }
 
         static async Task Hello()

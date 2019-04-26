@@ -31,7 +31,7 @@ namespace CSRPC
             var v2 = v1.GetAwaiter();
             var ret = v2.GetResult();
             var ser = m_service.Serializer.Serialize(ret);
-            m_service.CallAsync.SendWithoutResponse(iCommunicateID, (int)ProtoID.EICHelloService_HelloInt_MsgOut, ser.Item1, ser.Item2, ser.Item3);
+            m_service.CallAsync.SendWithoutResponse(m_service.ChunkType, iCommunicateID, (int)ProtoID.EICHelloService_HelloInt_MsgOut, ser.Item1, ser.Item2, ser.Item3);
         }
 
         private void Process_Hello2(int iCommunicateID, byte[] bytes, int iStartIndex, int iCount)
@@ -47,7 +47,7 @@ namespace CSRPC
             var v2 = v1.GetAwaiter();
             var ret = v2.GetResult();
             var ser = m_service.Serializer.Serialize(ret);
-            m_service.CallAsync.SendWithoutResponse(iCommunicateID, (int)ProtoID.EICHelloService_Hello3_MsgOut, ser.Item1, ser.Item2, ser.Item3);
+            m_service.CallAsync.SendWithoutResponse(m_service.ChunkType, iCommunicateID, (int)ProtoID.EICHelloService_Hello3_MsgOut, ser.Item1, ser.Item2, ser.Item3);
         }
     }
 }
