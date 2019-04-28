@@ -16,7 +16,7 @@ namespace TestAsyncAwaitApp
         {
             Console.WriteLine("Hello World!");
 
-            MyTaskScheduler scheduler = new MyTaskScheduler();
+            CustomTaskScheduler scheduler = new CustomTaskScheduler();
             MySynchronizationContext context = new MySynchronizationContext();
 
             //SynchronizationContext.SetSynchronizationContext(context);
@@ -54,7 +54,7 @@ namespace TestAsyncAwaitApp
 
         static void Log(string format, params object[] args)
         {
-            string szTaskScheduler = TaskScheduler.Current is MyTaskScheduler ? "My" : "Default";
+            string szTaskScheduler = TaskScheduler.Current is CustomTaskScheduler ? "My" : "Default";
             string context = SynchronizationContext.Current is MySynchronizationContext ? "My" : "" + SynchronizationContext.Current;
             Console.WriteLine($"Context: {context}, TaskScheduler: {szTaskScheduler}, ThreadID: {Thread.CurrentThread.ManagedThreadId}. " + format, args);
         }

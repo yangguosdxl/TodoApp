@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TestAsyncAwaitApp
 {
-    class MyTaskScheduler : TaskScheduler
+    class CustomTaskScheduler : TaskScheduler
     {
         List<Task> m_Tasks = new List<Task>();
         List<Task> m_NewTasks = new List<Task>();
