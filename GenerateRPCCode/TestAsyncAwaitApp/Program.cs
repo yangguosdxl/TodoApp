@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using TestAsyncAwaitApp.Coroutine;
 
 namespace TestAsyncAwaitApp
 {
@@ -19,27 +20,50 @@ namespace TestAsyncAwaitApp
             CustomTaskScheduler scheduler = new CustomTaskScheduler();
             MySynchronizationContext context = new MySynchronizationContext();
 
+            MyTaskScheduler myTaskScheduler = new MyTaskScheduler();
+
             //SynchronizationContext.SetSynchronizationContext(context);
 
-            Task.Factory.StartNew(Hello, "A:", new CancellationToken(), TaskCreationOptions.None, scheduler);
+            //Task.Factory.StartNew(Hello, "A:", new CancellationToken(), TaskCreationOptions.None, scheduler);
             //Task.Factory.StartNew(Hello, "B:", new CancellationToken(), TaskCreationOptions.None, scheduler);
             //Task.Factory.StartNew(Hello, "C:", new CancellationToken(), TaskCreationOptions.None, scheduler);
 
-           // Task.Factory.StartNew(Hello, "PoolA:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
+            // Task.Factory.StartNew(Hello, "PoolA:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
             //Task.Factory.StartNew(Hello, "PoolB:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
             //Task.Factory.StartNew(Hello, "PoolC:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
 
             //Hello("E");
+
+            MyTask.Run(delegate { HelloMyTask("I"); }, null, myTaskScheduler);
 
             Log("Main");
 
             while(Console.KeyAvailable == false)
             {
                 scheduler.Update();
+                myTaskScheduler.Update();
                 //context.Update();
             }
 
             ref StructA a = ref alist[0];
+        }
+
+        static async MyTask HelloMyTask(object prefix)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Log(prefix + $"{i}");
+                await MyTaskDelay(1000);
+            }
+        }
+
+        static async MyTask MyTaskDelay(int t)
+        {
+            for (int n = t / 10, i = 0; i < n; ++i)
+            {
+                await MyTask.WaitOneFrame();
+                Log($"delay time {i * 10}");
+            }
         }
 
         static async Task Hello(object prefix)

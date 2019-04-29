@@ -9,4 +9,12 @@
     <DefineConstants>TRACE;CSHARP_7_OR_LATER</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;CSHARP_7_OR_LATER</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Coroutine\Compiler\AsyncUniTaskVoidMethodBuilder.cs" />
+  </ItemGroup>
+
 </Project>

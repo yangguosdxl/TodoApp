@@ -5,11 +5,21 @@ using System.Text;
 
 namespace TestAsyncAwaitApp.Coroutine
 {
-    public class MyAwaiter : INotifyCompletion
+    public interface IMyAwaiter : INotifyCompletion
     {
-        MyTask m_Task;
+        MyTask Task { get; }
+    }
+    public class MyAwaiter : IMyAwaiter
+    {
+        protected MyTask m_Task;
 
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted => m_Task.IsCompleted;
+
+        public MyTask Task => m_Task;
+
+        public void GetResult()
+        {
+        }
 
         public MyAwaiter(MyTask task)
         {
@@ -19,23 +29,69 @@ namespace TestAsyncAwaitApp.Coroutine
         public void OnCompleted(Action continuation)
         {
             m_Task.OnCompleted = continuation;
+            m_Task.Status = MyTaskStatus.Wait;
+
+            MyTaskScheduler scheduler = m_Task.Parent.scheduler;
+
+            m_Task.scheduler = scheduler;
+            scheduler.QueueTask(m_Task);
         }
     }
 
-    public class MyAwaiter<T> : MyAwaiter
+    public class WaitOneFrameAwaiter : IMyAwaiter
+    {
+        protected MyTask m_Task;
+
+        public bool IsCompleted => m_Task.IsCompleted;
+
+        public MyTask Task => m_Task;
+
+        public void GetResult()
+        {
+        }
+
+        public WaitOneFrameAwaiter(MyTask task)
+        {
+            m_Task = task;
+        }
+
+        public virtual void OnCompleted(Action continuation)
+        {
+            m_Task.OnCompleted = continuation;
+            m_Task.Status = MyTaskStatus.Complete;
+
+            MyTaskScheduler scheduler = m_Task.Parent.scheduler;
+
+            m_Task.scheduler = scheduler;
+            scheduler.QueueTask(m_Task);
+        }
+    }
+
+    public class MyAwaiter<T> : IMyAwaiter
     {
         MyTask<T> m_Task;
+
+        public MyTask Task => m_Task;
 
         public MyAwaiter(MyTask<T> task)
         {
             m_Task = task;
         }
 
-        public bool IsCompleted { get; }
+        public bool IsCompleted => m_Task.IsCompleted;
         public T GetResult()
         {
-            return m_Task.get
+            return m_Task.GetResult();
         }
-        public void OnCompleted(Action completion);
+        public void OnCompleted(Action continuation)
+        {
+            m_Task.OnCompleted = continuation;
+            m_Task.Status = MyTaskStatus.Wait;
+
+            MyTaskScheduler scheduler = m_Task.Parent.scheduler;
+
+            m_Task.scheduler = scheduler;
+            scheduler.QueueTask(m_Task);
+        }
     }
 }

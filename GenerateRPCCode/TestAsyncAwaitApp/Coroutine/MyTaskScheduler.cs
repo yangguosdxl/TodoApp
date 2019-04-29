@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TestAsyncAwaitApp.Coroutine
 {
-    class MyTaskScheduler
+    public class MyTaskScheduler
     {
         List<MyTask> m_Tasks = new List<MyTask>();
         List<MyTask> m_NewTasks = new List<MyTask>();
@@ -26,9 +26,30 @@ namespace TestAsyncAwaitApp.Coroutine
                 MyTask t = m_Tasks[i];
                 try
                 {
-                    t.Action();
-                    if (t.IsCompleted)
+                    if (t.Status == MyTaskStatus.Active)
+                    {
+                        if (t.Action != null)
+                            t.Action();
+                    }
+                    
+                    if (t.Status == MyTaskStatus.Complete)
+                    {
+                        t.OnCompleted();
                         aCompleteTasks.Add(i);
+                    }
+                    else if (t.Status == MyTaskStatus.Exception)
+                    {
+                        aCompleteTasks.Add(i);
+
+                        foreach (Exception e in t.GetException().InnerExceptions)
+                            Console.WriteLine(e);
+                    }
+                    else if (t.Status == MyTaskStatus.Canceled)
+                    {
+                        aCompleteTasks.Add(i);
+                    }
+
+                        
                 }
                 catch (Exception e)
                 {
