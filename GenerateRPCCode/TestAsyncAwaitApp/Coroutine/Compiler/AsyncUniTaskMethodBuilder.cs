@@ -73,12 +73,17 @@ namespace UniRx.Async.CompilerServices
         {
             m_Task.szName = stateMachine.ToString();
 
-            if (MyTask.Current != null)
+            m_Task.Parent = MyTask.Current;
+            MyTask.Current = m_Task;
+
+            if (m_Task.Parent != null && m_Task.Parent.scheduler != null)
             {
-                m_Task.Parent = MyTask.Current;
-                MyTask.Current = m_Task;
-                
-            }              
+                m_Task.scheduler = m_Task.Parent.scheduler;
+            }
+            else
+            {
+                m_Task.scheduler = MyTaskScheduler.Current;
+            }
 
             stateMachine.MoveNext();
         }
@@ -153,6 +158,14 @@ namespace UniRx.Async.CompilerServices
         public void Start<TStateMachine>(ref TStateMachine stateMachine)
             where TStateMachine : IAsyncStateMachine
         {
+            m_Task.szName = stateMachine.ToString();
+
+            if (MyTask.Current != null)
+            {
+                m_Task.Parent = MyTask.Current;
+                MyTask.Current = m_Task;
+            }
+
             stateMachine.MoveNext();
         }
 

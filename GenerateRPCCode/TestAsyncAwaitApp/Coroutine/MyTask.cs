@@ -21,34 +21,38 @@ namespace TestAsyncAwaitApp.Coroutine
         public static MyTask Current;
         public static int NextTaskID { get; set; }
 
-        public static MyTask Run(Action action, MyTask parent, MyTaskScheduler scheduler)
+        #region factory method
+        public static MyTask Run(Func<object, MyTask> action, object state, MyTask parent, MyTaskScheduler scheduler)
         {
-            MyTask myTask = new MyTask();
-            myTask.szName = "RunAction" + action;
-            myTask.Action = action;
-            myTask.Parent = parent;
-            myTask.scheduler = scheduler;
+            MyTaskScheduler.Current = scheduler;
 
-            Current = myTask;
+            MyTask task = action(state);
 
-            if (action != null)
-            {
-                action();
-            }
+            scheduler.QueueTask(task);
 
-            scheduler.QueueTask(myTask);
-
-            return myTask;
+            return task;
         }
 
         public static WaitOneFrameTask WaitOneFrame()
         {
             WaitOneFrameTask task = new WaitOneFrameTask();
             task.szName = "WaitOneFrameTask";
+
             task.Parent = MyTask.Current;
-            MyTask.Current = task.Parent;
+            MyTask.Current = task;
+
+            if (task.Parent != null && task.Parent.scheduler != null)
+            {
+                task.scheduler = task.Parent.scheduler;
+            }
+            else
+            {
+                task.scheduler = MyTaskScheduler.Current;
+            }
+
             return task;
         }
+        #endregion
 
         public int iTaskID { get; set; }
         public string szName { get; set; }
@@ -62,8 +66,6 @@ namespace TestAsyncAwaitApp.Coroutine
             set
             {
                 m_Parent = value;
-                scheduler = value?.scheduler;
-
                 //Console.WriteLine($"------------TaskName: {szName}, TaskID: {iTaskID}, Parent: {m_Parent?.iTaskID}");
             }
         }
@@ -92,7 +94,7 @@ namespace TestAsyncAwaitApp.Coroutine
         {
             iTaskID = ++MyTask.NextTaskID;
 
-            Status = MyTaskStatus.Active;
+            Status = MyTaskStatus.Wait;
         }
         public MyAwaiter GetAwaiter()
         {
@@ -101,6 +103,7 @@ namespace TestAsyncAwaitApp.Coroutine
 
         public void SetResult()
         {
+            Status = MyTaskStatus.Complete;
         }
 
         public void GetResult()
@@ -114,10 +117,17 @@ namespace TestAsyncAwaitApp.Coroutine
 
         public void SetException(Exception e)
         {
+            Status = MyTaskStatus.Exception;
+
             if (Parent != null)
                 Parent.SetException(e);
             else
                 m_Exceptions.Add(e);
+        }
+
+        public void SetCancel()
+        {
+            Status = MyTaskStatus.Canceled;
         }
 
         public override string ToString()
@@ -147,6 +157,7 @@ namespace TestAsyncAwaitApp.Coroutine
 
         public void SetResult(ref T result)
         {
+            Status = MyTaskStatus.Complete;
             m_Result = result;
         }
 

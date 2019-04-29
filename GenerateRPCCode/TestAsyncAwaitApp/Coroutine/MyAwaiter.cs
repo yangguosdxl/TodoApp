@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -29,12 +30,11 @@ namespace TestAsyncAwaitApp.Coroutine
         public void OnCompleted(Action continuation)
         {
             m_Task.OnCompleted = continuation;
-            m_Task.Status = MyTaskStatus.Wait;
 
-            MyTaskScheduler scheduler = m_Task.Parent.scheduler;
+            if (m_Task.Parent != null)
+                m_Task.Parent.Status = MyTaskStatus.Wait;
 
-            m_Task.scheduler = scheduler;
-            scheduler.QueueTask(m_Task);
+            m_Task.scheduler.QueueTask(m_Task);
         }
     }
 
@@ -60,10 +60,10 @@ namespace TestAsyncAwaitApp.Coroutine
             m_Task.OnCompleted = continuation;
             m_Task.Status = MyTaskStatus.Complete;
 
-            MyTaskScheduler scheduler = m_Task.Parent.scheduler;
+            if (m_Task.Parent != null)
+                m_Task.Parent.Status = MyTaskStatus.Wait;
 
-            m_Task.scheduler = scheduler;
-            scheduler.QueueTask(m_Task);
+            m_Task.scheduler.QueueTask(m_Task);
         }
     }
 
@@ -86,12 +86,11 @@ namespace TestAsyncAwaitApp.Coroutine
         public void OnCompleted(Action continuation)
         {
             m_Task.OnCompleted = continuation;
-            m_Task.Status = MyTaskStatus.Wait;
 
-            MyTaskScheduler scheduler = m_Task.Parent.scheduler;
+            if (m_Task.Parent != null)
+                m_Task.Parent.Status = MyTaskStatus.Wait;
 
-            m_Task.scheduler = scheduler;
-            scheduler.QueueTask(m_Task);
+            m_Task.scheduler.QueueTask(m_Task);
         }
     }
 }

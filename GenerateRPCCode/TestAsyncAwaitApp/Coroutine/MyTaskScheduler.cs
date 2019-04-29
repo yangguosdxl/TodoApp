@@ -8,20 +8,23 @@ namespace TestAsyncAwaitApp.Coroutine
 {
     public class MyTaskScheduler
     {
+        public static MyTaskScheduler Current;
+
+        List<MyTask> m_WaitTasks = new List<MyTask>();
         List<MyTask> m_Tasks = new List<MyTask>();
-        List<MyTask> m_NewTasks = new List<MyTask>();
 
         public void QueueTask(MyTask task)
         {
-            m_NewTasks.Add(task);
+            if (task.Status == MyTaskStatus.Wait)
+                m_WaitTasks.Add(task);
+            else
+                m_Tasks.Add(task);
         }
 
         public void Update()
         {
-            m_Tasks.AddRange(m_NewTasks);
-            m_NewTasks.Clear();
             List<int> aCompleteTasks = new List<int>();
-            for(int i = 0; i < m_Tasks.Count; ++i)
+            for(int i = m_Tasks.Count  -1; i >= 0; --i)
             {
                 MyTask t = m_Tasks[i];
                 try
@@ -34,8 +37,18 @@ namespace TestAsyncAwaitApp.Coroutine
                     
                     if (t.Status == MyTaskStatus.Complete)
                     {
-                        t.OnCompleted();
+
+
+                        MyTask.Current = t.Parent;
+
+                        t.OnCompleted?.Invoke();
                         aCompleteTasks.Add(i);
+
+                        if (t.Parent != null && t.Parent.Status != MyTaskStatus.Wait)
+                        {
+                            m_WaitTasks.Remove(t.Parent);
+                            m_Tasks.Add(t.Parent);
+                        }
                     }
                     else if (t.Status == MyTaskStatus.Exception)
                     {

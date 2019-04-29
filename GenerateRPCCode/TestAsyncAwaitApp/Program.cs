@@ -34,7 +34,7 @@ namespace TestAsyncAwaitApp
 
             //Hello("E");
 
-            MyTask.Run(delegate { HelloMyTask("I"); }, null, myTaskScheduler);
+            MyTask.Run(HelloMyTask, "I", null, myTaskScheduler);
 
             Log("Main");
 
@@ -59,10 +59,11 @@ namespace TestAsyncAwaitApp
 
         static async MyTask MyTaskDelay(int t)
         {
-            for (int n = t / 10, i = 0; i < n; ++i)
+            for (int n = t / 500, i = 0; i < n; ++i)
             {
                 await MyTask.WaitOneFrame();
                 Log($"delay time {i * 10}");
+                throw new Exception($"EXCEPTION!! delay time {i * 10}");
             }
         }
 
