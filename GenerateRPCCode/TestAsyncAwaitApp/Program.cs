@@ -13,6 +13,8 @@ namespace TestAsyncAwaitApp
 
         }
         static StructA[] alist = new StructA[10];
+
+        static WaitOneFrameTasks s_WaitOneFrameTasks = new WaitOneFrameTasks();
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
@@ -34,22 +36,39 @@ namespace TestAsyncAwaitApp
 
             //Hello("E");
 
-            MyTask.Run(HelloMyTask, "I", null, myTaskScheduler);
+            MyTask.Run(HelloMyTask, "I");
+            //MyTask.Run(HelloMyTask2, "有返回值：");
 
             Log("Main");
 
             while(Console.KeyAvailable == false)
             {
                 scheduler.Update();
-                myTaskScheduler.Update();
+                //myTaskScheduler.Update();
+                s_WaitOneFrameTasks.Update();
                 //context.Update();
             }
 
             ref StructA a = ref alist[0];
         }
 
+        static async MyTask<string> HelloMyTask2(object prefix)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Log(prefix + $"{i}");
+                await MyTaskDelay(1000);
+            }
+
+            return "我是返回了String的协程";
+        }
+
         static async MyTask HelloMyTask(object prefix)
         {
+            string ret = await HelloMyTask2("我是有返回值的: ");
+
+            Console.WriteLine(ret);
+
             for (int i = 0; i < 3; i++)
             {
                 Log(prefix + $"{i}");
@@ -61,9 +80,9 @@ namespace TestAsyncAwaitApp
         {
             for (int n = t / 500, i = 0; i < n; ++i)
             {
-                await MyTask.WaitOneFrame();
+                await s_WaitOneFrameTasks.WaitOneFrame();
                 Log($"delay time {i * 10}");
-                throw new Exception($"EXCEPTION!! delay time {i * 10}");
+                //throw new Exception($"EXCEPTION!! delay time {i * 10}");
             }
         }
 

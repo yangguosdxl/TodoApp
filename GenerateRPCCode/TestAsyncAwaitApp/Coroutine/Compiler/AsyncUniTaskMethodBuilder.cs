@@ -38,14 +38,13 @@ namespace UniRx.Async.CompilerServices
         public void SetException(Exception exception)
         {
             m_Task.SetException(exception);
-            m_Task.Status = MyTaskStatus.Exception;
         }
 
         // 4. SetResult
         
         public void SetResult()
         {
-            m_Task.Status = MyTaskStatus.Complete;
+            m_Task.SetResult();
         }
 
         // 5. AwaitOnCompleted
@@ -73,18 +72,6 @@ namespace UniRx.Async.CompilerServices
         {
             m_Task.szName = stateMachine.ToString();
 
-            m_Task.Parent = MyTask.Current;
-            MyTask.Current = m_Task;
-
-            if (m_Task.Parent != null && m_Task.Parent.scheduler != null)
-            {
-                m_Task.scheduler = m_Task.Parent.scheduler;
-            }
-            else
-            {
-                m_Task.scheduler = MyTaskScheduler.Current;
-            }
-
             stateMachine.MoveNext();
         }
 
@@ -102,9 +89,9 @@ namespace UniRx.Async.CompilerServices
 
         // 1. Static Create method.
         
-        public static AsyncUniTaskMethodBuilder Create()
+        public static AsyncUniTaskMethodBuilder<T> Create()
         {
-            var builder = new AsyncUniTaskMethodBuilder();
+            var builder = new AsyncUniTaskMethodBuilder<T>();
             return builder;
         }
 
@@ -124,15 +111,13 @@ namespace UniRx.Async.CompilerServices
         public void SetException(Exception exception)
         {
             m_Task.SetException(exception);
-            m_Task.Status = MyTaskStatus.Exception;
         }
 
         // 4. SetResult
         
-        public void SetResult(ref T result)
+        public void SetResult(T result)
         {
             m_Task.SetResult(ref result);
-            m_Task.Status = MyTaskStatus.Complete;
         }
 
         // 5. AwaitOnCompleted
@@ -158,14 +143,6 @@ namespace UniRx.Async.CompilerServices
         public void Start<TStateMachine>(ref TStateMachine stateMachine)
             where TStateMachine : IAsyncStateMachine
         {
-            m_Task.szName = stateMachine.ToString();
-
-            if (MyTask.Current != null)
-            {
-                m_Task.Parent = MyTask.Current;
-                MyTask.Current = m_Task;
-            }
-
             stateMachine.MoveNext();
         }
 

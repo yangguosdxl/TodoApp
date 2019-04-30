@@ -22,36 +22,14 @@ namespace TestAsyncAwaitApp.Coroutine
         public static int NextTaskID { get; set; }
 
         #region factory method
-        public static MyTask Run(Func<object, MyTask> action, object state, MyTask parent, MyTaskScheduler scheduler)
+        public static MyTask Run(Func<object, MyTask> action, object state)
         {
-            MyTaskScheduler.Current = scheduler;
 
             MyTask task = action(state);
 
-            scheduler.QueueTask(task);
-
             return task;
         }
 
-        public static WaitOneFrameTask WaitOneFrame()
-        {
-            WaitOneFrameTask task = new WaitOneFrameTask();
-            task.szName = "WaitOneFrameTask";
-
-            task.Parent = MyTask.Current;
-            MyTask.Current = task;
-
-            if (task.Parent != null && task.Parent.scheduler != null)
-            {
-                task.scheduler = task.Parent.scheduler;
-            }
-            else
-            {
-                task.scheduler = MyTaskScheduler.Current;
-            }
-
-            return task;
-        }
         #endregion
 
         public int iTaskID { get; set; }
@@ -104,6 +82,7 @@ namespace TestAsyncAwaitApp.Coroutine
         public void SetResult()
         {
             Status = MyTaskStatus.Complete;
+            OnCompleted?.Invoke();
         }
 
         public void GetResult()
@@ -118,16 +97,13 @@ namespace TestAsyncAwaitApp.Coroutine
         public void SetException(Exception e)
         {
             Status = MyTaskStatus.Exception;
-
-            if (Parent != null)
-                Parent.SetException(e);
-            else
-                m_Exceptions.Add(e);
+            throw e;
         }
 
         public void SetCancel()
         {
             Status = MyTaskStatus.Canceled;
+            throw new CoroutineCanceledException();
         }
 
         public override string ToString()
@@ -136,16 +112,7 @@ namespace TestAsyncAwaitApp.Coroutine
         }
     }
 
-    [AsyncMethodBuilder(typeof(AsyncUniTaskMethodBuilder))]
-    public class WaitOneFrameTask : MyTask
-    {
-        public new WaitOneFrameAwaiter GetAwaiter()
-        {
-            return new WaitOneFrameAwaiter(this);
-        }
-    }
-
-    [AsyncMethodBuilder(typeof(AsyncUniTaskMethodBuilder))]
+    [AsyncMethodBuilder(typeof(AsyncUniTaskMethodBuilder<>))]
     public class MyTask<T> : MyTask
     {
         T m_Result;
@@ -159,6 +126,7 @@ namespace TestAsyncAwaitApp.Coroutine
         {
             Status = MyTaskStatus.Complete;
             m_Result = result;
+            OnCompleted?.Invoke();
         }
 
         public new T GetResult()

@@ -30,40 +30,6 @@ namespace TestAsyncAwaitApp.Coroutine
         public void OnCompleted(Action continuation)
         {
             m_Task.OnCompleted = continuation;
-
-            if (m_Task.Parent != null)
-                m_Task.Parent.Status = MyTaskStatus.Wait;
-
-            m_Task.scheduler.QueueTask(m_Task);
-        }
-    }
-
-    public class WaitOneFrameAwaiter : IMyAwaiter
-    {
-        protected MyTask m_Task;
-
-        public bool IsCompleted => m_Task.IsCompleted;
-
-        public MyTask Task => m_Task;
-
-        public void GetResult()
-        {
-        }
-
-        public WaitOneFrameAwaiter(MyTask task)
-        {
-            m_Task = task;
-        }
-
-        public virtual void OnCompleted(Action continuation)
-        {
-            m_Task.OnCompleted = continuation;
-            m_Task.Status = MyTaskStatus.Complete;
-
-            if (m_Task.Parent != null)
-                m_Task.Parent.Status = MyTaskStatus.Wait;
-
-            m_Task.scheduler.QueueTask(m_Task);
         }
     }
 
@@ -86,11 +52,6 @@ namespace TestAsyncAwaitApp.Coroutine
         public void OnCompleted(Action continuation)
         {
             m_Task.OnCompleted = continuation;
-
-            if (m_Task.Parent != null)
-                m_Task.Parent.Status = MyTaskStatus.Wait;
-
-            m_Task.scheduler.QueueTask(m_Task);
         }
     }
 }
