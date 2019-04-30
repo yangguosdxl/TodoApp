@@ -53,6 +53,8 @@ namespace UniRx.Async.CompilerServices
             where TAwaiter : IMyAwaiter
             where TStateMachine : IAsyncStateMachine
         {
+            m_Task.Child = awaiter.Task;
+
             var runner = new MoveNextRunner<TStateMachine>();
             runner.StateMachine = stateMachine;
             awaiter.OnCompleted(runner.Run);
@@ -126,6 +128,8 @@ namespace UniRx.Async.CompilerServices
             where TAwaiter : IMyAwaiter
             where TStateMachine : IAsyncStateMachine
         {
+            m_Task.Child = awaiter.Task;
+
             var runner = new MoveNextRunner<TStateMachine>();
             runner.StateMachine = stateMachine;
             awaiter.OnCompleted(runner.Run);

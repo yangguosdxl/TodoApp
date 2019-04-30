@@ -48,6 +48,8 @@ namespace TestAsyncAwaitApp.Coroutine
             }
         }
 
+        public MyTask Child { get; set; }
+
         MyTaskStatus m_Status;
         public MyTaskStatus Status
         {
@@ -103,7 +105,8 @@ namespace TestAsyncAwaitApp.Coroutine
         public void SetCancel()
         {
             Status = MyTaskStatus.Canceled;
-            throw new CoroutineCanceledException();
+            Child?.SetCancel();
+            //throw new CoroutineCanceledException();
         }
 
         public override string ToString()

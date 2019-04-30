@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
+using UniRx.Async.CompilerServices;
 
 namespace TestAsyncAwaitApp.Coroutine
 {
@@ -30,7 +32,8 @@ namespace TestAsyncAwaitApp.Coroutine
                 MyTask task = m_Tasks[i];
                 m_Tasks.RemoveAt(i);
 
-                task.SetResult();
+                if (task.Status == MyTaskStatus.Complete)
+                    task.SetResult();
             }
         }
     }
