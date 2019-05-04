@@ -234,6 +234,10 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CoolAsync\CoolAsync.csproj">
+      <Project>{3777B7A1-9D4A-4308-B60A-79AED0DA41CE}</Project>
+      <Name>CoolAsync</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CoolRpcInterface\CoolRpcInterface.csproj">
       <Project>{F7C7FD8A-93A1-4DAC-B519-DFD0A2D3F235}</Project>
       <Name>CoolRpcInterface</Name>

@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Coroutine\Compiler\AsyncUniTaskVoidMethodBuilder.cs" />
+    <ProjectReference Include="..\CoolAsync\CoolAsync.csproj" />
   </ItemGroup>
 
 </Project>

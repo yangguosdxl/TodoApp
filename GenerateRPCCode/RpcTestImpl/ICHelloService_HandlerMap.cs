@@ -18,6 +18,8 @@ namespace CSRPC
             service.CallAsync.AddProtocolHandler((int)ProtoID.EICHelloService_Hello3_MsgIn, Process_Hello3);
         }
 
+
+
         private void Process_Hello(int iCommunicateID, byte[] bytes, int iStartIndex, int iCount)
         {
             ICHelloService_Hello_MsgIn msg = m_service.Serializer.Deserialize<ICHelloService_Hello_MsgIn>(bytes, iStartIndex, iCount);

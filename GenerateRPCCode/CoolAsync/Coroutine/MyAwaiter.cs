@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
 
-namespace TestAsyncAwaitApp.Coroutine
+namespace Cool.Coroutine
 {
     public interface IMyAwaiter : INotifyCompletion
     {
@@ -20,6 +17,7 @@ namespace TestAsyncAwaitApp.Coroutine
 
         public void GetResult()
         {
+
         }
 
         public MyAwaiter(MyTask task)

@@ -7,7 +7,7 @@ namespace NetWorkInterface
     public interface ISocketTask
     {
         void Startup();
-        void Send(byte[] buffer, int start, int len);
+        void Send(int iChunkType, int iCommunicateID, int iProtoID, Func<byte[], int, (byte[], int, int)> f);
 
         event Action OnDisconnect;
         // int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len

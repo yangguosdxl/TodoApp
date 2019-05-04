@@ -1,10 +1,7 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
-using UniRx.Async.CompilerServices;
 
-namespace TestAsyncAwaitApp.Coroutine
+namespace Cool.Coroutine
 {
     public class WaitOneFrameTasks
     {
@@ -32,7 +29,7 @@ namespace TestAsyncAwaitApp.Coroutine
                 MyTask task = m_Tasks[i];
                 m_Tasks.RemoveAt(i);
 
-                if (task.Status == MyTaskStatus.Complete)
+                if (task.Status != MyTaskStatus.Canceled)
                     task.SetResult();
             }
         }

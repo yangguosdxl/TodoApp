@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CoolAsync\CoolAsync.csproj" />
     <ProjectReference Include="..\CoolRpcInterface\CoolRpcInterface.csproj" />
     <ProjectReference Include="..\CSCommon\CSCommon.csproj" />
     <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />

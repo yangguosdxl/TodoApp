@@ -1,4 +1,5 @@
-﻿using CoolRpcInterface;
+﻿using Cool.Coroutine;
+using CoolRpcInterface;
 using System;
 using System.Threading.Tasks;
 
@@ -12,21 +13,21 @@ namespace RpcTestInterface
     }
     public interface ICHelloService : ICoolRpc
     {
-        Task Hello();
+        void Hello();
 
-        Task<(int,int)> HelloInt(int a);
+        MyTask<(int,int)> HelloInt(int a);
 
-        Task Hello2(Param p);
-        Task<Param> Hello3(Param p);
+        void Hello2(Param p);
+        MyTask<Param> Hello3(Param p);
     }
 
     public interface ISHelloService : ICoolRpc
     {
-        Task Hello();
+        void Hello();
 
-        Task<(int, int)> HelloInt(int a);
+        MyTask<(int, int)> HelloInt(int a);
 
-        Task Hello2(Param p);
-        Task<Param> Hello3(Param p);
+        void Hello2(Param p);
+        MyTask<Param> Hello3(Param p);
     }
 }

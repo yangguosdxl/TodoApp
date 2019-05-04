@@ -1,4 +1,5 @@
-﻿using CoolRpcInterface;
+﻿using Cool.Coroutine;
+using CoolRpcInterface;
 using CSRPC;
 using MyNetWork;
 using NetWorkInterface;
@@ -19,6 +20,8 @@ namespace ClientTest
         ISocketTask m_Socket;
 
         IMessageEncoder m_MessageCoder = new MessageEncoder();
+
+        WaitCompleteTasks m_WaitCompleteTasks = new WaitCompleteTasks(1024);
 
         handler[] m_ProtocoHandlers = new handler[(int)ProtoID.COUNT]; 
 
@@ -53,6 +56,7 @@ namespace ClientTest
                 TaskCompletionSource<(byte[], int, int)> taskCompletionSource;
                 if (m_MapRpcResponseProcessor.TryGetValue(iCommunicateID, out taskCompletionSource))
                 {
+
                     taskCompletionSource.SetResult((messageBuff, start, len));
                 }
                 else
@@ -94,6 +98,28 @@ namespace ClientTest
             m_MapRpcResponseProcessor.Add(iCommunicateID, taskCompletionSource);
 
             return await taskCompletionSource.Task;
+        }
+
+        void ICallAsync.SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendWithoutResponse(Func<(byte[], int, int)> action)
+        {
+            throw new NotImplementedException();
+        }
+
+        public MyTask<T> SendWithResponse<T>(int iChunkType, Func<(byte[], int, int)> action)
+        {
+            WaitCompleteTask<T> task = m_WaitCompleteTasks.WaitComplete<T>();
+
+
+        }
+
+        public void AddDeserializeFunc(int iProtoID, DeserializeFunc deserializer)
+        {
+            throw new NotImplementedException();
         }
     }
 

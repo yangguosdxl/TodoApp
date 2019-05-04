@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Cool.Coroutine;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using TestAsyncAwaitApp.Coroutine;
+
 
 namespace TestAsyncAwaitApp
 {
@@ -21,8 +22,6 @@ namespace TestAsyncAwaitApp
 
             CustomTaskScheduler scheduler = new CustomTaskScheduler();
             MySynchronizationContext context = new MySynchronizationContext();
-
-            MyTaskScheduler myTaskScheduler = new MyTaskScheduler();
 
             //SynchronizationContext.SetSynchronizationContext(context);
 
@@ -82,6 +81,7 @@ namespace TestAsyncAwaitApp
             {
                 await s_WaitOneFrameTasks.WaitOneFrame();
                 Log($"delay time {i * 10}");
+                //int x = 10 / i;
                 //throw new Exception($"EXCEPTION!! delay time {i * 10}");
             }
         }

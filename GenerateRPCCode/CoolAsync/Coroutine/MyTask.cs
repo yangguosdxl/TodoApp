@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
-using UniRx.Async.CompilerServices;
+using Cool.Coroutine.CompilerServices;
 
-namespace TestAsyncAwaitApp.Coroutine
+namespace Cool.Coroutine
 {
     public enum MyTaskStatus
     {
@@ -66,8 +65,6 @@ namespace TestAsyncAwaitApp.Coroutine
 
         public Action Action { get; set; }
 
-        public MyTaskScheduler scheduler { get; set; }
-
         public bool IsCompleted => Status == MyTaskStatus.Complete || Status == MyTaskStatus.Canceled || Status == MyTaskStatus.Exception;
 
         public MyTask()
@@ -98,8 +95,9 @@ namespace TestAsyncAwaitApp.Coroutine
 
         public void SetException(Exception e)
         {
+            //Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>\n{e}\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
             Status = MyTaskStatus.Exception;
-            throw e;
+            throw new Exception(String.Empty, e);
         }
 
         public void SetCancel()

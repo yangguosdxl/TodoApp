@@ -5,7 +5,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace UniRx.Async.CompilerServices
+namespace Cool.Coroutine.CompilerServices
 {
     internal class MoveNextRunner<TStateMachine>
         where TStateMachine : IAsyncStateMachine

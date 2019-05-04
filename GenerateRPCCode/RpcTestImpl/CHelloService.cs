@@ -27,7 +27,7 @@ namespace CSRPC
             var msgSerializeInfo = Serializer.Serialize(msg);
             var ret = await CallAsync.SendWithResponse(ChunkType, (int)ProtoID.EICHelloService_HelloInt_MsgIn, msgSerializeInfo.Item1, msgSerializeInfo.Item2, msgSerializeInfo.Item3);
             var retMsg = Serializer.Deserialize<ICHelloService_HelloInt_MsgOut>(ret.Item1, ret.Item2, ret.Item3);
-            return await Task.FromResult(retMsg.Value);
+            return retMsg.Value;
         }
 
         public async Task Hello2(RpcTestInterface.Param p)

@@ -3,12 +3,9 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Security;
-using TestAsyncAwaitApp.Coroutine;
 
-namespace UniRx.Async.CompilerServices
+namespace Cool.Coroutine.CompilerServices
 {
     public struct AsyncUniTaskMethodBuilder
     {
@@ -94,6 +91,7 @@ namespace UniRx.Async.CompilerServices
         public static AsyncUniTaskMethodBuilder<T> Create()
         {
             var builder = new AsyncUniTaskMethodBuilder<T>();
+            builder.m_Task = new MyTask<T>();
             return builder;
         }
 
@@ -103,7 +101,6 @@ namespace UniRx.Async.CompilerServices
         {
             get
             {
-                m_Task = new MyTask<T>();
                 return m_Task;
             }
         }

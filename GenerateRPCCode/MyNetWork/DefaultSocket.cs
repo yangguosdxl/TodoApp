@@ -15,25 +15,27 @@ namespace MyNetWork
 
         byte[] m_RecvBuffer;
 
-        ConcurrentQueue<ArraySegment<byte>> m_SendQueue = new ConcurrentQueue<ArraySegment<byte>>();
+        byte[] m_SendBuffer;
+
+        ConcurrentQueue<(int,int, int, Func<byte[], int, (byte[], int, int)>)> m_SendTaskQueue = new ConcurrentQueue<(int,int, int, Func<byte[], int, (byte[], int, int)>)>();
 
         public event Action OnDisconnect;
         public event Action<int, int, byte[], int, int> OnMessage;
 
-        TaskCompletionSource<bool> m_SendEvent = new TaskCompletionSource<bool>(false);
+        IMessageDecoder m_MessageDecoder;
 
-        IMessageDecoder m_MessageParser;
-
-        public IMessageDecoder MessageParser
+        public IMessageDecoder MessageDecoder
         {
-            get => m_MessageParser;
+            get => m_MessageDecoder;
             set
             {
-                m_MessageParser = value;
+                m_MessageDecoder = value;
 
-                m_MessageParser.OnMessage += _OnMessage;
+                m_MessageDecoder.OnMessage += _OnMessage;
             }
         }
+
+        public IMessageEncoder MessageEncoder { get; set; }
 
         private void _OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
@@ -45,25 +47,13 @@ namespace MyNetWork
             m_Socket = socket;
 
             m_RecvBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
+            m_SendBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
         }  
 
         public void Startup()
         {
             Task.Factory.StartNew(RecvLoopAsync, m_CTS.Token, m_CTS.Token, TaskCreationOptions.None, TaskScheduler.Default);
-            Task.Factory.StartNew(SendLoopAsync, m_CTS.Token, m_CTS.Token, TaskCreationOptions.None, TaskScheduler.Default);
-        }
-
-        public void Send(byte[] buffer, int start, int len)
-        {
-            byte[] bytes = new byte[len];
-            Array.Copy(buffer, start, bytes, 0, len);
-
-            ArraySegment<byte> seg = new ArraySegment<byte>(bytes, 0, len);
-
-            m_SendQueue.Enqueue(seg);
-
-            // @todo notify send task;
-            m_SendEvent.SetResult(true);
+            Task.Factory.StartNew(SendTaskLoopAsync, m_CTS.Token, m_CTS.Token, TaskCreationOptions.None, TaskScheduler.Default);
         }
 
         private async Task RecvLoopAsync(object state)
@@ -78,24 +68,39 @@ namespace MyNetWork
                 int iRecvBytes = await m_Socket.RecvAsync(seg);
 
                 if (iRecvBytes > 0)
-                    m_MessageParser.Decode(m_RecvBuffer, 0, iRecvBytes);
+                    m_MessageDecoder.Decode(m_RecvBuffer, 0, iRecvBytes);
             }
         }
 
-        private async Task SendLoopAsync(object state)
+        public void Send(int iChunkType, int iCommunicateID, int iProtoID, Func<byte[], int, (byte[], int,int)> f)
+        {
+            m_SendTaskQueue.Enqueue((iChunkType, iCommunicateID, iProtoID, f));
+        }
+
+        private async Task SendTaskLoopAsync(object state)
         {
             CancellationToken cancelToken = (CancellationToken)state;
             while (true)
             {
                 cancelToken.ThrowIfCancellationRequested();
 
-                ArraySegment<byte> seg;
-                if (m_SendQueue.TryDequeue(out seg))
+                (int,int,int, Func<byte[], int, (byte[], int, int)>) sendTask;
+                if (m_SendTaskQueue.TryDequeue(out sendTask))
                 {
+                    int iChunkType = sendTask.Item1;
+                    int iCommunicateID = sendTask.Item2;
+                    int iProtoID = sendTask.Item3;
+                    Func<byte[], int, (byte[], int,int)> f = sendTask.Item4;
+                    var (sendBytes, start, len) = f(m_SendBuffer, NetworkConfig.MESSAGE_HEAD_BYTES);
+
+                    (sendBytes, start, len) = MessageEncoder.Encode(iChunkType, iCommunicateID, iProtoID, sendBytes, start, len);
+
+                    ArraySegment<byte> seg = new ArraySegment<byte>(sendBytes, start, len);
+
                     int iSendBytes = await m_Socket.SendAsync(seg);
                     if (iSendBytes != seg.Count)
                     {
-                        // @todo what happened
+                        throw new Exception($"Real send bytes {iSendBytes}, Need send bytes {seg.Count}");
                     }
                 }
                 else

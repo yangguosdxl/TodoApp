@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace TestAsyncAwaitApp.Coroutine
+
+namespace Cool.Coroutine
 {
     public class CoroutineCanceledException : Exception
     {

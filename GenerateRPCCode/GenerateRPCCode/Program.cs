@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using CSharpSyntax;
 using System.IO;
 using RpcTestInterface;
+using Cool.Coroutine;
 
 namespace GenerateRPCCode
 {
@@ -375,11 +376,11 @@ namespace GenerateRPCCode
                 Identifier = t.Name + "_" + szMiName + "_MsgOut"
             };
 
-            if (typeRet == typeof(Task))
+            if (typeRet == typeof(void))
             {
                 bHasReturnValue = false;
             }
-            else if (typeRet.GetGenericTypeDefinition() == (typeof(Task<>)))
+            else if (typeRet.GetGenericTypeDefinition() == (typeof(MyTask<>)))
             {
                 s_EDSProtoID.Members.Add(msgOutProtoID);
 
@@ -423,9 +424,10 @@ namespace GenerateRPCCode
 
 
             // 函数名
+            // public async Task<ValueTuple<System.Int32, System.Int32>> HelloInt(System.Int32 a)
             MethodDeclarationSyntax rpcCallMDS = new MethodDeclarationSyntax
             {
-                Modifiers = Modifiers.Public | Modifiers.Async,
+                Modifiers = bHasReturnValue ?  Modifiers.Public | Modifiers.Async : Modifiers.Public,
                 Identifier = szMiName,
                 ParameterList = rpcInParams,
                 Body = new BlockSyntax()
@@ -436,7 +438,7 @@ namespace GenerateRPCCode
             if (bHasReturnValue)
             {
                 string retValues = GetRetValues(typeRet);
-                rpcCallMDS.ReturnType = Syntax.ParseName(string.Format("Task<{0}>", retValues));
+                rpcCallMDS.ReturnType = Syntax.ParseName(string.Format("MyTask<{0}>", retValues));
 
                 sendMsgSyntax = "CallAsync.SendWithResponse";
             }
@@ -447,6 +449,7 @@ namespace GenerateRPCCode
                 sendMsgSyntax = "CallAsync.SendWithoutResponse";
             }
 
+            // ICHelloService_HelloInt_MsgIn msg = new ICHelloService_HelloInt_MsgIn();
             rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
                 declaration: Syntax.VariableDeclaration(
                     Syntax.ParseName(MsgInStruct.Identifier),
@@ -459,6 +462,7 @@ namespace GenerateRPCCode
                             )
                         )) })));
             // 给msg赋值
+            // msg.a = a;
             foreach (var pi in aPiIn)
             {
                 rpcCallMDS.Body.Statements.Add(Syntax.ExpressionStatement(Syntax.BinaryExpression(
