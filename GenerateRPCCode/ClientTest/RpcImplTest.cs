@@ -49,7 +49,7 @@ namespace ClientTest.RpcImpl
         {
             Func<byte[], int, (byte[], int,int)> f = delegate(byte[] buffer, int start)
             {
-                var data = Serializer.Serialize(new ICHelloService_Hello_MsgIn());
+                var data = Serializer.Serialize(new ICHelloService_Hello_MsgIn(), );
 
                 return data;
             };

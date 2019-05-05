@@ -2,6 +2,7 @@ using System;
 using CoolRpcInterface;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Cool.Coroutine;
 
 namespace CSRPC
 {
@@ -17,8 +18,6 @@ namespace CSRPC
             service.CallAsync.AddProtocolHandler((int)ProtoID.EICHelloService_Hello2_MsgIn, Process_Hello2);
             service.CallAsync.AddProtocolHandler((int)ProtoID.EICHelloService_Hello3_MsgIn, Process_Hello3);
         }
-
-
 
         private void Process_Hello(int iCommunicateID, byte[] bytes, int iStartIndex, int iCount)
         {

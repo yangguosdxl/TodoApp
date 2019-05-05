@@ -7,6 +7,7 @@ namespace CoolRpcInterface
     public interface ISerializer
     {
         (byte[], int, int) Serialize<T>(T o);
+        (byte[], int, int) Serialize<T>(T o, byte[] buffer, int start);
         T Deserialize<T>(byte[] bytes, int iStartIndex, int iCount);
     }
 }

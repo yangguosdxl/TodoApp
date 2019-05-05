@@ -37,6 +37,7 @@ namespace GenerateRPCCode
                         Syntax.UsingDirective((NameSyntax)Syntax.ParseName("CoolRpcInterface")),
                         Syntax.UsingDirective((NameSyntax)Syntax.ParseName("System.Threading.Tasks")),
                         Syntax.UsingDirective((NameSyntax)Syntax.ParseName("Microsoft.Extensions.DependencyInjection")),
+                        Syntax.UsingDirective((NameSyntax)Syntax.ParseName("Cool.Coroutine")),
                     }
             );
             s_NameSpace = Syntax.NamespaceDeclaration((NameSyntax)Syntax.ParseName("CSRPC"));
@@ -440,11 +441,11 @@ namespace GenerateRPCCode
                 string retValues = GetRetValues(typeRet);
                 rpcCallMDS.ReturnType = Syntax.ParseName(string.Format("MyTask<{0}>", retValues));
 
-                sendMsgSyntax = "CallAsync.SendWithResponse";
+                sendMsgSyntax = $"CallAsync.SendWithResponse<{MsgOutStruct.Identifier}>";
             }
             else
             {
-                rpcCallMDS.ReturnType = Syntax.ParseName(typeRet.Name);
+                rpcCallMDS.ReturnType = Syntax.ParseName("void");
 
                 sendMsgSyntax = "CallAsync.SendWithoutResponse";
             }
@@ -472,8 +473,34 @@ namespace GenerateRPCCode
                     )));
             }
 
-            // var (bytes, iStart, len ) = m_Serializer.Serialize(msg);
+            // Func<byte[], int, (byte[], int,int)> f = delegate(byte[] buffer, int start) {}
+            BlockSyntax serializeBlock = Syntax.Block();
+
             rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
+                declaration: Syntax.VariableDeclaration(
+                    Syntax.ParseName("Func<byte[], int, ValueTuple<byte[], int,int>>"),
+                    new[] {Syntax.VariableDeclarator(
+                        "f",
+                        initializer: Syntax.EqualsValueClause(
+                            Syntax.AnonymousMethodExpression(
+                                block: serializeBlock,
+                                parameterList: Syntax.ParameterList(
+                                    Syntax.Parameter(
+                                        identifier: "buffer",
+                                        type: Syntax.ParseName("byte[]")
+                                    ),
+                                    Syntax.Parameter(
+                                        identifier: "start",
+                                        type: Syntax.ParseName("int")
+                                    )
+                                )
+                            )
+                        )) })));
+
+
+
+            // var (bytes, iStart, len ) = m_Serializer.Serialize(msg);
+            serializeBlock.Statements.Add(Syntax.LocalDeclarationStatement(
                 declaration: Syntax.VariableDeclaration(
                     Syntax.ParseName("var"),
                     new[] {Syntax.VariableDeclarator(
@@ -485,30 +512,35 @@ namespace GenerateRPCCode
                                                 Expression = Syntax.ParseName("Serializer"),
                                                 Name = (SimpleNameSyntax)Syntax.ParseName("Serialize")
                                             },
-                                            argumentList: Syntax.ArgumentList(Syntax.Argument(Syntax.ParseName("msg")))
+                                            argumentList: Syntax.ArgumentList(
+                                                Syntax.Argument(Syntax.ParseName("msg")),
+                                                Syntax.Argument(Syntax.ParseName("buffer")),
+                                                Syntax.Argument(Syntax.ParseName("start"))
+                                            )
                                         )
-                                    )) }
-                    )
-                 )
-             );
+                                    )
+                    ) }
+                )
+             ));
 
-            // var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse(ChunkType, iCommunicateID, iProtoID, bytes, iStart, len);
+            serializeBlock.Statements.Add(Syntax.ReturnStatement(Syntax.ParseName("msgSerializeInfo")));
+
+            // var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse<ReturnValue>(ChunkType, iCommunicateID, iProtoID, bytes, iStart, len);
             List<ArgumentSyntax> sendMsgArgs = new List<ArgumentSyntax>();
             sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("ChunkType")));
             if (!bHasReturnValue)
                 sendMsgArgs.Add(Syntax.Argument(Syntax.LiteralExpression(0)));
             sendMsgArgs.Add(Syntax.Argument((Syntax.CastExpression("int", Syntax.ParseName("ProtoID." + msgInProtoID.Identifier)))));
-            sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item1")));
-            sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item2")));
-            sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("msgSerializeInfo.Item3")));
+            sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("f")));
 
-            var sendExpression = Syntax.AwaitExpression(Syntax.InvocationExpression(
+            ExpressionSyntax sendExpression = Syntax.InvocationExpression(
                 expression: Syntax.ParseName(sendMsgSyntax),
                 argumentList: Syntax.ArgumentList( sendMsgArgs.ToArray())
-                ));
+                );
 
             if (bHasReturnValue)
             {
+                sendExpression = Syntax.AwaitExpression(sendExpression);
                 rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
                     declaration: Syntax.VariableDeclaration(
                         Syntax.ParseName("var"),
@@ -521,46 +553,8 @@ namespace GenerateRPCCode
                      )
                 );
 
-                // var retMsg = m_Serializer.Deserialize<MsgHelloIntRet>(byteRet, indexRet, lenRet);
-                rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
-                declaration: Syntax.VariableDeclaration(
-                    Syntax.ParseName("var"),
-                    new[] {Syntax.VariableDeclarator(
-                                    "retMsg",
-                                    initializer: Syntax.EqualsValueClause(
-                                        Syntax.InvocationExpression(
-                                            Syntax.ParseName(string.Format("Serializer.Deserialize<{0}>", MsgOutStruct.Identifier)),
-                                            argumentList: Syntax.ArgumentList(
-                                                Syntax.Argument(Syntax.ParseName("ret.Item1")),
-                                                Syntax.Argument(Syntax.ParseName("ret.Item2")),
-                                                Syntax.Argument(Syntax.ParseName("ret.Item3"))
-                                            )
-                                        )
-                                    )
-                          )}
-                    )
-                ));
-
                 // return await Task.FromResult((ret.a, ret.a));
-                rpcCallMDS.Body.Statements.Add(Syntax.ReturnStatement(
-
-                    Syntax.AwaitExpression(Syntax.InvocationExpression(
-                        expression: Syntax.ParseName("Task.FromResult"),
-                        argumentList: Syntax.ArgumentList(
-                            Syntax.Argument(Syntax.ParseName("retMsg.Value"))
-                            )
-                        ))
-                    ));
-                //rpcCallMDS.Body.Statements.Add(Syntax.ReturnStatement(
-                //    Syntax.AwaitExpression(Syntax.InvocationExpression(
-                //        expression: Syntax.ParseName("Task.FromResult"),
-                //        argumentList: Syntax.ArgumentList(
-                //            Syntax.Argument(Syntax.ParseName("retMsg.Value")),
-                //            Syntax.Argument(Syntax.ParseName("msgSerializeInfo.item2")),
-                //            Syntax.Argument(Syntax.ParseName("msgSerializeInfo.item3"))
-                //            )
-                //        ))
-                //    ));
+                rpcCallMDS.Body.Statements.Add(Syntax.ReturnStatement(Syntax.ParseName("ret.Value")));
             }
             else
             {
