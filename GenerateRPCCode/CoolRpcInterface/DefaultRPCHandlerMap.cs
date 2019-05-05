@@ -6,19 +6,19 @@ namespace CoolRpcInterface
 {
     public class DefaultRPCHandlerMap : IRPCHandlerMap
     {
-        private handler[] m_Handlers;
+        private ProtocolHandler[] m_Handlers;
 
         public DefaultRPCHandlerMap(int count)
         {
-            m_Handlers = new handler[count];
+            m_Handlers = new ProtocolHandler[count];
         }
 
-        public void Add(int id, handler h)
+        public void Add(int id, ProtocolHandler h)
         {
             m_Handlers[id] = h;
         }
 
-        public handler Get(int id)
+        public ProtocolHandler Get(int id)
         {
             return m_Handlers[id];
         }

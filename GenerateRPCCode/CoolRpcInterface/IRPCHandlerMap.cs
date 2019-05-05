@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Cool.Coroutine;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CoolRpcInterface
 {
-    public delegate void handler(int iCommunicateID, byte[] bytes, int iStartIndex, int iCount);
+    public delegate MyTask ProtocolHandler(int iCommunicateID, IMessage _msg);
 
-    public delegate IMessage DeserializeFunc(byte[] bytes, int iStartIndex, int iCount);
+    public delegate IMessage ProtocolDeserializer(byte[] bytes, int iStartIndex, int iCount);
 
     public interface IRPCHandlerMap
     {

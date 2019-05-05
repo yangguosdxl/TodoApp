@@ -7,7 +7,7 @@ using Cool.Coroutine;
 namespace CSRPC
 {
     [MessagePack.MessagePackObject]
-    public class ISHelloService_HelloInt_MsgIn
+    public class ISHelloService_HelloInt_MsgIn : IMessage
     {
         [MessagePack.Key(1)]
         public System.Int32 a;

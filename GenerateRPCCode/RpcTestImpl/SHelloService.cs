@@ -36,6 +36,7 @@ namespace CSRPC
             };
             var ret = await CallAsync.SendWithResponse<ISHelloService_HelloInt_MsgOut>(ChunkType, (int)ProtoID.EISHelloService_HelloInt_MsgIn, f);
             return ret.Value;
+            msgRet.Value = ret;
         }
 
         public void Hello2(RpcTestInterface.Param p)
@@ -61,6 +62,7 @@ namespace CSRPC
             };
             var ret = await CallAsync.SendWithResponse<ISHelloService_Hello3_MsgOut>(ChunkType, (int)ProtoID.EISHelloService_Hello3_MsgIn, f);
             return ret.Value;
+            msgRet.Value = ret;
         }
     }
 }

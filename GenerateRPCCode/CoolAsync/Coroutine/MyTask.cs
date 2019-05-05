@@ -111,6 +111,13 @@ namespace Cool.Coroutine
         {
             return $"TaskName: {szName}, TaskID: {iTaskID}, Parent: {Parent?.iTaskID}, Status: {Status}";
         }
+
+        public static MyTask<T> FromResult<T>(T value)
+        {
+            MyTask<T> task = new MyTask<T>();
+            task.SetResult(ref value);
+            return task;
+        }
     }
 
     [AsyncMethodBuilder(typeof(AsyncUniTaskMethodBuilder<>))]

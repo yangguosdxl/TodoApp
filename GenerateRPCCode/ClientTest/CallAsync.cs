@@ -23,7 +23,7 @@ namespace ClientTest
 
         WaitCompleteTasks m_WaitCompleteTasks = new WaitCompleteTasks(1024);
 
-        handler[] m_ProtocoHandlers = new handler[(int)ProtoID.COUNT]; 
+        ProtocolHandler[] m_ProtocoHandlers = new ProtocolHandler[(int)ProtoID.COUNT]; 
 
         int GetNextRpcCommuniationID()
         {
@@ -68,13 +68,13 @@ namespace ClientTest
             {
                 if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
                 {
-                    handler h = m_ProtocoHandlers[iProtocolID];
+                    ProtocolHandler h = m_ProtocoHandlers[iProtocolID];
                     h(iCommunicateID, messageBuff, start, len);
                 }
             }
         }
 
-        public void AddProtocolHandler(int iProtoID, handler h)
+        public void AddProtocolHandler(int iProtoID, ProtocolHandler h)
         {
             m_ProtocoHandlers[iProtoID] = h;
         }
@@ -117,7 +117,7 @@ namespace ClientTest
 
         }
 
-        public void AddDeserializeFunc(int iProtoID, DeserializeFunc deserializer)
+        public void AddDeserializeFunc(int iProtoID, ProtocolDeserializer deserializer)
         {
             throw new NotImplementedException();
         }
