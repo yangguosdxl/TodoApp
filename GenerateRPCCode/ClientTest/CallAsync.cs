@@ -4,33 +4,24 @@ using CSRPC;
 using MyNetWork;
 using NetWorkInterface;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace ClientTest
 {
     class CallAsync : ICallAsync
     {
-        int m_iRpcCommuniationID = 0;
-        Dictionary<int, TaskCompletionSource<(byte[], int, int)>> m_MapRpcResponseProcessor = new Dictionary<int, TaskCompletionSource<(byte[], int, int)>>();
-
         ISocketTask m_Socket;
 
         IMessageEncoder m_MessageCoder = new MessageEncoder();
 
         WaitCompleteTasks m_WaitCompleteTasks = new WaitCompleteTasks(1024);
 
-        ProtocolHandler[] m_ProtocoHandlers = new ProtocolHandler[(int)ProtoID.COUNT]; 
+        ProtocolHandler[] m_ProtocoHandlers = new ProtocolHandler[(int)ProtoID.COUNT];
+        ProtocolDeserializer[] m_ProtocolDeserializers = new ProtocolDeserializer[(int)ProtoID.COUNT];
 
-        int GetNextRpcCommuniationID()
-        {
-            if (m_iRpcCommuniationID == int.MaxValue)
-                m_iRpcCommuniationID = 0;
-            return ++m_iRpcCommuniationID;
-        }
+        ConcurrentQueue<(int, int, IMessage)> m_RecvMessages = new ConcurrentQueue<(int, int, IMessage)>();
 
         public CallAsync(string ip, int port, NetType netType)
         {
@@ -51,25 +42,30 @@ namespace ClientTest
 
         private void OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
-            if (iCommunicateID != 0)
-            {
-                TaskCompletionSource<(byte[], int, int)> taskCompletionSource;
-                if (m_MapRpcResponseProcessor.TryGetValue(iCommunicateID, out taskCompletionSource))
-                {
+            IMessage msg = m_ProtocolDeserializers[iProtocolID](messageBuff, start, len);
+            m_RecvMessages.Enqueue((iProtocolID, iCommunicateID, msg));
+        }
 
-                    taskCompletionSource.SetResult((messageBuff, start, len));
+        public void Update()
+        {
+            ValueTuple<int, int, IMessage> msg;
+            while(m_RecvMessages.TryDequeue(out msg))
+            {
+                int iProtocolID = msg.Item1;
+                int iCommunicateID = msg.Item2;
+                IMessage message = msg.Item3;
+
+                if (iCommunicateID != 0)
+                {
+                    m_WaitCompleteTasks.OnComplete(iCommunicateID, ref message);
                 }
                 else
                 {
-                    Console.WriteLine($"Can not find communicate id's processor, {iCommunicateID}");
-                }
-            }
-            else
-            {
-                if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
-                {
-                    ProtocolHandler h = m_ProtocoHandlers[iProtocolID];
-                    h(iCommunicateID, messageBuff, start, len);
+                    if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
+                    {
+                        ProtocolHandler h = m_ProtocoHandlers[iProtocolID];
+                        h(iCommunicateID, message);
+                    }
                 }
             }
         }
@@ -79,45 +75,33 @@ namespace ClientTest
             m_ProtocoHandlers[iProtoID] = h;
         }
 
-        public async Task SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
+        public void AddProtocolDeserializer(int iProtoID, ProtocolDeserializer deserializer)
         {
-            (byte[] bytes2, int start2, int len2) = m_MessageCoder.Encode(iChunkType, iCommunicateID, iProtoID, bytes, iStart, len);
-            m_Socket.Send(bytes2, start2, len2);
-            await Task.CompletedTask;
+            m_ProtocolDeserializers[iProtoID] = deserializer;
         }
 
-        public async Task<(byte[], int, int)> SendWithResponse(int iChunkType, int iProtoID, byte[] bytes, int iStart, int len)
+
+
+        public void SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, Func<byte[], int, (byte[], int, int)> action)
         {
-            int iCommunicateID = GetNextRpcCommuniationID();
-
-            (byte[] bytes2, int start2, int len2) = m_MessageCoder.Encode(iChunkType, iCommunicateID, iProtoID, bytes, iStart, len);
-            m_Socket.Send(bytes2, start2, len2);
-
-            TaskCompletionSource<(byte[], int, int)> taskCompletionSource = new TaskCompletionSource<(byte[], int, int)>();
-
-            m_MapRpcResponseProcessor.Add(iCommunicateID, taskCompletionSource);
-
-            return await taskCompletionSource.Task;
+            m_Socket.Send(iChunkType, iCommunicateID, iProtoID, action);
         }
 
-        void ICallAsync.SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SendWithoutResponse(Func<(byte[], int, int)> action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public MyTask<T> SendWithResponse<T>(int iChunkType, Func<(byte[], int, int)> action)
+        public MyTask<T> SendWithResponse<T>(int iChunkType, int iProtoID, Func<byte[], int, (byte[], int, int)> action)
         {
             WaitCompleteTask<T> task = m_WaitCompleteTasks.WaitComplete<T>();
 
+            m_Socket.Send(iChunkType, task.ID, iProtoID, action);
 
+            return task;
         }
 
-        public void AddDeserializeFunc(int iProtoID, ProtocolDeserializer deserializer)
+        public void SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<(byte[], int, int)> SendWithResponse(int iChunkType, int iProtoID, byte[] bytes, int iStart, int len)
         {
             throw new NotImplementedException();
         }

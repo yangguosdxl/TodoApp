@@ -39,6 +39,9 @@ namespace Cool.Coroutine
         public void OnComplete<T>(int iID, ref T result)
         {
             WaitCompleteTask<T> task = m_aTasks[iID] as WaitCompleteTask<T>;
+            if (task == null)
+                return;
+
             m_aTasks[iID] = null;
             task.SetResult(ref result);
         }

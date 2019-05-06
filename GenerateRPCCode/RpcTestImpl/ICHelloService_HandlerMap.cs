@@ -40,6 +40,7 @@ namespace CSRPC
             ICHelloService_HelloInt_MsgIn msg = (ICHelloService_HelloInt_MsgIn)_msg;
             var ret = await m_service.HelloInt(msg.a);
             ICHelloService_HelloInt_MsgOut msgRet = new ICHelloService_HelloInt_MsgOut();
+            msgRet.Value = ret;
             Func<byte[], int, ValueTuple<byte[], int, int>> f = delegate(byte[] buffer, int start)
             {
                 var msgSerializeInfo = m_service.Serializer.Serialize(msgRet, buffer, start);
@@ -71,6 +72,7 @@ namespace CSRPC
             ICHelloService_Hello3_MsgIn msg = (ICHelloService_Hello3_MsgIn)_msg;
             var ret = await m_service.Hello3(msg.p);
             ICHelloService_Hello3_MsgOut msgRet = new ICHelloService_Hello3_MsgOut();
+            msgRet.Value = ret;
             Func<byte[], int, ValueTuple<byte[], int, int>> f = delegate(byte[] buffer, int start)
             {
                 var msgSerializeInfo = m_service.Serializer.Serialize(msgRet, buffer, start);

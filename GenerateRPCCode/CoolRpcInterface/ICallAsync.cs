@@ -16,5 +16,7 @@ namespace CoolRpcInterface
 
         void AddProtocolHandler(int iProtoID, ProtocolHandler h);
         void AddProtocolDeserializer(int iProtoID, ProtocolDeserializer deserializer);
+
+        void Update();
     }
 }

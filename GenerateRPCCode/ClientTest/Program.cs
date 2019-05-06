@@ -6,11 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 using RpcTestInterface;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ClientTest
@@ -37,24 +32,11 @@ namespace ClientTest
             sHelloService.ChunkType = (int)ChunkType.BASE;
 
             sHelloService.Hello();
+
+            while(true)
+            {
+                callAsync.Update();
+            }
         }
-
-        static async Task Hello()
-        {
-            var helloServer = rpcFactory.Get<ISHelloService>();
-            var ret = await helloServer.HelloInt(1);
-            Console.WriteLine("" + ret.Item1 + ", " + ret.Item2);
-
-            await helloServer.Hello2(new Param());
-        }
-
-        static void AddServices(IServiceCollection sc)
-        {
-            
-        }
-
-        
-
-        
     }
 }

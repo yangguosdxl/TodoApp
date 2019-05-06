@@ -48,9 +48,13 @@ namespace Gateway
             SessionMgr.Inst.TryRemove(SessionID, out session);
         }
 
-        public void Send(byte[] bytes, int start, int len)
+        public void Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len)
         {
-            m_Socket.Send(bytes, start, len);
+            m_Socket.Send(0, iCommunicateID, iProtocolID, delegate(byte[] sendBuffer, int offset)
+            {
+                Array.Copy(bytes, start, sendBuffer, offset, len);
+                return (sendBuffer, offset, len);
+            });
         }
     }
 }

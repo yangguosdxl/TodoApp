@@ -17,7 +17,7 @@ namespace GrainInterface
 
         void Recv(ChunkType eChunkType, int iCommunicationID, int iProtocolID, byte[] bytes, int start, int len);
 
-        void Send(byte[] bytes, int start, int len);
+        void Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len);
 
         void SetSessionID(Guid sessionID);
 

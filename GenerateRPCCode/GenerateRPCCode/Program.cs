@@ -704,7 +704,7 @@ namespace GenerateRPCCode
                         )) })));
                 // 给msg赋值
                 // msgRet.a = a;
-                rpcCallMDS.Body.Statements.Add(Syntax.ExpressionStatement(Syntax.BinaryExpression(
+                handlerMDS.Body.Statements.Add(Syntax.ExpressionStatement(Syntax.BinaryExpression(
                     @operator: BinaryOperator.Equals,
                     left: Syntax.ParseName("msgRet.Value"),
                     right: Syntax.ParseName("ret")
