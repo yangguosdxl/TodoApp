@@ -8,19 +8,19 @@ namespace CSCommon
     {
         public T Deserialize<T>(byte[] bytes, int iStartIndex, int iCount)
         {
+            ArraySegment<byte> seg = new ArraySegment<byte>(bytes, iStartIndex, iCount);
+            return MessagePack.LZ4MessagePackSerializer.Deserialize<T>(seg);
+        }
 
-            MemoryStream msRet = new MemoryStream(bytes, iStartIndex, iCount, false);
-
-            return MessagePack.MessagePackSerializer.Deserialize<T>(msRet);
+        public (byte[], int, int) Serialize<T>(T o, byte[] buffer, int start)
+        {
+            int len = MessagePack.LZ4MessagePackSerializer.SerializeToBlock(ref buffer, start, o, MessagePack.Resolvers.StandardResolver.Instance);
+            return (buffer, start, len);
         }
 
         public (byte[], int, int) Serialize<T>(T o)
         {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                MessagePack.MessagePackSerializer.Serialize(ms, o);
-                return (ms.GetBuffer(), 0, (int)ms.Position);
-            }
+            throw new NotImplementedException();
         }
     }
 }

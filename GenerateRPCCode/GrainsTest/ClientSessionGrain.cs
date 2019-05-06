@@ -1,4 +1,5 @@
-﻿using GrainInterface;
+﻿using CSRPC;
+using GrainInterface;
 using System;
 using System.Threading.Tasks;
 
@@ -11,6 +12,9 @@ namespace GrainsTest
         public object State { get; set; }
 
         IGatewayGrainObserver m_GateWayGrain;
+
+        ISHelloService_HandlerMap m_SHelloServiceHandlers
+
         public Task Subscribe(IGatewayGrainObserver gateway)
         {
             m_GateWayGrain = gateway;
@@ -25,13 +29,13 @@ namespace GrainsTest
 
         public void Recv(ChunkType eChunkType, int iCommunicationID, int iProtocolID, byte[] bytes, int start, int len)
         {
-            throw new NotImplementedException();
+        
         }
 
-        public void Send(byte[] bytes, int start, int len)
+        public void Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len)
         {
             if (m_GateWayGrain != null)
-                m_GateWayGrain.Send(bytes, start, len);
+                m_GateWayGrain.Send(iProtocolID, iCommunicateID, bytes, start, len);
         }
 
         public void SetSessionID(Guid sessionID)
