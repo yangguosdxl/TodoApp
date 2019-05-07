@@ -89,9 +89,9 @@ namespace ClientTest
             m_Socket.Send(iChunkType, iCommunicateID, iProtoID, action);
         }
 
-        public MyTask<T> SendWithResponse<T>(int iChunkType, int iProtoID, Func<byte[], int, (byte[], int, int)> action)
+        public MyTask<IMessage> SendWithResponse(int iChunkType, int iProtoID, Func<byte[], int, (byte[], int, int)> action)
         {
-            WaitCompleteTask<T> task = m_WaitCompleteTasks.WaitComplete<T>();
+            WaitCompleteTask<IMessage> task = m_WaitCompleteTasks.WaitComplete<IMessage>();
 
             m_Socket.Send(iChunkType, task.ID, iProtoID, action);
 

@@ -21,35 +21,37 @@ namespace ClientTest
             ISerializer serializer = new Serializer();
             callAsync = new CallAsync("127.0.0.1", 1234, NetWorkInterface.NetType.TCP);
 
-            CHelloService cHelloService = new CHelloService();
+            ClientTest.CHelloService cHelloService = new ClientTest.CHelloService();
             cHelloService.Serializer = serializer;
             cHelloService.CallAsync = callAsync;
             cHelloService.ChunkType = (int)ChunkType.BASE;
 
             CHelloServiceHandlers = new ICHelloService_HandlerMap(cHelloService);
 
-            sHelloService = new CSRPC.SHelloService();
-            sHelloService.Serializer = serializer;
-            sHelloService.CallAsync = callAsync;
+            sHelloService = new CSRPC.SHelloService(serializer, callAsync);
             sHelloService.ChunkType = (int)ChunkType.BASE;
 
             while (true)
             {
-                if (Console.ReadKey().Key ==  ConsoleKey.Spacebar)
+                if (Console.KeyAvailable)
                 {
-                    sHelloService.Hello();
-                    MyTask.Run(async delegate (object state)
+                    if (Console.ReadKey().Key == ConsoleKey.Spacebar)
                     {
-                        var (a, b) = await sHelloService.HelloInt(1);
-                        Console.WriteLine($"a:{a}, b:{b}");
+                        sHelloService.Hello();
+                        MyTask.Run(async delegate (object state)
+                        {
+                            var (a, b) = await sHelloService.HelloInt(1);
+                            Console.WriteLine($"a:{a}, b:{b}");
 
-                        //return null;
-                    }, null);
-                }
-                else if (Console.ReadKey().Key == ConsoleKey.A)
-                {
+                            //return null;
+                        }, null);
+                    }
+                    else if (Console.ReadKey().Key == ConsoleKey.A)
+                    {
 
+                    }
                 }
+
 
                 if (callAsync != null)
                     callAsync.Update();

@@ -57,7 +57,7 @@ namespace GrainsTest
             throw new NotImplementedException();
         }
 
-        public Cool.Coroutine.MyTask<T> SendWithResponse<T>(int iChunkType, int iProtoID, Func<byte[], int, (byte[], int, int)> action)
+        public Cool.Coroutine.MyTask<IMessage> SendWithResponse(int iChunkType, int iProtoID, Func<byte[], int, (byte[], int, int)> action)
         {
             throw new NotImplementedException();
         }

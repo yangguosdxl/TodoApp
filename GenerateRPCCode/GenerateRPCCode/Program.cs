@@ -23,6 +23,7 @@ namespace GenerateRPCCode
         static ClassDeclarationSyntax s_CDSRegistAllRpcService;
         static BlockSyntax s_AddAllRpcServicesBody;
         static BlockSyntax s_HandlerMapConstructorBody;
+        static BlockSyntax s_RpcCallConstructorBody;
 
         static void Main(string[] args)
         {
@@ -142,65 +143,56 @@ namespace GenerateRPCCode
                     modifiers: Modifiers.Public,
                     identifier: "CallAsync",
                     type: Syntax.ParseName("ICallAsync"),
-                    accessorList: new AccessorListSyntax
-                    {
-                        Accessors =
-                        {
-                            new AccessorDeclarationSyntax
-                            {
-                                Kind = AccessorDeclarationKind.Get,
-                                //Body = new BlockSyntax()
-                            },
-                            new AccessorDeclarationSyntax
-                            {
-                                Kind = AccessorDeclarationKind.Set,
-                                //Body = new BlockSyntax()
-                            }
-                        }
-                    }
+                    accessorList: Syntax.AccessorList(
+                        Syntax.AccessorDeclaration(AccessorDeclarationKind.Get, null),
+                        Syntax.AccessorDeclaration(AccessorDeclarationKind.Set, null)
+                        )
                     ));
 
             classRpcImpl.Members.Add(Syntax.PropertyDeclaration(
                     modifiers: Modifiers.Public,
                     identifier: "Serializer",
                     type: Syntax.ParseName("ISerializer"),
-                    accessorList: new AccessorListSyntax
-                    {
-                        Accessors =
-                        {
-                            new AccessorDeclarationSyntax
-                            {
-                                Kind = AccessorDeclarationKind.Get,
-                                //Body = new BlockSyntax()
-                            },
-                            new AccessorDeclarationSyntax
-                            {
-                                Kind = AccessorDeclarationKind.Set,
-                                //Body = new BlockSyntax()
-                            }
-                        }
-                    }
+                    accessorList: Syntax.AccessorList(
+                        Syntax.AccessorDeclaration(AccessorDeclarationKind.Get, null),
+                        Syntax.AccessorDeclaration(AccessorDeclarationKind.Set, null)
+                        )
                     ));
 
             classRpcImpl.Members.Add(Syntax.PropertyDeclaration(
                     modifiers: Modifiers.Public,
                     identifier: "ChunkType",
                     type: Syntax.ParseName("int"),
-                    accessorList: new AccessorListSyntax
-                    {
-                        Accessors =
-                        {
-                            new AccessorDeclarationSyntax
-                            {
-                                Kind = AccessorDeclarationKind.Get,
-                            },
-                            new AccessorDeclarationSyntax
-                            {
-                                Kind = AccessorDeclarationKind.Set,
-                            }
-                        }
-                    }
+                                        accessorList: Syntax.AccessorList(
+                        Syntax.AccessorDeclaration(AccessorDeclarationKind.Get, null),
+                        Syntax.AccessorDeclaration(AccessorDeclarationKind.Set, null)
+                        )
                     ));
+
+            s_RpcCallConstructorBody = new BlockSyntax();
+            classRpcImpl.Members.Add(Syntax.ConstructorDeclaration(
+                    modifiers: Modifiers.Public,
+                    identifier: classRpcImpl.Identifier,
+                    body: s_RpcCallConstructorBody,
+                    parameterList: Syntax.ParameterList(
+                        Syntax.Parameter(type: "ISerializer", identifier: "serializer"),
+                        Syntax.Parameter(type: "ICallAsync", identifier: "callAsync")
+                        )/*,
+                    initializer: Syntax.ConstructorInitializer(ThisOrBase.Base, Syntax.ArgumentList(
+                        Syntax.Argument(Syntax.CastExpression("int", Syntax.ParseName(s_EDSProtoID.Identifier + ".COUNT")))
+                        ))*/
+
+                    ));
+            s_RpcCallConstructorBody.Statements.Add(Syntax.ExpressionStatement(Syntax.BinaryExpression(
+                BinaryOperator.Equals,
+                Syntax.ParseName("Serializer"),
+                Syntax.ParseName("serializer")
+            )));
+            s_RpcCallConstructorBody.Statements.Add(Syntax.ExpressionStatement(Syntax.BinaryExpression(
+                BinaryOperator.Equals,
+                Syntax.ParseName("CallAsync"),
+                Syntax.ParseName("callAsync")
+            )));
             #endregion
 
 
@@ -375,7 +367,8 @@ namespace GenerateRPCCode
             ClassDeclarationSyntax MsgOutStruct = new ClassDeclarationSyntax
             {
                 Modifiers = Modifiers.Public,
-                Identifier = t.Name + "_" + szMiName + "_MsgOut"
+                Identifier = t.Name + "_" + szMiName + "_MsgOut",
+                BaseList = Syntax.BaseList("IMessage")
             };
 
             if (typeRet == typeof(void))
@@ -424,6 +417,22 @@ namespace GenerateRPCCode
                 return nodes;
             }
 
+            // 注册返回协议的反序列化函数
+            // CallAsync.AddProtocolDeserializer(1, m_service.Serializer.Deserialize<ISHelloService_Hello2_MsgIn>);
+            if (bHasReturnValue)
+            {
+                s_RpcCallConstructorBody.Statements.Add(Syntax.ExpressionStatement(Syntax.InvocationExpression(
+                    Syntax.ParseName("CallAsync.AddProtocolDeserializer"),
+                    Syntax.ArgumentList(
+                        Syntax.Argument(
+                            Syntax.CastExpression("int", Syntax.ParseName($"{s_EDSProtoID.Identifier}.{msgOutProtoID.Identifier}"))),
+                        Syntax.Argument(
+                            Syntax.ParseName($"Serializer.Deserialize<{MsgOutStruct.Identifier}>"))
+                        )
+                )));
+            }
+
+
 
             // 函数名
             // public async Task<ValueTuple<System.Int32, System.Int32>> HelloInt(System.Int32 a)
@@ -442,7 +451,7 @@ namespace GenerateRPCCode
                 string retValues = GetRetValues(typeRet);
                 rpcCallMDS.ReturnType = Syntax.ParseName(string.Format("MyTask<{0}>", retValues));
 
-                sendMsgSyntax = $"CallAsync.SendWithResponse<{MsgOutStruct.Identifier}>";
+                sendMsgSyntax = $"CallAsync.SendWithResponse";
             }
             else
             {
@@ -526,7 +535,7 @@ namespace GenerateRPCCode
 
             serializeBlock.Statements.Add(Syntax.ReturnStatement(Syntax.ParseName("msgSerializeInfo")));
 
-            // var (byteRet, indexRet, lenRet) = await m_CallAsync.SendWithResponse<ReturnValue>(ChunkType, iCommunicateID, iProtoID, bytes, iStart, len);
+            // var ret = (ReturnValue)await m_CallAsync.SendWithResponse(ChunkType, iProtoID, bytes, iStart, len);
             List<ArgumentSyntax> sendMsgArgs = new List<ArgumentSyntax>();
             sendMsgArgs.Add(Syntax.Argument(Syntax.ParseName("ChunkType")));
             if (!bHasReturnValue)
@@ -541,7 +550,7 @@ namespace GenerateRPCCode
 
             if (bHasReturnValue)
             {
-                sendExpression = Syntax.AwaitExpression(sendExpression);
+                sendExpression = Syntax.CastExpression(MsgOutStruct.Identifier, Syntax.AwaitExpression(sendExpression));
                 rpcCallMDS.Body.Statements.Add(Syntax.LocalDeclarationStatement(
                     declaration: Syntax.VariableDeclaration(
                         Syntax.ParseName("var"),

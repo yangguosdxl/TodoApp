@@ -14,6 +14,14 @@ namespace CSRPC
 
         public int ChunkType { get; set; }
 
+        public SHelloService(ISerializer serializer, ICallAsync callAsync)
+        {
+            Serializer = serializer;
+            CallAsync = callAsync;
+            CallAsync.AddProtocolDeserializer((int)ProtoID.EISHelloService_HelloInt_MsgOut, Serializer.Deserialize<ISHelloService_HelloInt_MsgOut>);
+            CallAsync.AddProtocolDeserializer((int)ProtoID.EISHelloService_Hello3_MsgOut, Serializer.Deserialize<ISHelloService_Hello3_MsgOut>);
+        }
+
         public void Hello()
         {
             ISHelloService_Hello_MsgIn msg = new ISHelloService_Hello_MsgIn();
@@ -34,7 +42,7 @@ namespace CSRPC
                 var msgSerializeInfo = Serializer.Serialize(msg, buffer, start);
                 return msgSerializeInfo;
             };
-            var ret = await CallAsync.SendWithResponse<ISHelloService_HelloInt_MsgOut>(ChunkType, (int)ProtoID.EISHelloService_HelloInt_MsgIn, f);
+            var ret = (ISHelloService_HelloInt_MsgOut)await CallAsync.SendWithResponse(ChunkType, (int)ProtoID.EISHelloService_HelloInt_MsgIn, f);
             return ret.Value;
         }
 
@@ -59,7 +67,7 @@ namespace CSRPC
                 var msgSerializeInfo = Serializer.Serialize(msg, buffer, start);
                 return msgSerializeInfo;
             };
-            var ret = await CallAsync.SendWithResponse<ISHelloService_Hello3_MsgOut>(ChunkType, (int)ProtoID.EISHelloService_Hello3_MsgIn, f);
+            var ret = (ISHelloService_Hello3_MsgOut)await CallAsync.SendWithResponse(ChunkType, (int)ProtoID.EISHelloService_Hello3_MsgIn, f);
             return ret.Value;
         }
     }

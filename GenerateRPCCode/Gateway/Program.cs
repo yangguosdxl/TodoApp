@@ -66,6 +66,8 @@ namespace Gateway
         {
             ClientSession session = new ClientSession(socket, Guid.NewGuid(), client);
             SessionMgr.Inst.TryAdd(session.SessionID, session);
+
+            Console.WriteLine($"New Connection, add session, guid {session.SessionID}");
         }
     }
 }

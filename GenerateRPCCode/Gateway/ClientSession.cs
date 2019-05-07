@@ -60,6 +60,8 @@ namespace Gateway
 
             ClientSession session;
             SessionMgr.Inst.TryRemove(SessionID, out session);
+
+            Console.WriteLine($"Disconnection, remove session, guid {session.SessionID}");
         }
 
         public void Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len)

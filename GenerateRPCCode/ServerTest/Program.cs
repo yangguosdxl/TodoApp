@@ -58,7 +58,7 @@ namespace ServerTest
                 //    options.ConnectionString = "server=localhost;user id=root;password=123456;database=TodoTest;pooling=true;SslMode=none;";
                 //    options.UseJsonFormat = true;
                 //})
-                .UseDashboard(options => { })
+                .UseDashboard(options => { options.HideTrace = true; })
                 ;
 
             var host = builder.Build();

@@ -34,12 +34,16 @@ namespace GrainsTest
 
         public Task Subscribe(IGatewayGrainObserver gateway)
         {
+            Console.WriteLine($"subscribe, session {IdentityString}");
+
             m_GateWayGrain = gateway;
             return Task.CompletedTask;
         }
 
         public Task UnSubscribe(IGatewayGrainObserver gateway)
         {
+            Console.WriteLine($"unsubscribe, session {IdentityString}");
+
             m_GateWayGrain = null;
             return Task.CompletedTask;
         }
@@ -66,7 +70,8 @@ namespace GrainsTest
 
         public Task OnDisconnect()
         {
-            throw new NotImplementedException();
+            Console.WriteLine($"Disconnection, remove session, guid {SessionID}");
+            return Task.CompletedTask;
         }
         
     }
