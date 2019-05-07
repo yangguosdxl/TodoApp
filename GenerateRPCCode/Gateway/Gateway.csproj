@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>F:\home\wann\TodoApp\GenerateRPCCode\bin\</OutputPath>
+    <OutputPath>../bin</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>F:\home\wann\TodoApp\GenerateRPCCode\bin\</OutputPath>
+    <OutputPath>../bin</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
