@@ -18,5 +18,7 @@ namespace CoolRpcInterface
         void AddProtocolDeserializer(int iProtoID, ProtocolDeserializer deserializer);
 
         void Update();
+        void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len);
+
     }
 }

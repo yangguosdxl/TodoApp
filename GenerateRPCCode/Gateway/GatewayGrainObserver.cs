@@ -12,5 +12,10 @@ namespace Gateway
         {
             throw new NotImplementedException();
         }
+
+        public void Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

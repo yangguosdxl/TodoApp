@@ -15,7 +15,7 @@ namespace MyNetWork
         int m_iCommunicateID = 0;
         int m_iChunkType = 0;
 
-        public event Action<int, int, byte[], int, int> OnMessage;
+        public event Action<int, int, int, byte[], int, int> OnMessage;
 
         public MessageDecoder()
         {
@@ -66,7 +66,7 @@ namespace MyNetWork
 
                     if (m_iBodyLeftBytes == 0)
                     { // 完整的协议已解析出来
-                        OnMessage(m_iProtocolID, m_iCommunicateID, m_OneMessgeBuffer, NetworkConfig.MESSAGE_HEAD_BYTES, m_iMessageBufferLen);
+                        OnMessage(m_iChunkType, m_iProtocolID, m_iCommunicateID, m_OneMessgeBuffer, NetworkConfig.MESSAGE_HEAD_BYTES, m_iMessageBufferLen);
 
                         // 清理
                         m_iMessageBufferLen = 0;

@@ -1,11 +1,13 @@
-﻿using CSRPC;
+﻿using CSCommon;
+using CSRPC;
 using GrainInterface;
+using Orleans;
 using System;
 using System.Threading.Tasks;
 
 namespace GrainsTest
 {
-    public class ClientSessionGrain : IClientSessionGrain
+    public class ClientSessionGrain : Grain, IClientSessionGrain
     {
         public Guid SessionID { get; set; }
 
@@ -13,7 +15,21 @@ namespace GrainsTest
 
         IGatewayGrainObserver m_GateWayGrain;
 
-        ISHelloService_HandlerMap m_SHelloServiceHandlers
+        ISHelloService_HandlerMap m_SHelloServiceHandlers;
+        CallAsync m_CallAsync;
+
+        public override Task OnActivateAsync()
+        {
+            SHelloService sHelloService = new SHelloService();
+            sHelloService.Serializer = new Serializer();
+            sHelloService.CallAsync = m_CallAsync = new CallAsync(this);
+
+            m_SHelloServiceHandlers = new ISHelloService_HandlerMap(sHelloService);
+
+
+
+            return base.OnActivateAsync();
+        }
 
         public Task Subscribe(IGatewayGrainObserver gateway)
         {
@@ -27,25 +43,30 @@ namespace GrainsTest
             return Task.CompletedTask;
         }
 
-        public void Recv(ChunkType eChunkType, int iCommunicationID, int iProtocolID, byte[] bytes, int start, int len)
+        public Task Recv(ChunkType eChunkType, int iCommunicationID, int iProtocolID, byte[] bytes, int start, int len)
         {
-        
+            m_CallAsync.OnMessage((int)eChunkType, iProtocolID, iCommunicationID, bytes, start, len);
+
+            return Task.CompletedTask;
         }
 
-        public void Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len)
+        public Task Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len)
         {
             if (m_GateWayGrain != null)
                 m_GateWayGrain.Send(iProtocolID, iCommunicateID, bytes, start, len);
+            return Task.CompletedTask;
         }
 
-        public void SetSessionID(Guid sessionID)
+        public Task SetSessionID(Guid sessionID)
         {
             SessionID = sessionID;
+            return Task.CompletedTask;
         }
 
         public Task OnDisconnect()
         {
             throw new NotImplementedException();
         }
+        
     }
 }

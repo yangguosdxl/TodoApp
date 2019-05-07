@@ -1,4 +1,5 @@
-﻿using NetWorkInterface;
+﻿
+using NetWorkInterface;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace MyNetWork.Tcp
         {
             Socket socket = await m_Socket.AcceptAsync();
 
-            return new KcpSocket(socket);
+            return new TcpSocket(socket);
         }
     }
 }

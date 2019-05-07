@@ -24,6 +24,7 @@ namespace Gateway
                             options.ClusterId = "dev";
                             options.ServiceId = "RpcTest";
                         })
+                        .UseLocalhostClustering()
                         // Clustering provider
                         //.UseAzureStorageClustering(options => options.ConnectionString = connectionString)
                         // Application parts: just reference one of the grain interfaces that we use

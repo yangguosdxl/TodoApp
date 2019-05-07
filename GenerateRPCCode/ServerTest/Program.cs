@@ -49,7 +49,7 @@ namespace ServerTest
                     options.ServiceId = "RpcTest";
                 })
                 .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(MessageRouter).Assembly).WithReferences())
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(ClientSessionGrain).Assembly).WithReferences())
                 .ConfigureLogging(logging => logging.AddConsole())
                 .AddMemoryGrainStorageAsDefault()
                 //.AddAdoNetGrainStorage("Mysql", options =>

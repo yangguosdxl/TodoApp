@@ -32,6 +32,15 @@ namespace GrainsTest
             m_ProtocolHandlers[iProtoID] = h;
         }
 
+        public void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
+        {
+            ProtocolDeserializer protocolDeserializer = m_ProtocolDeserializers[iProtocolID];
+            IMessage msg = protocolDeserializer(messageBuff, start, len);
+
+            ProtocolHandler h = m_ProtocolHandlers[iProtocolID];
+            h(iCommunicateID, msg);
+        }
+
         public void SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
         {
             throw new NotImplementedException();

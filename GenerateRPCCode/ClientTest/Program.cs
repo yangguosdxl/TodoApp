@@ -2,11 +2,8 @@
 using CSCommon;
 using CSRPC;
 using GrainInterface;
-using Microsoft.Extensions.DependencyInjection;
-
 using RpcTestInterface;
 using System;
-using System.Threading.Tasks;
 
 namespace ClientTest
 {
@@ -35,6 +32,10 @@ namespace ClientTest
 
             while(true)
             {
+                if (Console.ReadKey().Key ==  ConsoleKey.Spacebar)
+                {
+                    sHelloService.Hello();
+                }
                 callAsync.Update();
             }
         }

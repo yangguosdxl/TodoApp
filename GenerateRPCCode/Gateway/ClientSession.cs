@@ -1,4 +1,5 @@
 ﻿using GrainInterface;
+using MyNetWork;
 using NetWorkInterface;
 using Orleans;
 using System;
@@ -21,6 +22,10 @@ namespace Gateway
             m_Socket = socket;
             SessionID = sessionID;
 
+            socket.MessageEncoder = new MessageEncoder();
+            socket.MessageDecoder = new MessageDecoder();
+            socket.Startup();
+
             m_Socket.OnDisconnect += OnDisconnect;
             m_Socket.OnMessage += OnMessage;
 
@@ -30,9 +35,9 @@ namespace Gateway
             m_ClientSessionGrain.Subscribe(obj).GetAwaiter().GetResult();
         }
 
-        private void OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
+        private void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
-            m_ClientSessionGrain.Send(iCommunicateID, iProtocolID, messageBuff, start, len);
+            m_ClientSessionGrain.Recv((ChunkType)iChunkType, iCommunicateID, iProtocolID, messageBuff, start, len);
         }
 
         private void OnDisconnect()

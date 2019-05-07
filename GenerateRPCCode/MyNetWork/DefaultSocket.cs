@@ -1,5 +1,4 @@
-﻿using CoolRpcInterface;
-using NetWorkInterface;
+﻿using NetWorkInterface;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -20,7 +19,7 @@ namespace MyNetWork
         ConcurrentQueue<(int,int, int, Func<byte[], int, (byte[], int, int)>)> m_SendTaskQueue = new ConcurrentQueue<(int,int, int, Func<byte[], int, (byte[], int, int)>)>();
 
         public event Action OnDisconnect;
-        public event Action<int, int, byte[], int, int> OnMessage;
+        public event Action<int, int, int, byte[], int, int> OnMessage;
 
         IMessageDecoder m_MessageDecoder;
 
@@ -37,9 +36,9 @@ namespace MyNetWork
 
         public IMessageEncoder MessageEncoder { get; set; }
 
-        private void _OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
+        private void _OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
-            OnMessage(iProtocolID, iCommunicateID, messageBuff, start, len);
+            OnMessage(iChunkType, iProtocolID, iCommunicateID, messageBuff, start, len);
         }
 
         public DefaultSocket(ISocket socket)

@@ -14,8 +14,6 @@ namespace ClientTest
     {
         ISocketTask m_Socket;
 
-        IMessageEncoder m_MessageCoder = new MessageEncoder();
-
         WaitCompleteTasks m_WaitCompleteTasks = new WaitCompleteTasks(1024);
 
         ProtocolHandler[] m_ProtocoHandlers = new ProtocolHandler[(int)ProtoID.COUNT];
@@ -27,12 +25,16 @@ namespace ClientTest
         {
             DefaultSocketConnector socketConnector = new DefaultSocketConnector();
             m_Socket = socketConnector.Connect(ip, port, netType);
+            m_Socket.MessageEncoder = new MessageEncoder();
+            m_Socket.MessageDecoder = new MessageDecoder();
 
             if (m_Socket == null)
                 throw new Exception($"failed connect to socket {ip}:{port}:{netType}");
 
             m_Socket.OnMessage += OnMessage;
             m_Socket.OnDisconnect += OnDisconnect;
+
+            m_Socket.Startup();
         }
 
         private void OnDisconnect()
@@ -40,7 +42,7 @@ namespace ClientTest
             throw new NotImplementedException();
         }
 
-        private void OnMessage(int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
+        public void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
             IMessage msg = m_ProtocolDeserializers[iProtocolID](messageBuff, start, len);
             m_RecvMessages.Enqueue((iProtocolID, iCommunicateID, msg));
