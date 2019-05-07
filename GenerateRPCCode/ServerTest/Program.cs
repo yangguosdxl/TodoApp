@@ -1,15 +1,16 @@
-﻿using GrainInterface;
+﻿
 using GrainsTest;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using System.Net;
-using System.Text;
+
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace ServerTest
 {
@@ -50,7 +51,7 @@ namespace ServerTest
                 })
                 .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(ClientSessionGrain).Assembly).WithReferences())
-                .ConfigureLogging(logging => logging.AddConsole())
+                .ConfigureLogging(logging => logging.AddConsole().AddFilter("", LogLevel.Information))
                 .AddMemoryGrainStorageAsDefault()
                 //.AddAdoNetGrainStorage("Mysql", options =>
                 //{
