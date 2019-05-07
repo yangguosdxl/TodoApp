@@ -6,6 +6,8 @@ using Orleans.Configuration;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Gateway
 {
@@ -17,7 +19,10 @@ namespace Gateway
         {
             Console.WriteLine("Hello World!");
 
-            var client = new ClientBuilder()
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
+            client = new ClientBuilder()
                         // Clustering information
                         .Configure<ClusterOptions>(options =>
                         {
@@ -25,6 +30,7 @@ namespace Gateway
                             options.ServiceId = "RpcTest";
                         })
                         .UseLocalhostClustering()
+                        .ConfigureLogging(logging => logging.AddConsole())
                         // Clustering provider
                         //.UseAzureStorageClustering(options => options.ConnectionString = connectionString)
                         // Application parts: just reference one of the grain interfaces that we use
@@ -44,6 +50,16 @@ namespace Gateway
 
             }
 
+        }
+
+        private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            Console.WriteLine(e.Exception);
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine(e.ExceptionObject);
         }
 
         private static void OnNewConnection(ISocketTask socket)

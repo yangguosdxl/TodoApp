@@ -1,6 +1,7 @@
 ﻿using NetWorkInterface;
 using System;
 using System.Collections.Concurrent;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -62,12 +63,30 @@ namespace MyNetWork
             {
                 cancelToken.ThrowIfCancellationRequested();
 
-                ArraySegment<byte> seg = new ArraySegment<byte>(m_RecvBuffer);
+                try
+                {
+                    ArraySegment<byte> seg = new ArraySegment<byte>(m_RecvBuffer);
 
-                int iRecvBytes = await m_Socket.RecvAsync(seg);
+                    int iRecvBytes = await m_Socket.RecvAsync(seg);
 
-                if (iRecvBytes > 0)
-                    m_MessageDecoder.Decode(m_RecvBuffer, 0, iRecvBytes);
+                    if (iRecvBytes > 0)
+                        m_MessageDecoder.Decode(m_RecvBuffer, 0, iRecvBytes);
+                }
+                catch(SocketException e)
+                {
+                    m_Socket.Dispose();
+
+                    Console.WriteLine(e);
+
+                    OnDisconnect();
+                    
+                    return;
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
             }
         }
 
@@ -83,29 +102,46 @@ namespace MyNetWork
             {
                 cancelToken.ThrowIfCancellationRequested();
 
-                (int,int,int, Func<byte[], int, (byte[], int, int)>) sendTask;
-                if (m_SendTaskQueue.TryDequeue(out sendTask))
+                try
                 {
-                    int iChunkType = sendTask.Item1;
-                    int iCommunicateID = sendTask.Item2;
-                    int iProtoID = sendTask.Item3;
-                    Func<byte[], int, (byte[], int,int)> f = sendTask.Item4;
-                    var (sendBytes, start, len) = f(m_SendBuffer, NetworkConfig.MESSAGE_HEAD_BYTES);
-
-                    (sendBytes, start, len) = MessageEncoder.Encode(iChunkType, iCommunicateID, iProtoID, sendBytes, start, len);
-
-                    ArraySegment<byte> seg = new ArraySegment<byte>(sendBytes, start, len);
-
-                    int iSendBytes = await m_Socket.SendAsync(seg);
-                    if (iSendBytes != seg.Count)
+                    (int, int, int, Func<byte[], int, (byte[], int, int)>) sendTask;
+                    if (m_SendTaskQueue.TryDequeue(out sendTask))
                     {
-                        throw new Exception($"Real send bytes {iSendBytes}, Need send bytes {seg.Count}");
+                        int iChunkType = sendTask.Item1;
+                        int iCommunicateID = sendTask.Item2;
+                        int iProtoID = sendTask.Item3;
+                        Func<byte[], int, (byte[], int, int)> f = sendTask.Item4;
+                        var (sendBytes, start, len) = f(m_SendBuffer, NetworkConfig.MESSAGE_HEAD_BYTES);
+
+                        (sendBytes, start, len) = MessageEncoder.Encode(iChunkType, iCommunicateID, iProtoID, sendBytes, start, len);
+
+                        ArraySegment<byte> seg = new ArraySegment<byte>(sendBytes, start, len);
+
+                        int iSendBytes = await m_Socket.SendAsync(seg);
+                        if (iSendBytes != seg.Count)
+                        {
+                            throw new Exception($"Real send bytes {iSendBytes}, Need send bytes {seg.Count}");
+                        }
+                    }
+                    else
+                    {
+                        // @todo wait notfiy
+                        await Task.Delay(1);
                     }
                 }
-                else
+                catch (SocketException e)
                 {
-                    // @todo wait notfiy
-                    await Task.Delay(1);
+                    m_Socket.Dispose();
+
+                    Console.WriteLine(e);
+
+                    OnDisconnect();
+
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
                 }
             }
         }

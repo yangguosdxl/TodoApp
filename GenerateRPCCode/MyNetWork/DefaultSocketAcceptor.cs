@@ -30,9 +30,18 @@ namespace MyNetWork
             {
                 cancelTocken.ThrowIfCancellationRequested();
 
-                ISocket c = await m_Acceptor.AcceptAsync();
+                try
+                {
 
-                OnNewConnection?.Invoke(new DefaultSocket(c));
+                    ISocket c = await m_Acceptor.AcceptAsync();
+
+                    OnNewConnection?.Invoke(new DefaultSocket(c));
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
             }
         }
     }

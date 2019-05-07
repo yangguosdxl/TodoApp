@@ -8,5 +8,7 @@ namespace NetWorkInterface
     {
         Task<int> SendAsync(ArraySegment<byte> seg);
         Task<int> RecvAsync(ArraySegment<byte> seg);
+
+        void Dispose();
     }
 }

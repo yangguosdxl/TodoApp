@@ -4,6 +4,7 @@ using GrainInterface;
 using Orleans;
 using System;
 using System.Threading.Tasks;
+using SHelloService = ServerTest.SHelloService;
 
 namespace GrainsTest
 {

@@ -8,9 +8,9 @@ namespace ServerTest
 {
     class SHelloService : ISHelloService
     {
-        public ISerializer Serializer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ICallAsync CallAsync { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int ChunkType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ISerializer Serializer { get ; set ; }
+        public ICallAsync CallAsync { get ; set ; }
+        public int ChunkType { get ; set ; }
 
         public void Hello()
         {

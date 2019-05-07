@@ -13,7 +13,6 @@ namespace Gateway
     {
         ISocketTask m_Socket;
         IClientSessionGrain m_ClientSessionGrain;
-        IGatewayGrainObserver m_gatewayGrainObserver;
 
         public Guid SessionID { get; set; }
 
@@ -29,10 +28,20 @@ namespace Gateway
             m_Socket.OnDisconnect += OnDisconnect;
             m_Socket.OnMessage += OnMessage;
 
-            m_ClientSessionGrain = clusterClient.GetGrain<IClientSessionGrain>(sessionID);
 
-            var obj = clusterClient.CreateObjectReference<IGatewayGrainObserver>(this).GetAwaiter().GetResult();
-            m_ClientSessionGrain.Subscribe(obj).GetAwaiter().GetResult();
+            try
+            {
+                m_ClientSessionGrain = clusterClient.GetGrain<IClientSessionGrain>(sessionID);
+
+                var obj = clusterClient.CreateObjectReference<IGatewayGrainObserver>(this).GetAwaiter().GetResult();
+                m_ClientSessionGrain.Subscribe(obj).GetAwaiter().GetResult();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+
         }
 
         private void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)

@@ -15,6 +15,11 @@ namespace MyNetWork.Kcp
             m_Socket = socket;
         }
 
+        public void Dispose()
+        {
+            m_Socket.Dispose();
+        }
+
         public async Task<int> RecvAsync(ArraySegment<byte> seg)
         {
             int iRecvBytes = await m_Socket.ReceiveAsync(seg, SocketFlags.None);
