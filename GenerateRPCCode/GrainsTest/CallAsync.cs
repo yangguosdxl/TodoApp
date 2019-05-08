@@ -43,7 +43,7 @@ namespace GrainsTest
             IMessage message = protocolDeserializer(messageBuff, start, len);
 
 
-            if (iCommunicateID != 0)
+            if (NetHelper.IsValidCommunicateID(iCommunicateID) && NetHelper.IsResponseCommunicateID(iCommunicateID))
             {
                 m_WaitCompleteTasks.OnComplete(iCommunicateID, ref message);
             }
@@ -52,6 +52,9 @@ namespace GrainsTest
                 if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
                 {
                     ProtocolHandler h = m_ProtocolHandlers[iProtocolID];
+                    if (NetHelper.IsValidCommunicateID(iCommunicateID))
+                        iCommunicateID = NetHelper.ConvertToResponseCommunicateID(iCommunicateID);
+
                     h(iCommunicateID, message);
                 }
             }
@@ -79,7 +82,9 @@ namespace GrainsTest
 
             WaitCompleteTask<IMessage> task = m_WaitCompleteTasks.WaitComplete<IMessage>();
 
-            m_ClientSessionGrain.Send(iProtoID, task.ID, bytes, start, len);
+            int iCommunicateID = NetHelper.ConvertToRequestCommunicateID(task.ID);
+
+            m_ClientSessionGrain.Send(iProtoID, iCommunicateID, bytes, start, len);
 
             return task;
         }

@@ -57,7 +57,7 @@ namespace ClientTest
                 int iCommunicateID = msg.Item2;
                 IMessage message = msg.Item3;
 
-                if (iCommunicateID != 0)
+                if (iCommunicateID != 0 && NetHelper.IsResponseCommunicateID(iCommunicateID))
                 {
                     m_WaitCompleteTasks.OnComplete(iCommunicateID, ref message);
                 }
@@ -66,6 +66,9 @@ namespace ClientTest
                     if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
                     {
                         ProtocolHandler h = m_ProtocoHandlers[iProtocolID];
+                        if (iCommunicateID != 0)
+                            iCommunicateID = NetHelper.ConvertToResponseCommunicateID(iCommunicateID);
+                        
                         h(iCommunicateID, message);
                     }
                 }
@@ -89,11 +92,11 @@ namespace ClientTest
             m_Socket.Send(iChunkType, iCommunicateID, iProtoID, action);
         }
 
-        public MyTask<IMessage> SendWithResponse(int iChunkType, int iProtoID, int iProtoIDRet, Func<byte[], int, (byte[], int, int)> action)
+        public MyTask<IMessage> SendWithResponse(int iChunkType, int iProtoID, Func<byte[], int, (byte[], int, int)> action)
         {
-            WaitMessageCompleteTask task = m_WaitCompleteTasks.WaitComplete<IMessage>();
-
-            m_Socket.Send(iChunkType, task.ID, iProtoID, action);
+            WaitCompleteTask<IMessage> task = m_WaitCompleteTasks.WaitComplete<IMessage>();
+            int iCommunicateID = NetHelper.ConvertToRequestCommunicateID(task.ID);
+            m_Socket.Send(iChunkType, iCommunicateID, iProtoID, action);
 
             return task;
         }

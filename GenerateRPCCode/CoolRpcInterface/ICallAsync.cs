@@ -12,7 +12,7 @@ namespace CoolRpcInterface
         Task<(byte[], int, int)> SendWithResponse(int iChunkType, int iProtoID, byte[] bytes, int iStart, int len);
 
         void SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, Func<byte[], int, ValueTuple<byte[], int, int>> action);
-        MyTask<IMessage> SendWithResponse(int iChunkType, int iProtoID, int iProtoIDRet, Func<byte[], int, ValueTuple<byte[], int, int>> action);
+        MyTask<IMessage> SendWithResponse(int iChunkType, int iProtoID, Func<byte[], int, ValueTuple<byte[], int, int>> action);
 
         void AddProtocolHandler(int iProtoID, ProtocolHandler h);
         void AddProtocolDeserializer(int iProtoID, ProtocolDeserializer deserializer);

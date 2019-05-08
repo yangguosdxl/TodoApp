@@ -86,7 +86,7 @@ namespace MyNetWork
 
                 value = bytes[1];
                 value <<= 8;
-                value = bytes[0];
+                value |= (ushort)bytes[0];
 
                 return value;
             }

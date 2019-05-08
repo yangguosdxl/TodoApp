@@ -27,13 +27,6 @@ namespace GrainsTest
             Console.WriteLine($"server: recv hello2 param {p.a}");
 
             p.a = 2;
-
-            MyTask.Run(async delegate (object o)
-            {
-                var (a, b) = await clientSessionGrain.CHelloService.HelloInt(1);
-                Console.WriteLine($"recv client a: {a}, b: {b}");
-
-            }, null);
         }
 
         public MyTask<Param> Hello3(Param p)
@@ -47,6 +40,13 @@ namespace GrainsTest
         public MyTask<(int, int)> HelloInt(int a)
         {
             Console.WriteLine($"server: recv helloint {a}");
+
+            MyTask.Run(async delegate (object o)
+            {
+                var (c, d) = await clientSessionGrain.CHelloService.HelloInt(1);
+                Console.WriteLine($"recv client a: {c}, b: {d}");
+
+            }, null);
 
             return MyTask.FromResult((a, a));
         }
