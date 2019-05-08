@@ -1,7 +1,9 @@
-﻿using CoolRpcInterface;
+﻿using Cool.Coroutine;
+using CoolRpcInterface;
 using CSRPC;
 using GrainInterface;
 using MyNetWork;
+using NetWorkInterface;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,6 +18,9 @@ namespace GrainsTest
         IClientSessionGrain m_ClientSessionGrain;
 
         byte[] m_SendBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
+
+        WaitCompleteTasks m_WaitCompleteTasks = new WaitCompleteTasks(1024);
+        IMessageEncoder m_MessageEncoder = new MessageEncoder();
 
         public CallAsync(IClientSessionGrain clientSessionGrain)
         {
@@ -35,10 +40,21 @@ namespace GrainsTest
         public void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
             ProtocolDeserializer protocolDeserializer = m_ProtocolDeserializers[iProtocolID];
-            IMessage msg = protocolDeserializer(messageBuff, start, len);
+            IMessage message = protocolDeserializer(messageBuff, start, len);
 
-            ProtocolHandler h = m_ProtocolHandlers[iProtocolID];
-            h(iCommunicateID, msg);
+
+            if (iCommunicateID != 0)
+            {
+                m_WaitCompleteTasks.OnComplete(iCommunicateID, ref message);
+            }
+            else
+            {
+                if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
+                {
+                    ProtocolHandler h = m_ProtocolHandlers[iProtocolID];
+                    h(iCommunicateID, message);
+                }
+            }
         }
 
         public void SendWithoutResponse(int iChunkType, int iCommunicateID, int iProtoID, byte[] bytes, int iStart, int len)
@@ -59,7 +75,13 @@ namespace GrainsTest
 
         public Cool.Coroutine.MyTask<IMessage> SendWithResponse(int iChunkType, int iProtoID, Func<byte[], int, (byte[], int, int)> action)
         {
-            throw new NotImplementedException();
+            var (bytes, start, len) = action(m_SendBuffer, 0);
+
+            WaitCompleteTask<IMessage> task = m_WaitCompleteTasks.WaitComplete<IMessage>();
+
+            m_ClientSessionGrain.Send(iProtoID, task.ID, bytes, start, len);
+
+            return task;
         }
 
         public void Update()

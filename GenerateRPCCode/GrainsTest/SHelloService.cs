@@ -2,9 +2,10 @@
 using System.Threading.Tasks;
 using Cool.Coroutine;
 using CoolRpcInterface;
+using GrainsTest;
 using RpcTestInterface;
 
-namespace ServerTest
+namespace GrainsTest
 {
     class SHelloService : ISHelloService
     {
@@ -12,9 +13,13 @@ namespace ServerTest
         public ICallAsync CallAsync { get ; set ; }
         public int ChunkType { get ; set ; }
 
+        public ClientSessionGrain clientSessionGrain;
+
         public void Hello()
         {
             Console.WriteLine("server: recv hello");
+
+            clientSessionGrain.CHelloService.Hello();
         }
 
         public void Hello2(Param p)
@@ -22,6 +27,13 @@ namespace ServerTest
             Console.WriteLine($"server: recv hello2 param {p.a}");
 
             p.a = 2;
+
+            MyTask.Run(async delegate (object o)
+            {
+                var (a, b) = await clientSessionGrain.CHelloService.HelloInt(1);
+                Console.WriteLine($"recv client a: {a}, b: {b}");
+
+            }, null);
         }
 
         public MyTask<Param> Hello3(Param p)

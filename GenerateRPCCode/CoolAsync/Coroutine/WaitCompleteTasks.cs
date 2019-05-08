@@ -36,6 +36,19 @@ namespace Cool.Coroutine
             return myTask;
         }
 
+        public void AddWaitCompleteTask<T>(WaitCompleteTask<T> task)
+        {
+            int iNextFreeID = GetNextFreeID();
+            task.ID = iNextFreeID;
+
+            m_aTasks[iNextFreeID] = task;
+        }
+
+        public MyTask GetTask(int iID)
+        {
+            return m_aTasks[iID];
+        }
+
         public void OnComplete<T>(int iID, ref T result)
         {
             WaitCompleteTask<T> task = m_aTasks[iID] as WaitCompleteTask<T>;

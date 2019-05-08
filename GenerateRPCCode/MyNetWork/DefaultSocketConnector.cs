@@ -30,7 +30,7 @@ namespace MyNetWork
             catch(SocketException e)
             {
                 socket = null;
-                Console.WriteLine($"socket error code: {e.NativeErrorCode}. {e}");
+                Console.WriteLine($"socket error code: {e.SocketErrorCode}. {e}");
             }
             catch(Exception e)
             {
@@ -62,7 +62,7 @@ namespace MyNetWork
             catch (SocketException e)
             {
                 socket = null;
-                Console.WriteLine($"socket error code: {e.NativeErrorCode}. {e}");
+                Console.WriteLine($"socket error code: {e.SocketErrorCode}. {e}");
             }
             catch (Exception e)
             {

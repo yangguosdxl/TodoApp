@@ -2,9 +2,10 @@
 using CSRPC;
 using GrainInterface;
 using Orleans;
+using RpcTestInterface;
 using System;
 using System.Threading.Tasks;
-using SHelloService = ServerTest.SHelloService;
+using SHelloService = GrainsTest.SHelloService;
 
 namespace GrainsTest
 {
@@ -19,14 +20,32 @@ namespace GrainsTest
         ISHelloService_HandlerMap m_SHelloServiceHandlers;
         CallAsync m_CallAsync;
 
+        public ICHelloService CHelloService;
+
         public override Task OnActivateAsync()
         {
             SHelloService sHelloService = new SHelloService();
             sHelloService.Serializer = new Serializer();
             sHelloService.CallAsync = m_CallAsync = new CallAsync(this);
+            sHelloService.clientSessionGrain = this;
 
             m_SHelloServiceHandlers = new ISHelloService_HandlerMap(sHelloService);
 
+            CHelloService = new CHelloService(sHelloService.Serializer, m_CallAsync);
+
+            //this.RegisterTimer(async delegate (object o)
+            //{
+            //    if (Console.KeyAvailable)
+            //    {
+            //        if (Console.ReadKey().Key == ConsoleKey.Spacebar)
+            //        {
+            //            m_CHelloService.Hello();
+
+            //            var (a,b) = await m_CHelloService.HelloInt(1);
+            //            Console.WriteLine($"recv client a: {a}, b: {b}");
+            //        }
+            //    }
+            //}, null, new TimeSpan(0), new TimeSpan(0,0,0,0,100));
 
 
             return base.OnActivateAsync();

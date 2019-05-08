@@ -13,6 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CoolAsync\CoolAsync.csproj" />
+    <ProjectReference Include="..\CoolRpcInterface\CoolRpcInterface.csproj" />
     <ProjectReference Include="..\NetWorkInterface\NetWorkInterface.csproj" />
   </ItemGroup>
 
