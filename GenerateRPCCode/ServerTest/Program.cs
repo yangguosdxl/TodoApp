@@ -51,7 +51,7 @@ namespace ServerTest
                 })
                 .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
                 .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(ClientSessionGrain).Assembly).WithReferences())
-                .ConfigureLogging(logging => logging.AddConsole().AddFilter("", LogLevel.Information))
+                .ConfigureLogging(logging => logging.AddConsole().AddFilter("Orleans", LogLevel.Warning))
                 .AddMemoryGrainStorageAsDefault()
                 //.AddAdoNetGrainStorage("Mysql", options =>
                 //{
@@ -59,7 +59,7 @@ namespace ServerTest
                 //    options.ConnectionString = "server=localhost;user id=root;password=123456;database=TodoTest;pooling=true;SslMode=none;";
                 //    options.UseJsonFormat = true;
                 //})
-                .UseDashboard(options => { options.HideTrace = true; })
+                .UseDashboard(options => {  })
                 ;
 
             var host = builder.Build();

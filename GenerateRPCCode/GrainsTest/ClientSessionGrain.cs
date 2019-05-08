@@ -70,7 +70,7 @@ namespace GrainsTest
 
         public Task OnDisconnect()
         {
-            Console.WriteLine($"Disconnection, remove session, guid {SessionID}");
+            Console.WriteLine($"Disconnection, remove session, guid {IdentityString}");
             return Task.CompletedTask;
         }
         
