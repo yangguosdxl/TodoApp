@@ -12,10 +12,21 @@ namespace MyNetWork.Tcp
         public ISocket Connect(EndPoint endPoint)
         {
             Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(endPoint);
 
-            if (socket.Connected)
-                return new TcpSocket(socket);
+            try
+            {
+                socket.Connect(endPoint);
+                if (socket.Connected)
+                    return new TcpSocket(socket);
+            }
+            catch(SocketException e)
+            {
+                socket.Dispose();
+                Console.WriteLine(e);
+                return null;
+            }
+
+            socket.Dispose();
 
             return null;
         }
@@ -23,10 +34,20 @@ namespace MyNetWork.Tcp
         public ISocket Connect(string host, int port)
         {
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(host, port);
 
-            if (socket.Connected)
-                return new TcpSocket(socket);
+            try
+            {
+                socket.Connect(host, port);
+
+                if (socket.Connected)
+                    return new TcpSocket(socket);
+            }
+            catch (SocketException e)
+            {
+                socket.Dispose();
+                Console.WriteLine(e);
+                return null;
+            }
 
             return null;
         }

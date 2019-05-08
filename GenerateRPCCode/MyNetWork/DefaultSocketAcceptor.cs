@@ -1,5 +1,6 @@
 ﻿using NetWorkInterface;
 using System;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,6 +37,10 @@ namespace MyNetWork
                     ISocket c = await m_Acceptor.AcceptAsync();
 
                     OnNewConnection?.Invoke(new DefaultSocket(c));
+                }
+                catch(SocketException e)
+                {
+                    Console.WriteLine(e);
                 }
                 catch(Exception e)
                 {

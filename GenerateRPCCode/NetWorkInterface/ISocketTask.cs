@@ -12,8 +12,10 @@ namespace NetWorkInterface
         IMessageDecoder MessageDecoder { get; set; }
         IMessageEncoder MessageEncoder { get; set; }
 
+        // 要求回调线程安全
         event Action OnDisconnect;
         // int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len
+        // 要求回调线程安全
         event Action<int, int, int, byte[], int,int> OnMessage;
     }
 }
