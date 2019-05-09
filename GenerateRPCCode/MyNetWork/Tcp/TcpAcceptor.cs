@@ -21,7 +21,7 @@ namespace MyNetWork.Tcp
         }
 
         public async Task<ISocket> AcceptAsync()
-        {
+        { 
             Socket socket = await m_Socket.AcceptAsync();
 
             return new TcpSocket(socket);
