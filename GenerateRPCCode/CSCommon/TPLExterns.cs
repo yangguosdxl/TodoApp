@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cool;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace CSCommon
                 var aggException = t.Exception.Flatten();
                 foreach (var exception in aggException.InnerExceptions)
                 {
-                    Console.WriteLine(exception);
+                    CoolLog.WriteLine(exception);
                 }
             },
             TaskContinuationOptions.OnlyOnFaulted);

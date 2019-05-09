@@ -1,35 +1,45 @@
-﻿using Cool.Coroutine;
+﻿using Cool;
+using Cool.Coroutine;
 using CoolRpcInterface;
 using CSCommon;
 using CSRPC;
 using GrainInterface;
 using RpcTestInterface;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ClientTest
 {
 
     class Program
     {
-        static IRPCHandlerMap CHelloServiceHandlers;
-        static ICallAsync callAsync;
-        static ISHelloService sHelloService;
-
+        static IRPCHandlerMap s_CHelloServiceHandlers;
+        static ICallAsync s_callAsync;
+        static ISHelloService s_sHelloService;
+        static Random s_Random = new Random();
 
         static void Main(string[] args)
         {
+            for(int i = 0; i < 1000; ++i)
+            {
+                Task.Run(StartClient);
+            }
+
+            Console.ReadKey();
+#if false
             ISerializer serializer = new Serializer();
-            callAsync = new CallAsync("127.0.0.1", 1234, NetWorkInterface.NetType.TCP);
+            s_callAsync = new CallAsync("127.0.0.1", 1234, NetWorkInterface.NetType.TCP);
 
             ClientTest.CHelloService cHelloService = new ClientTest.CHelloService();
             cHelloService.Serializer = serializer;
-            cHelloService.CallAsync = callAsync;
+            cHelloService.CallAsync = s_callAsync;
             cHelloService.ChunkType = (int)ChunkType.BASE;
 
-            CHelloServiceHandlers = new ICHelloService_HandlerMap(cHelloService);
+            s_CHelloServiceHandlers = new ICHelloService_HandlerMap(cHelloService);
 
-            sHelloService = new CSRPC.SHelloService(serializer, callAsync);
-            sHelloService.ChunkType = (int)ChunkType.BASE;
+            s_sHelloService = new CSRPC.SHelloService(serializer, s_callAsync);
+            s_sHelloService.ChunkType = (int)ChunkType.BASE;
 
             while (true)
             {
@@ -37,11 +47,11 @@ namespace ClientTest
                 {
                     if (Console.ReadKey().Key == ConsoleKey.Spacebar)
                     {
-                        sHelloService.Hello();
+                        s_sHelloService.Hello();
                         MyTask.Run(async delegate (object state)
                         {
-                            var (a, b) = await sHelloService.HelloInt(1);
-                            Console.WriteLine($"a:{a}, b:{b}");
+                            var (a, b) = await s_sHelloService.HelloInt(1);
+                            CoolLog.WriteLine($"a:{a}, b:{b}");
 
                             //return null;
                         }, null);
@@ -53,11 +63,74 @@ namespace ClientTest
                 }
 
 
+                if (s_callAsync != null)
+                    s_callAsync.Update();
+            }
+
+#endif
+        }
+
+        static async Task StartClient()
+        {
+            ISerializer serializer = new Serializer();
+            ICallAsync callAsync = new CallAsync("127.0.0.1", 1234, NetWorkInterface.NetType.TCP);
+
+            ClientTest.CHelloService cHelloService = new ClientTest.CHelloService();
+            cHelloService.Serializer = serializer;
+            cHelloService.CallAsync = callAsync;
+            cHelloService.ChunkType = (int)ChunkType.BASE;
+
+            IRPCHandlerMap cHelloServiceHandlerMap = new ICHelloService_HandlerMap(cHelloService);
+
+            ISHelloService sHelloService = new CSRPC.SHelloService(serializer, callAsync);
+            sHelloService.ChunkType = (int)ChunkType.BASE;
+
+            while (true)
+            {
+                await Task.Delay(10);
+
+                MyTask.Run(RunRequest, sHelloService);
+                
+
                 if (callAsync != null)
                     callAsync.Update();
             }
+        }
 
-            
+        static async MyTask RunRequest(object state)
+        {
+            ISHelloService sHelloService = state as ISHelloService;
+            int choose = s_Random.Next() % 4;
+            switch (choose)
+            {
+                case 0:
+                    {
+                        sHelloService.Hello();
+                        break;
+                    }
+                case 1:
+                    {
+                        var (a, b) = await sHelloService.HelloInt(1);
+                        CoolLog.WriteLine($"a:{a}, b:{b}");
+                        
+                        break;
+                    }
+                case 2:
+                    {
+                        Param p = new Param();
+                        p.a = 2;
+                        sHelloService.Hello2(p);
+                        break;
+                    }
+                case 3:
+                    {
+                        Param p = new Param();
+                        p.a = 3;
+                        Param ret = await sHelloService.Hello3(p);
+                        break;
+                    }
+
+            }
         }
     }
 }

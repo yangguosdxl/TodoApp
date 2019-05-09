@@ -43,7 +43,7 @@ namespace Cool.Coroutine
             set
             {
                 m_Parent = value;
-                //Console.WriteLine($"------------TaskName: {szName}, TaskID: {iTaskID}, Parent: {m_Parent?.iTaskID}");
+                //CoolLog.WriteLine($"------------TaskName: {szName}, TaskID: {iTaskID}, Parent: {m_Parent?.iTaskID}");
             }
         }
 
@@ -57,7 +57,7 @@ namespace Cool.Coroutine
             {
                 m_Status = value;
 
-                Console.WriteLine(this);
+                CoolLog.WriteLine(this);
             }
         }
 
@@ -95,7 +95,7 @@ namespace Cool.Coroutine
 
         public void SetException(Exception e)
         {
-            //Console.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>\n{e}\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+            //CoolLog.WriteLine($">>>>>>>>>>>>>>>>>>>>>>>>>\n{e}\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
             Status = MyTaskStatus.Exception;
             throw new Exception(String.Empty, e);
         }

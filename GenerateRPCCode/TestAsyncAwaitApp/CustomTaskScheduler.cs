@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cool;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -42,7 +43,7 @@ namespace TestAsyncAwaitApp
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"exception {e}");
+                    CoolLog.WriteLine($"exception {e}");
                 }
             }
             foreach (int i in aCompleteTasks)

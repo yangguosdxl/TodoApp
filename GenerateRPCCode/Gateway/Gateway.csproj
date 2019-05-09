@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BaseLib\BaseLib.csproj" />
     <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />
     <ProjectReference Include="..\MyNetWork\MyNetWork.csproj" />
   </ItemGroup>

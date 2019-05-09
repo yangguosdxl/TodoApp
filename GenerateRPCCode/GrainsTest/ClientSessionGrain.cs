@@ -1,4 +1,5 @@
-﻿using CSCommon;
+﻿using Cool;
+using CSCommon;
 using CSRPC;
 using GrainInterface;
 using Orleans;
@@ -42,7 +43,7 @@ namespace GrainsTest
             //            m_CHelloService.Hello();
 
             //            var (a,b) = await m_CHelloService.HelloInt(1);
-            //            Console.WriteLine($"recv client a: {a}, b: {b}");
+            //            CoolLog.WriteLine($"recv client a: {a}, b: {b}");
             //        }
             //    }
             //}, null, new TimeSpan(0), new TimeSpan(0,0,0,0,100));
@@ -53,7 +54,7 @@ namespace GrainsTest
 
         public Task Subscribe(IGatewayGrainObserver gateway)
         {
-            Console.WriteLine($"subscribe, session {IdentityString}");
+            CoolLog.WriteLine($"subscribe, session {IdentityString}");
 
             m_GateWayGrain = gateway;
             return Task.CompletedTask;
@@ -61,7 +62,7 @@ namespace GrainsTest
 
         public Task UnSubscribe(IGatewayGrainObserver gateway)
         {
-            Console.WriteLine($"unsubscribe, session {IdentityString}");
+            CoolLog.WriteLine($"unsubscribe, session {IdentityString}");
 
             m_GateWayGrain = null;
             return Task.CompletedTask;
@@ -89,7 +90,7 @@ namespace GrainsTest
 
         public Task OnDisconnect()
         {
-            Console.WriteLine($"Disconnection, remove session, guid {IdentityString}");
+            CoolLog.WriteLine($"Disconnection, remove session, guid {IdentityString}");
             return Task.CompletedTask;
         }
         

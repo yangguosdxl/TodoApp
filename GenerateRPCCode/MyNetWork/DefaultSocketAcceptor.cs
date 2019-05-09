@@ -1,4 +1,5 @@
-﻿using NetWorkInterface;
+﻿using Cool;
+using NetWorkInterface;
 using System;
 using System.Net.Sockets;
 using System.Threading;
@@ -40,11 +41,11 @@ namespace MyNetWork
                 }
                 catch(SocketException e)
                 {
-                    Console.WriteLine(e);
+                    CoolLog.WriteLine(e);
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine(e);
+                    CoolLog.WriteLine(e);
                 }
 
             }

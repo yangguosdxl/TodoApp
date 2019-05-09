@@ -1,4 +1,5 @@
-﻿using GrainInterface;
+﻿using Cool;
+using GrainInterface;
 using MyNetWork;
 using NetWorkInterface;
 using Orleans;
@@ -23,7 +24,7 @@ namespace Gateway
 
             socket.MessageEncoder = new MessageEncoder();
             socket.MessageDecoder = new MessageDecoder();
-            socket.Startup();
+            
 
             m_Socket.OnDisconnect += OnDisconnect;
             m_Socket.OnMessage += OnMessage;
@@ -34,14 +35,14 @@ namespace Gateway
                 m_ClientSessionGrain = clusterClient.GetGrain<IClientSessionGrain>(sessionID);
 
                 var obj = clusterClient.CreateObjectReference<IGatewayGrainObserver>(this).GetAwaiter().GetResult();
-                m_ClientSessionGrain.Subscribe(obj).GetAwaiter().GetResult();
+                m_ClientSessionGrain.Subscribe(obj).Wait();
             }
             catch(Exception e)
             {
-                Console.WriteLine(e);
+                CoolLog.WriteLine(e);
             }
 
-
+            socket.Startup();
         }
 
         private void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
@@ -61,7 +62,7 @@ namespace Gateway
             ClientSession session;
             SessionMgr.Inst.TryRemove(SessionID, out session);
 
-            Console.WriteLine($"Disconnection, remove session, guid {session.SessionID}");
+            CoolLog.WriteLine($"Disconnection, remove session, guid {session.SessionID}");
         }
 
         public void Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len)

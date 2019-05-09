@@ -10,7 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-
+using Cool;
 
 namespace ServerTest
 {
@@ -26,7 +26,7 @@ namespace ServerTest
             try
             {
                 var host = await StartSilo();
-                Console.WriteLine("Press Enter to terminate...");
+                CoolLog.WriteLine("Press Enter to terminate...");
                 Console.ReadLine();
 
                 await host.StopAsync();
@@ -35,7 +35,7 @@ namespace ServerTest
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                CoolLog.WriteLine(ex);
                 return 1;
             }
         }

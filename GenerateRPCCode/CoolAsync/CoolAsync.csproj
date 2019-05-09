@@ -5,4 +5,8 @@
     <RootNamespace>Cool</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BaseLib\BaseLib.csproj" />
+  </ItemGroup>
+
 </Project>

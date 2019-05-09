@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cool;
+using System;
 using System.Threading.Tasks;
 
 namespace SimpleAsyncTest
@@ -9,7 +10,7 @@ namespace SimpleAsyncTest
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            CoolLog.WriteLine("Hello World!");
         }
 
         async static Task<Type1> Method1Async()

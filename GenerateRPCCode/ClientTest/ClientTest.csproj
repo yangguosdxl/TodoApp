@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BaseLib\BaseLib.csproj" />
     <ProjectReference Include="..\CoolAsync\CoolAsync.csproj" />
     <ProjectReference Include="..\CoolRpcInterface\CoolRpcInterface.csproj" />
     <ProjectReference Include="..\CSCommon\CSCommon.csproj" />

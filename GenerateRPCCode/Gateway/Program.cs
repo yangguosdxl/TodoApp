@@ -8,6 +8,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using static System.Net.Mime.MediaTypeNames;
+using Cool;
 
 namespace Gateway
 {
@@ -17,7 +18,7 @@ namespace Gateway
         
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            CoolLog.WriteLine("Hello World!");
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
@@ -54,12 +55,12 @@ namespace Gateway
 
         private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            Console.WriteLine(e.Exception);
+            CoolLog.WriteLine(e.Exception);
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Console.WriteLine(e.ExceptionObject);
+            CoolLog.WriteLine(e.ExceptionObject);
         }
 
         private static void OnNewConnection(ISocketTask socket)
@@ -67,7 +68,7 @@ namespace Gateway
             ClientSession session = new ClientSession(socket, Guid.NewGuid(), client);
             SessionMgr.Inst.TryAdd(session.SessionID, session);
 
-            Console.WriteLine($"New Connection, add session, guid {session.SessionID}");
+            CoolLog.WriteLine($"New Connection, add session, guid {session.SessionID}");
         }
     }
 }

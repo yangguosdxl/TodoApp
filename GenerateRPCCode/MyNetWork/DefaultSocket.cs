@@ -1,4 +1,5 @@
-﻿using NetWorkInterface;
+﻿using Cool;
+using NetWorkInterface;
 using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
@@ -76,7 +77,7 @@ namespace MyNetWork
                 {
                     m_Socket.Dispose();
 
-                    Console.WriteLine(e);
+                    CoolLog.WriteLine(e);
 
                     OnDisconnect();
                     
@@ -84,7 +85,7 @@ namespace MyNetWork
                 }
                 catch(Exception e)
                 {
-                    Console.WriteLine(e);
+                    CoolLog.WriteLine(e);
                 }
 
             }
@@ -133,7 +134,7 @@ namespace MyNetWork
                 {
                     m_Socket.Dispose();
 
-                    Console.WriteLine(e);
+                    CoolLog.WriteLine(e);
 
                     OnDisconnect();
 
@@ -141,7 +142,7 @@ namespace MyNetWork
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    CoolLog.WriteLine(e);
                 }
             }
         }

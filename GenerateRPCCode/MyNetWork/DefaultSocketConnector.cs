@@ -1,4 +1,5 @@
-﻿using NetWorkInterface;
+﻿using Cool;
+using NetWorkInterface;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -30,12 +31,12 @@ namespace MyNetWork
             catch(SocketException e)
             {
                 socket = null;
-                Console.WriteLine($"socket error code: {e.SocketErrorCode}. {e}");
+                CoolLog.WriteLine($"socket error code: {e.SocketErrorCode}. {e}");
             }
             catch(Exception e)
             {
                 socket = null;
-                Console.WriteLine($"{e}");
+                CoolLog.WriteLine($"{e}");
             }
 
             return null;
@@ -62,12 +63,12 @@ namespace MyNetWork
             catch (SocketException e)
             {
                 socket = null;
-                Console.WriteLine($"socket error code: {e.SocketErrorCode}. {e}");
+                CoolLog.WriteLine($"socket error code: {e.SocketErrorCode}. {e}");
             }
             catch (Exception e)
             {
                 socket = null;
-                Console.WriteLine($"{e}");
+                CoolLog.WriteLine($"{e}");
             }
 
             return null;

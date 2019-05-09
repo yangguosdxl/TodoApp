@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BaseLib\BaseLib.csproj" />
     <ProjectReference Include="..\CSCommon\CSCommon.csproj" />
     <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />
     <ProjectReference Include="..\MyNetWork\MyNetWork.csproj" />

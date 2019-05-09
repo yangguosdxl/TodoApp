@@ -17,6 +17,7 @@ processReceive接口中可添加自定义动作
 -----------------------------------------------------------------
 */
 
+using Cool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,7 +111,7 @@ namespace UDP_IOCP.UIOCP_Kernel
             }
             catch (Exception e)
             {
-                Console.WriteLine("receove failed {0}", e);
+                CoolLog.WriteLine("receove failed {0}", e);
             }           
         }
 

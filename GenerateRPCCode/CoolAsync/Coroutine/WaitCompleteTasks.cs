@@ -19,7 +19,7 @@ namespace Cool.Coroutine
                 ++m_iNextFreeID;
                 if (m_iNextFreeID >= m_aTasks.Length)
                 {
-                    m_iNextFreeID = 0;
+                    m_iNextFreeID = 1;
                 }
             }
             while (m_aTasks[m_iNextFreeID] != null);

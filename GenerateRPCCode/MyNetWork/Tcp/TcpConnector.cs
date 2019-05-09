@@ -1,4 +1,5 @@
-﻿using NetWorkInterface;
+﻿using Cool;
+using NetWorkInterface;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -22,7 +23,7 @@ namespace MyNetWork.Tcp
             catch(SocketException e)
             {
                 socket.Dispose();
-                Console.WriteLine(e);
+                CoolLog.WriteLine(e);
                 return null;
             }
 
@@ -45,7 +46,7 @@ namespace MyNetWork.Tcp
             catch (SocketException e)
             {
                 socket.Dispose();
-                Console.WriteLine(e);
+                CoolLog.WriteLine(e);
                 return null;
             }
 
