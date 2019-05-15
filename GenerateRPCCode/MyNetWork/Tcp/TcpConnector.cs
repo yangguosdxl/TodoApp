@@ -1,10 +1,7 @@
-﻿using Cool;
+﻿
 using NetWorkInterface;
-using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace MyNetWork.Tcp
 {
@@ -20,14 +17,11 @@ namespace MyNetWork.Tcp
                 if (socket.Connected)
                     return new TcpSocket(socket);
             }
-            catch(SocketException e)
+            finally
             {
-                socket.Dispose();
-                CoolLog.WriteLine(e);
-                return null;
+                if (socket == null || socket.Connected == false)
+                    socket.Dispose();
             }
-
-            socket.Dispose();
 
             return null;
         }
@@ -43,11 +37,10 @@ namespace MyNetWork.Tcp
                 if (socket.Connected)
                     return new TcpSocket(socket);
             }
-            catch (SocketException e)
+            finally
             {
-                socket.Dispose();
-                CoolLog.WriteLine(e);
-                return null;
+                if (socket == null || socket.Connected == false)
+                    socket.Dispose();
             }
 
             return null;

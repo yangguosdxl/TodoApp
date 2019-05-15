@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Cool;
+using Orleans.Statistics;
 
 namespace ServerTest
 {
@@ -60,6 +61,7 @@ namespace ServerTest
                 //    options.UseJsonFormat = true;
                 //})
                 .UseDashboard(options => {  })
+                //.UsePerfCounterEnvironmentStatistics()
                 ;
 
             var host = builder.Build();

@@ -2,6 +2,7 @@
 using NetWorkInterface;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,6 +46,7 @@ namespace MyNetWork
 
         public DefaultSocket(ISocket socket)
         {
+            Debug.Assert(socket != null);
             m_Socket = socket;
 
             m_RecvBuffer = new byte[NetworkConfig.MESSAGE_MAX_BYTES];
