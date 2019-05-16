@@ -10,7 +10,7 @@ namespace SimpleAsyncTest
     {
         static void Main(string[] args)
         {
-            CoolLog.WriteLine("Hello World!");
+            Logger.Debug("Hello World!");
         }
 
         async static Task<Type1> Method1Async()

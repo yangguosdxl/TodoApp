@@ -54,7 +54,7 @@ namespace GrainsTest
 
         public Task Subscribe(IGatewayGrainObserver gateway)
         {
-            CoolLog.WriteLine($"subscribe, session {IdentityString}");
+            Logger.Info($"subscribe, session {IdentityString}");
 
             m_GateWayGrain = gateway;
             return Task.CompletedTask;
@@ -62,7 +62,7 @@ namespace GrainsTest
 
         public Task UnSubscribe(IGatewayGrainObserver gateway)
         {
-            CoolLog.WriteLine($"unsubscribe, session {IdentityString}");
+            Logger.Info($"unsubscribe, session {IdentityString}");
 
             m_GateWayGrain = null;
             return Task.CompletedTask;
@@ -90,7 +90,7 @@ namespace GrainsTest
 
         public Task OnDisconnect()
         {
-            CoolLog.WriteLine($"Disconnection, remove session, guid {IdentityString}");
+            Logger.Info($"Disconnection, remove session, guid {IdentityString}");
             return Task.CompletedTask;
         }
         

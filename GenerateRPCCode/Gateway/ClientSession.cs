@@ -39,7 +39,7 @@ namespace Gateway
             }
             catch(Exception e)
             {
-                CoolLog.WriteLine(e);
+                Logger.Warn(e);
             }
 
             socket.Startup();
@@ -62,7 +62,7 @@ namespace Gateway
             ClientSession session;
             SessionMgr.Inst.TryRemove(SessionID, out session);
 
-            CoolLog.WriteLine($"Disconnection, remove session, guid {session.SessionID}");
+            Logger.Info($"Disconnection, remove session, guid {session.SessionID}");
         }
 
         public void Send(int iProtocolID, int iCommunicateID, byte[] bytes, int start, int len)

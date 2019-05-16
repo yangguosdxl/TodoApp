@@ -57,7 +57,7 @@ namespace Cool.Coroutine
             {
                 m_Status = value;
 
-                CoolLog.WriteLine(this);
+                Logger.Debug(this);
             }
         }
 

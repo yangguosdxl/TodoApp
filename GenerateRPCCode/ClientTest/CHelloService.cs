@@ -16,19 +16,19 @@ namespace ClientTest
 
         public void Hello()
         {
-            CoolLog.WriteLine("client: recv hello");
+            Logger.Debug("client: recv hello");
         }
 
         public void Hello2(Param p)
         {
-            CoolLog.WriteLine($"client: recv hello2 param {p.a}");
+            Logger.Debug($"client: recv hello2 param {p.a}");
 
             p.a = 2;
         }
 
         public MyTask<Param> Hello3(Param p)
         {
-            CoolLog.WriteLine($"client: recv hello3 param {p.a}");
+            Logger.Debug($"client: recv hello3 param {p.a}");
 
             p.a = 3;
             return MyTask.FromResult(p);
@@ -36,7 +36,7 @@ namespace ClientTest
 
         public MyTask<(int, int)> HelloInt(int a)
         {
-            CoolLog.WriteLine($"client: recv helloint {a}");
+            Logger.Debug($"client: recv helloint {a}");
 
             return MyTask.FromResult((a, a));
         }

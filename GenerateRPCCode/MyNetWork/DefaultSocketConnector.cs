@@ -31,12 +31,12 @@ namespace MyNetWork
             catch(SocketException e)
             {
                 socket = null;
-                CoolLog.WriteLine($"socket error code: {e.SocketErrorCode}. {e}");
+                Logger.Warn($"socket error code: {e.SocketErrorCode}. {e}");
             }
             catch(Exception e)
             {
                 socket = null;
-                CoolLog.WriteLine($"{e}");
+                Logger.Warn($"{e}");
             }
 
             return null;
@@ -63,12 +63,12 @@ namespace MyNetWork
             catch (SocketException e)
             {
                 socket = null;
-                CoolLog.WriteLine($"socket error code: {e.SocketErrorCode}. {e}");
+                Logger.Warn($"socket error code: {e.SocketErrorCode}. {e}");
             }
             catch (Exception e)
             {
                 socket = null;
-                CoolLog.WriteLine($"{e}");
+                Logger.Warn($"{e}");
             }
 
             return null;

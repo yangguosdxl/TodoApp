@@ -41,11 +41,11 @@ namespace MyNetWork
                 }
                 catch(SocketException e)
                 {
-                    CoolLog.WriteLine(e);
+                    Logger.Warn(e);
                 }
                 catch(Exception e)
                 {
-                    CoolLog.WriteLine(e);
+                    Logger.Warn(e);
                 }
 
             }

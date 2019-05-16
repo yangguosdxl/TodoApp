@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>../bin</OutputPath>
+    <OutputPath>../bin/ServerTest</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

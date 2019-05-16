@@ -19,7 +19,7 @@ namespace TestAsyncAwaitApp
         static WaitOneFrameTasks s_WaitOneFrameTasks = new WaitOneFrameTasks();
         static void Main(string[] args)
         {
-            CoolLog.WriteLine("Hello World!");
+            Logger.Info("Hello World!");
 
             CustomTaskScheduler scheduler = new CustomTaskScheduler();
             MySynchronizationContext context = new MySynchronizationContext();
@@ -67,7 +67,7 @@ namespace TestAsyncAwaitApp
         {
             string ret = await HelloMyTask2("我是有返回值的: ");
 
-            CoolLog.WriteLine(ret);
+            Logger.Debug(ret);
 
             for (int i = 0; i < 3; i++)
             {
@@ -101,7 +101,7 @@ namespace TestAsyncAwaitApp
         {
             string szTaskScheduler = TaskScheduler.Current is CustomTaskScheduler ? "My" : "Default";
             string context = SynchronizationContext.Current is MySynchronizationContext ? "My" : "" + SynchronizationContext.Current;
-            CoolLog.WriteLine($"Context: {context}, TaskScheduler: {szTaskScheduler}, ThreadID: {Thread.CurrentThread.ManagedThreadId}. " + format, args);
+            Logger.Debug($"Context: {context}, TaskScheduler: {szTaskScheduler}, ThreadID: {Thread.CurrentThread.ManagedThreadId}. " + format, args);
         }
 
         static async Task Delay(int t)

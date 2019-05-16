@@ -27,7 +27,7 @@ namespace ServerTest
             try
             {
                 var host = await StartSilo();
-                CoolLog.WriteLine("Press Enter to terminate...");
+                Logger.Info("Press Enter to terminate...");
                 Console.ReadLine();
 
                 await host.StopAsync();
@@ -36,7 +36,7 @@ namespace ServerTest
             }
             catch (Exception ex)
             {
-                CoolLog.WriteLine(ex);
+                Logger.Warn(ex);
                 return 1;
             }
         }

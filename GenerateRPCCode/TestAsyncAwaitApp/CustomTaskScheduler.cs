@@ -43,7 +43,7 @@ namespace TestAsyncAwaitApp
                 }
                 catch (Exception e)
                 {
-                    CoolLog.WriteLine($"exception {e}");
+                    Logger.Warn($"exception {e}");
                 }
             }
             foreach (int i in aCompleteTasks)

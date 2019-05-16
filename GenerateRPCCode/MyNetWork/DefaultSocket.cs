@@ -79,7 +79,7 @@ namespace MyNetWork
                 {
                     m_Socket.Dispose();
 
-                    CoolLog.WriteLine(e);
+                    Logger.Warn(e);
 
                     OnDisconnect();
                     
@@ -87,7 +87,7 @@ namespace MyNetWork
                 }
                 catch(Exception e)
                 {
-                    CoolLog.WriteLine(e);
+                    Logger.Warn(e);
                 }
 
             }
@@ -136,7 +136,7 @@ namespace MyNetWork
                 {
                     m_Socket.Dispose();
 
-                    CoolLog.WriteLine(e);
+                    Logger.Warn(e);
 
                     OnDisconnect();
 
@@ -144,7 +144,7 @@ namespace MyNetWork
                 }
                 catch (Exception e)
                 {
-                    CoolLog.WriteLine(e);
+                    Logger.Warn(e);
                 }
             }
         }

@@ -18,7 +18,7 @@ namespace Gateway
         
         static void Main(string[] args)
         {
-            CoolLog.WriteLine("Hello World!");
+            Logger.Debug("Hello World!");
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
@@ -55,12 +55,12 @@ namespace Gateway
 
         private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            CoolLog.WriteLine(e.Exception);
+            Logger.Error(e.Exception);
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            CoolLog.WriteLine(e.ExceptionObject);
+            Logger.Error(e.ExceptionObject);
         }
 
         private static void OnNewConnection(ISocketTask socket)
@@ -68,7 +68,7 @@ namespace Gateway
             ClientSession session = new ClientSession(socket, Guid.NewGuid(), client);
             SessionMgr.Inst.TryAdd(session.SessionID, session);
 
-            CoolLog.WriteLine($"New Connection, add session, guid {session.SessionID}");
+            Logger.Info($"New Connection, add session, guid {session.SessionID}");
         }
     }
 }

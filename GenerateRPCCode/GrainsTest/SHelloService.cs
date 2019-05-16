@@ -18,21 +18,21 @@ namespace GrainsTest
 
         public void Hello()
         {
-            CoolLog.WriteLine("server: recv hello");
+            Logger.Debug("server: recv hello");
 
             clientSessionGrain.CHelloService.Hello();
         }
 
         public void Hello2(Param p)
         {
-            CoolLog.WriteLine($"server: recv hello2 param {p.a}");
+            Logger.Debug($"server: recv hello2 param {p.a}");
 
             p.a = 2;
         }
 
         public MyTask<Param> Hello3(Param p)
         {
-            CoolLog.WriteLine($"server: recv hello3 param {p.a}");
+            Logger.Debug($"server: recv hello3 param {p.a}");
 
             p.a = 3;
             return MyTask.FromResult(p);
@@ -40,12 +40,12 @@ namespace GrainsTest
 
         public MyTask<(int, int)> HelloInt(int a)
         {
-            CoolLog.WriteLine($"server: recv helloint {a}");
+            Logger.Debug($"server: recv helloint {a}");
 
             MyTask.Run(async delegate (object o)
             {
                 var (c, d) = await clientSessionGrain.CHelloService.HelloInt(1);
-                CoolLog.WriteLine($"recv client a: {c}, b: {d}");
+                Logger.Debug($"recv client a: {c}, b: {d}");
 
             }, null);
 

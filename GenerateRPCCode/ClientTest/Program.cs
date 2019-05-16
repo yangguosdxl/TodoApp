@@ -111,7 +111,7 @@ namespace ClientTest
                 case 1:
                     {
                         var (a, b) = await sHelloService.HelloInt(1);
-                        CoolLog.WriteLine($"a:{a}, b:{b}");
+                        Logger.Debug($"a:{a}, b:{b}");
                         
                         break;
                     }

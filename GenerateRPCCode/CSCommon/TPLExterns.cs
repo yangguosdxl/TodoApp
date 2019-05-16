@@ -15,7 +15,7 @@ namespace CSCommon
                 var aggException = t.Exception.Flatten();
                 foreach (var exception in aggException.InnerExceptions)
                 {
-                    CoolLog.WriteLine(exception);
+                    Logger.Warn(exception);
                 }
             },
             TaskContinuationOptions.OnlyOnFaulted);

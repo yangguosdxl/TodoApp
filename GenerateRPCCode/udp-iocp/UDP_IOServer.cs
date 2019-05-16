@@ -111,7 +111,7 @@ namespace UDP_IOCP.UIOCP_Kernel
             }
             catch (Exception e)
             {
-                CoolLog.WriteLine("receove failed {0}", e);
+                Logger.Warn("receove failed {0}", e);
             }           
         }
 
