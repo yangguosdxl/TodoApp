@@ -9,8 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BaseLib\BaseLib.csproj" />
-    <ProjectReference Include="..\CoolRpcInterface\CoolRpcInterface.csproj" />
+    <ProjectReference Include="..\..\..\app\Program\Base\BaseLib\BaseLib.csproj" />
+    <ProjectReference Include="..\..\..\app\Program\Base\CoolRpcInterface\Cool.Interface.Rpc.csproj" />
   </ItemGroup>
 
 </Project>

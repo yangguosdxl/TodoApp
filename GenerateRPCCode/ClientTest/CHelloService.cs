@@ -1,6 +1,6 @@
 ﻿using Cool;
 using Cool.Coroutine;
-using CoolRpcInterface;
+using Cool.Interface.Rpc;
 using RpcTestInterface;
 using System;
 using System.Collections.Generic;

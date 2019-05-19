@@ -1,6 +1,6 @@
 ﻿using GrainInterface;
-using MyNetWork;
-using NetWorkInterface;
+using Cool.NetWork;
+using Cool.Interface.NetWork;
 using Orleans;
 using Orleans.Configuration;
 using System;

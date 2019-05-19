@@ -27,9 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BaseLib\BaseLib.csproj" />
+    <ProjectReference Include="..\..\..\app\Program\Base\NetWorkInterface\Cool.Interface.NetWork.csproj" />
+    <ProjectReference Include="..\..\..\app\Program\Base\NetWork\CoolNetWork\CoolNetWork.csproj" />
     <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />
-    <ProjectReference Include="..\MyNetWork\MyNetWork.csproj" />
   </ItemGroup>
 
 </Project>

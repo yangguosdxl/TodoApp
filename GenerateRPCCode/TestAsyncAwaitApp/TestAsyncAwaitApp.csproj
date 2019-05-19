@@ -14,7 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CoolAsync\CoolAsync.csproj" />
+    <ProjectReference Include="..\..\..\app\Program\Base\BaseLib\BaseLib.csproj" />
+    <ProjectReference Include="..\..\..\app\Program\Base\CoolAsync\CoolAsync.csproj" />
   </ItemGroup>
 
 </Project>

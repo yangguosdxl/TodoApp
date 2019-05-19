@@ -1,4 +1,4 @@
-﻿using CoolRpcInterface;
+﻿using Cool.Interface.Rpc;
 using System;
 using System.IO;
 

@@ -1,5 +1,5 @@
 ﻿using Cool.Coroutine;
-using CoolRpcInterface;
+using Cool.Interface.Rpc;
 using System;
 using System.Threading.Tasks;
 

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Cool;
 using Cool.Coroutine;
-using CoolRpcInterface;
+using Cool.Interface.Rpc;
 using GrainsTest;
 using RpcTestInterface;
 

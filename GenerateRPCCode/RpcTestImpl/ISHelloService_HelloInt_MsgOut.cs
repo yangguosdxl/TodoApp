@@ -1,5 +1,5 @@
 using System;
-using CoolRpcInterface;
+using Cool.Interface.Rpc;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Cool.Coroutine;

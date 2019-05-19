@@ -16,8 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BaseLib\BaseLib.csproj" />
-    <ProjectReference Include="..\CoolRpcInterface\CoolRpcInterface.csproj" />
     <ProjectReference Include="..\RpcTestInterface\RpcTestInterface.csproj" />
   </ItemGroup>
 

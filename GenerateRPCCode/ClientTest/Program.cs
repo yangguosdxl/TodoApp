@@ -1,6 +1,6 @@
 ﻿using Cool;
 using Cool.Coroutine;
-using CoolRpcInterface;
+using Cool.Interface.Rpc;
 using CSCommon;
 using CSRPC;
 using GrainInterface;
@@ -21,7 +21,7 @@ namespace ClientTest
 
         static void Main(string[] args)
         {
-            for(int i = 0; i < 1000; ++i)
+            for(int i = 0; i < 500; ++i)
             {
                 Task.Run(StartClient);
             }
@@ -29,7 +29,7 @@ namespace ClientTest
             Console.ReadKey();
 #if false
             ISerializer serializer = new Serializer();
-            s_callAsync = new CallAsync("127.0.0.1", 1234, NetWorkInterface.NetType.TCP);
+            s_callAsync = new CallAsync("127.0.0.1", 1234, Cool.Interface.NetWork.NetType.TCP);
 
             ClientTest.CHelloService cHelloService = new ClientTest.CHelloService();
             cHelloService.Serializer = serializer;
@@ -73,7 +73,7 @@ namespace ClientTest
         static async Task StartClient()
         {
             ISerializer serializer = new Serializer();
-            ICallAsync callAsync = new CallAsync("127.0.0.1", 1234, NetWorkInterface.NetType.TCP);
+            ICallAsync callAsync = new CallAsync("127.0.0.1", 1234, Cool.Interface.NetWork.NetType.TCP);
 
             ClientTest.CHelloService cHelloService = new ClientTest.CHelloService();
             cHelloService.Serializer = serializer;

@@ -13,10 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BaseLib\BaseLib.csproj" />
+    <ProjectReference Include="..\..\..\app\Program\Base\NetWork\CoolNetWork\CoolNetWork.csproj" />
     <ProjectReference Include="..\CSCommon\CSCommon.csproj" />
     <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />
-    <ProjectReference Include="..\MyNetWork\MyNetWork.csproj" />
     <ProjectReference Include="..\RpcTestImpl\RpcTestImpl.csproj" />
     <ProjectReference Include="..\RpcTestInterface\RpcTestInterface.csproj" />
   </ItemGroup>

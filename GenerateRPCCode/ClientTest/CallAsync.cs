@@ -1,8 +1,8 @@
 ﻿using Cool.Coroutine;
-using CoolRpcInterface;
+using Cool.Interface.Rpc;
 using CSRPC;
-using MyNetWork;
-using NetWorkInterface;
+using Cool.NetWork;
+using Cool.Interface.NetWork;
 using System;
 
 using System.Collections.Concurrent;

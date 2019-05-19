@@ -1,11 +1,9 @@
 ﻿using Cool;
 using GrainInterface;
-using MyNetWork;
-using NetWorkInterface;
+using Cool.NetWork;
+using Cool.Interface.NetWork;
 using Orleans;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Gateway
