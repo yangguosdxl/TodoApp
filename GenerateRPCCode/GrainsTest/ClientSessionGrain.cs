@@ -1,5 +1,5 @@
 ﻿using Cool;
-using CSCommon;
+using Cool.CSCommon;
 using CSRPC;
 using GrainInterface;
 using Orleans;

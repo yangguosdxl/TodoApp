@@ -1,7 +1,7 @@
 ﻿using Cool;
 using Cool.Coroutine;
 using Cool.Interface.Rpc;
-using CSCommon;
+using Cool.CSCommon;
 using CSRPC;
 using GrainInterface;
 using RpcTestInterface;
