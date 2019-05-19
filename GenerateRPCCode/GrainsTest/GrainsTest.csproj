@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\app\Program\Base\CSCommon\CSCommon.csproj" />
     <ProjectReference Include="..\..\..\app\Program\Base\NetWork\CoolNetWork\CoolNetWork.csproj" />
     <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />
     <ProjectReference Include="..\RpcTestImpl\RpcTestImpl.csproj" />
