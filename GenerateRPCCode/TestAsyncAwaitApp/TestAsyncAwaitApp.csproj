@@ -13,9 +13,4 @@
     <DefineConstants>TRACE;CSHARP_7_OR_LATER</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\app\Program\Base\BaseLib\BaseLib.csproj" />
-    <ProjectReference Include="..\..\..\app\Program\Base\CoolAsync\CoolAsync.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -9,7 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\app\Program\Base\BaseLib\BaseLib.csproj" />
     <ProjectReference Include="..\RpcTestInterface\RpcTestInterface.csproj" />
   </ItemGroup>
 
