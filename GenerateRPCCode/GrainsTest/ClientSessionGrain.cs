@@ -25,6 +25,8 @@ namespace GrainsTest
 
         public override Task OnActivateAsync()
         {
+            Logger.Info($"OnActivateAsync, session {IdentityString}");
+
             SHelloService sHelloService = new SHelloService();
             sHelloService.Serializer = new Serializer();
             sHelloService.CallAsync = m_CallAsync = new CallAsync(this);
@@ -48,8 +50,14 @@ namespace GrainsTest
             //    }
             //}, null, new TimeSpan(0), new TimeSpan(0,0,0,0,100));
 
+            return Task.CompletedTask;
+        }
 
-            return base.OnActivateAsync();
+        public override Task OnDeactivateAsync()
+        {
+            Logger.Info($"OnDeactivateAsync, session {IdentityString}");
+
+            return base.OnDeactivateAsync();
         }
 
         public Task Subscribe(IGatewayGrainObserver gateway)

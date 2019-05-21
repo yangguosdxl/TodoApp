@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GrainInterface
 {
-    public interface IClientSessionGrain : IGrainWithGuidKey
+    public interface IClientSessionGrain //: IGrainWithGuidKey
     {
 
         Task Subscribe(IGatewayGrainObserver gateway);

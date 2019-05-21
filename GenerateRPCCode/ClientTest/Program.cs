@@ -21,7 +21,7 @@ namespace ClientTest
 
         static void Main(string[] args)
         {
-            for(int i = 0; i < 500; ++i)
+            for(int i = 0; i < 1; ++i)
             {
                 Task.Run(StartClient);
             }

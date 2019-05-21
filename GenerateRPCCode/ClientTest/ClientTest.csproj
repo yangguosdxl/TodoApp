@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\app\Program\Base\CoolRpcInterface\Cool.Interface.Rpc.csproj" />
+    <ProjectReference Include="..\..\..\app\Program\Base\CSCommon\CSCommon.csproj" />
     <ProjectReference Include="..\..\..\app\Program\Base\NetWork\CoolNetWork\Cool.NetWork.csproj" />
     <ProjectReference Include="..\GrainInterface\GrainInterface.csproj" />
     <ProjectReference Include="..\RpcTestImpl\RpcTestImpl.csproj" />

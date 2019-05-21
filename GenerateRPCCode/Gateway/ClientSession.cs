@@ -11,7 +11,7 @@ namespace Gateway
     class ClientSession : IGatewayGrainObserver
     {
         ISocketTask m_Socket;
-        IClientSessionGrain m_ClientSessionGrain;
+        IPlayerGrain m_ClientSessionGrain;
 
         public Guid SessionID { get; set; }
 
@@ -30,7 +30,7 @@ namespace Gateway
 
             try
             {
-                m_ClientSessionGrain = clusterClient.GetGrain<IClientSessionGrain>(sessionID);
+                m_ClientSessionGrain = clusterClient.GetGrain<IPlayerGrain>(sessionID);
 
                 var obj = clusterClient.CreateObjectReference<IGatewayGrainObserver>(this).GetAwaiter().GetResult();
                 m_ClientSessionGrain.Subscribe(obj).Wait();
@@ -45,6 +45,7 @@ namespace Gateway
 
         private void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
+            m_ClientSessionGrain.Hello();
             m_ClientSessionGrain.Recv((ChunkType)iChunkType, iCommunicateID, iProtocolID, messageBuff, start, len);
         }
 
