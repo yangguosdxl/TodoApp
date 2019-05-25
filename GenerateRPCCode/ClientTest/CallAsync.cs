@@ -7,6 +7,7 @@ using System;
 
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Cool.CSCommon;
 
 namespace ClientTest
 {
@@ -20,6 +21,8 @@ namespace ClientTest
         ProtocolDeserializer[] m_ProtocolDeserializers = new ProtocolDeserializer[(int)ProtoID.COUNT];
 
         ConcurrentQueue<(int, int, IMessage)> m_RecvMessages = new ConcurrentQueue<(int, int, IMessage)>();
+
+        ICoolRpc[] m_aCoolRpcs = new ICoolRpc[RpcServiceHelper.GetRpcServiceCount()];
 
         public CallAsync(string ip, int port, NetType netType)
         {
@@ -109,6 +112,20 @@ namespace ClientTest
         public Task<(byte[], int, int)> SendWithResponse(int iChunkType, int iProtoID, byte[] bytes, int iStart, int len)
         {
             throw new NotImplementedException();
+        }
+
+        public T GetRpc<T>() where T : ICoolRpc
+        {
+            ICoolRpc rpc = m_aCoolRpcs[RpcServiceHelper.GetID<T>()];
+            if (rpc == null)
+            {
+                rpc = RpcServiceHelper.Create<T>();
+                rpc.Init(new Serializer(), this, 0);
+
+                m_aCoolRpcs[RpcServiceHelper.GetID<T>()] = rpc;
+            }
+
+            return (T)rpc;
         }
     }
 

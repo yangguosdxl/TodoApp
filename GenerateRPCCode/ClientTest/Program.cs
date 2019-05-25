@@ -82,14 +82,14 @@ namespace ClientTest
 
             IRPCHandlerMap cHelloServiceHandlerMap = new ICHelloService_HandlerMap(cHelloService);
 
-            ISHelloService sHelloService = new CSRPC.SHelloService(serializer, callAsync);
-            sHelloService.ChunkType = (int)ChunkType.BASE;
+            //ISHelloService sHelloService = new CSRPC.SHelloService(serializer, callAsync);
+            //sHelloService.ChunkType = (int)ChunkType.BASE;
 
             while (true)
             {
                 await Task.Delay(10);
 
-                MyTask.Run(RunRequest, sHelloService);
+                MyTask.Run(RunRequest, callAsync);
                 
 
                 if (callAsync != null)
@@ -99,7 +99,7 @@ namespace ClientTest
 
         static async MyTask RunRequest(object state)
         {
-            ISHelloService sHelloService = state as ISHelloService;
+            ISHelloService sHelloService = ((CallAsync)state).GetRpc<ISHelloService>();
             int choose = s_Random.Next() % 4;
             switch (choose)
             {

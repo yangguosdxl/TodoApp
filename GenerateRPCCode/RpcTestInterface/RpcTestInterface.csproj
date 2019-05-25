@@ -12,4 +12,8 @@
     <ProjectReference Include="..\..\..\app\Program\Base\CoolRpcInterface\Cool.Interface.Rpc.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="dotnet $(SolutionDir)..\..\app\bin\tools\GenerateRpcCode\netcoreapp2.1\GenerateRPCCode.dll $(TargetPath) $(SolutionDir)RpcTestImpl" />
+  </Target>
+
 </Project>

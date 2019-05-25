@@ -40,5 +40,10 @@ namespace ClientTest
 
             return MyTask.FromResult((a, a));
         }
+
+        public void Init(ISerializer serializer, ICallAsync callAsync, int iChunkType)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

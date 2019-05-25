@@ -3,13 +3,14 @@ using Cool.Interface.Rpc;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Cool.Coroutine;
+using RpcTestInterface;
 
 namespace CSRPC
 {
     [MessagePack.MessagePackObject]
-    public class ISHelloService_HelloInt_MsgIn : IMessage
+    public class ICHelloService_Hello3_MsgIn : IMessage
     {
         [MessagePack.Key(1)]
-        public System.Int32 a;
+        public RpcTestInterface.Param p;
     }
 }
