@@ -1,6 +1,7 @@
 ﻿using Cool;
 using GrainInterface;
 using Orleans;
+using RpcTestInterface;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,8 +13,11 @@ namespace GrainsTest
     {
         public override Task OnActivateAsync()
         {
+            Task task = base.OnActivateAsync();
 
-            return base.OnActivateAsync();
+            CallAsync.AddRpcHandlers<ISHelloService>(new SHelloService(this));
+
+            return task;
         }
         public Task Hello()
         {

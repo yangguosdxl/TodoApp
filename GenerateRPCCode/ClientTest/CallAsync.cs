@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Cool.CSCommon;
+using System.Diagnostics.Contracts;
 
 namespace ClientTest
 {
@@ -17,12 +18,13 @@ namespace ClientTest
 
         WaitCompleteTasks m_WaitCompleteTasks = new WaitCompleteTasks(1024);
 
-        ProtocolHandler[] m_ProtocoHandlers = new ProtocolHandler[(int)ProtoID.COUNT];
-        ProtocolDeserializer[] m_ProtocolDeserializers = new ProtocolDeserializer[(int)ProtoID.COUNT];
+        ProtocolHandler[] m_ProtocoHandlers = new ProtocolHandler[RpcServiceHelper.ProtoCount];
+        ProtocolDeserializer[] m_ProtocolDeserializers = new ProtocolDeserializer[RpcServiceHelper.ProtoCount];
 
         ConcurrentQueue<(int, int, IMessage)> m_RecvMessages = new ConcurrentQueue<(int, int, IMessage)>();
 
-        ICoolRpc[] m_aCoolRpcs = new ICoolRpc[RpcServiceHelper.GetRpcServiceCount()];
+        ICoolRpc[] m_aCoolRpcs = new ICoolRpc[RpcServiceHelper.RpcServiceCount];
+        IRPCHandlerMap[] m_aRpcHandlerMaps = new IRPCHandlerMap[RpcServiceHelper.RpcServiceCount];
 
         public CallAsync(string ip, int port, NetType netType)
         {
@@ -66,7 +68,7 @@ namespace ClientTest
                 }
                 else
                 {
-                    if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
+                    if (iProtocolID >= 0 && iProtocolID < RpcServiceHelper.ProtoCount)
                     {
                         ProtocolHandler h = m_ProtocoHandlers[iProtocolID];
                         if (iCommunicateID != 0)
@@ -119,13 +121,25 @@ namespace ClientTest
             ICoolRpc rpc = m_aCoolRpcs[RpcServiceHelper.GetID<T>()];
             if (rpc == null)
             {
-                rpc = RpcServiceHelper.Create<T>();
+                rpc = RpcServiceHelper.CreateRpc<T>();
                 rpc.Init(new Serializer(), this, 0);
 
                 m_aCoolRpcs[RpcServiceHelper.GetID<T>()] = rpc;
             }
 
             return (T)rpc;
+        }
+
+        public void AddRpcHandlers<T>(ICoolRpc rpcHandler) where T : ICoolRpc
+        {
+            rpcHandler.Init(new Serializer(), this, 0);
+
+            int id = RpcServiceHelper.GetID<T>();
+            Contract.Ensures(rpcHandler != null && m_aRpcHandlerMaps[id] == null);
+
+            IRPCHandlerMap handlerMap = RpcServiceHelper.CreateRpcHandlerMap<T>(rpcHandler);
+
+            m_aRpcHandlerMaps[id] = handlerMap;
         }
     }
 

@@ -12,16 +12,25 @@ namespace CSRPC
         static RpcServiceHelper()
         {
             RpcServiceHelperHodler<ICHelloService>.ID = 1;
-            RpcServiceHelperHodler<ICHelloService>.CreateFunc = delegate()
+            RpcServiceHelperHodler<ICHelloService>.CreateRpcFunc = delegate()
             {
                 return new CHelloService();
             };
+            RpcServiceHelperHodler<ICHelloService>.CreateRpcHandlerMapFunc = delegate(ICoolRpc rpcHandler)
+            {
+                return new ICHelloService_HandlerMap(rpcHandler);
+            };
             RpcServiceHelperHodler<ISHelloService>.ID = 2;
-            RpcServiceHelperHodler<ISHelloService>.CreateFunc = delegate()
+            RpcServiceHelperHodler<ISHelloService>.CreateRpcFunc = delegate()
             {
                 return new SHelloService();
             };
+            RpcServiceHelperHodler<ISHelloService>.CreateRpcHandlerMapFunc = delegate(ICoolRpc rpcHandler)
+            {
+                return new ISHelloService_HandlerMap(rpcHandler);
+            };
             s_iRpcServiceCount = 3;
+            s_iProtoCount = (int)ProtoID.COUNT;
         }
     }
 }

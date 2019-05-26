@@ -7,7 +7,7 @@ using RpcTestInterface;
 
 namespace CSRPC
 {
-    public class SHelloService : RpcTestInterface.ISHelloService
+    internal class SHelloService : RpcTestInterface.ISHelloService
     {
         public ICallAsync CallAsync { get; set; }
 

@@ -14,13 +14,18 @@ namespace GrainsTest
         public ICallAsync CallAsync { get ; set ; }
         public int ChunkType { get ; set ; }
 
-        public ClientSessionGrain clientSessionGrain;
+        private PlayerGrain m_PlayerGrain;
+
+        public SHelloService(PlayerGrain playerGrain)
+        {
+            m_PlayerGrain = playerGrain;
+        }
 
         public void Hello()
         {
             Logger.Debug("server: recv hello");
 
-            clientSessionGrain.CHelloService.Hello();
+            CallAsync.GetRpc<ICHelloService>().Hello();
         }
 
         public void Hello2(Param p)
@@ -44,13 +49,19 @@ namespace GrainsTest
 
             MyTask.Run(async delegate (object o)
             {
-                var (c, d) = await clientSessionGrain.CHelloService.HelloInt(1);
+                var (c, d) = await CallAsync.GetRpc<ICHelloService>().HelloInt(1);
                 Logger.Debug($"recv client a: {c}, b: {d}");
 
             }, null);
 
             return MyTask.FromResult((a, a));
         }
-        
+
+        public void Init(ISerializer serializer, ICallAsync callAsync, int iChunkType)
+        {
+            this.Serializer = serializer;
+            this.CallAsync = callAsync;
+            this.ChunkType = iChunkType;
+        }
     }
 }

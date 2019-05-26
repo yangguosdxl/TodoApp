@@ -7,13 +7,13 @@ using RpcTestInterface;
 
 namespace CSRPC
 {
-    public class ICHelloService_HandlerMap : IRPCHandlerMap
+    internal class ICHelloService_HandlerMap : IRPCHandlerMap
     {
         private RpcTestInterface.ICHelloService m_service;
 
-        public ICHelloService_HandlerMap(RpcTestInterface.ICHelloService service)
+        public ICHelloService_HandlerMap(ICoolRpc service)
         {
-            m_service = service;
+            m_service = (ICHelloService)service;
             service.CallAsync.AddProtocolHandler((int)ProtoID.EICHelloService_Hello_MsgIn, Process_Hello);
             service.CallAsync.AddProtocolDeserializer((int)ProtoID.EICHelloService_Hello_MsgIn, Deserialize_Hello);
             service.CallAsync.AddProtocolHandler((int)ProtoID.EICHelloService_HelloInt_MsgIn, Process_HelloInt);

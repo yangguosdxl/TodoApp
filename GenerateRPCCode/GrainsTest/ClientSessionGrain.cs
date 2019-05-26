@@ -18,23 +18,13 @@ namespace GrainsTest
 
         IGatewayGrainObserver m_GateWayGrain;
 
-        ISHelloService_HandlerMap m_SHelloServiceHandlers;
-        CallAsync m_CallAsync;
-
-        public ICHelloService CHelloService;
+        public CallAsync CallAsync { get; set; }
 
         public override Task OnActivateAsync()
         {
             Logger.Info($"OnActivateAsync, session {IdentityString}");
 
-            SHelloService sHelloService = new SHelloService();
-            sHelloService.Serializer = new Serializer();
-            sHelloService.CallAsync = m_CallAsync = new CallAsync(this);
-            sHelloService.clientSessionGrain = this;
-
-            m_SHelloServiceHandlers = new ISHelloService_HandlerMap(sHelloService);
-
-            CHelloService = new CHelloService(sHelloService.Serializer, m_CallAsync);
+            CallAsync = new CallAsync(this);
 
             //this.RegisterTimer(async delegate (object o)
             //{
@@ -78,7 +68,7 @@ namespace GrainsTest
 
         public Task Recv(ChunkType eChunkType, int iCommunicationID, int iProtocolID, byte[] bytes, int start, int len)
         {
-            m_CallAsync.OnMessage((int)eChunkType, iProtocolID, iCommunicationID, bytes, start, len);
+            CallAsync.OnMessage((int)eChunkType, iProtocolID, iCommunicationID, bytes, start, len);
 
             return Task.CompletedTask;
         }

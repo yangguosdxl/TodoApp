@@ -7,13 +7,15 @@ using Cool.Interface.NetWork;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Cool.CSCommon;
+using System.Diagnostics.Contracts;
 
 namespace GrainsTest
 {
-    class CallAsync : ICallAsync
+    public class CallAsync : ICallAsync
     {
-        ProtocolDeserializer[] m_ProtocolDeserializers = new ProtocolDeserializer[(int)ProtoID.COUNT];
-        ProtocolHandler[] m_ProtocolHandlers = new ProtocolHandler[(int)ProtoID.COUNT];
+        ProtocolDeserializer[] m_ProtocolDeserializers = new ProtocolDeserializer[RpcServiceHelper.ProtoCount];
+        ProtocolHandler[] m_ProtocolHandlers = new ProtocolHandler[RpcServiceHelper.ProtoCount];
 
         IClientSessionGrain m_ClientSessionGrain;
 
@@ -21,6 +23,10 @@ namespace GrainsTest
 
         WaitCompleteTasks m_WaitCompleteTasks = new WaitCompleteTasks(1024);
         IMessageEncoder m_MessageEncoder = new MessageEncoder();
+
+        ICoolRpc[] m_aCoolRpcs = new ICoolRpc[RpcServiceHelper.RpcServiceCount];
+
+        IRPCHandlerMap[] m_aRpcHandlerMaps = new IRPCHandlerMap[RpcServiceHelper.RpcServiceCount];
 
         public CallAsync(IClientSessionGrain clientSessionGrain)
         {
@@ -37,6 +43,32 @@ namespace GrainsTest
             m_ProtocolHandlers[iProtoID] = h;
         }
 
+        public T GetRpc<T>() where T : ICoolRpc
+        {
+            ICoolRpc rpc = m_aCoolRpcs[RpcServiceHelper.GetID<T>()];
+            if (rpc == null)
+            {
+                rpc = RpcServiceHelper.CreateRpc<T>();
+                rpc.Init(new Serializer(), this, 0);
+
+                m_aCoolRpcs[RpcServiceHelper.GetID<T>()] = rpc;
+            }
+
+            return (T)rpc;
+        }
+
+        public void AddRpcHandlers<T>(ICoolRpc rpcHandler) where T : ICoolRpc
+        {
+            rpcHandler.Init(new Serializer(), this, 0);
+
+            int id = RpcServiceHelper.GetID<T>();
+            Contract.Ensures(rpcHandler != null && m_aRpcHandlerMaps[id] == null);
+
+            IRPCHandlerMap handlerMap = RpcServiceHelper.CreateRpcHandlerMap<T>(rpcHandler);
+
+            m_aRpcHandlerMaps[id] = handlerMap;
+        }
+
         public void OnMessage(int iChunkType, int iProtocolID, int iCommunicateID, byte[] messageBuff, int start, int len)
         {
             ProtocolDeserializer protocolDeserializer = m_ProtocolDeserializers[iProtocolID];
@@ -49,7 +81,7 @@ namespace GrainsTest
             }
             else
             {
-                if (iProtocolID >= 0 && iProtocolID < (int)ProtoID.COUNT)
+                if (iProtocolID >= 0 && iProtocolID < RpcServiceHelper.ProtoCount)
                 {
                     ProtocolHandler h = m_ProtocolHandlers[iProtocolID];
                     if (NetHelper.IsValidCommunicateID(iCommunicateID))

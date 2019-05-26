@@ -43,7 +43,9 @@ namespace ClientTest
 
         public void Init(ISerializer serializer, ICallAsync callAsync, int iChunkType)
         {
-            throw new NotImplementedException();
+            Serializer = serializer;
+            CallAsync = callAsync;
+            ChunkType = iChunkType;
         }
     }
 }

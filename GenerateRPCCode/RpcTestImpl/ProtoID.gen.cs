@@ -7,7 +7,7 @@ using RpcTestInterface;
 
 namespace CSRPC
 {
-    public enum ProtoID
+    internal enum ProtoID
     {
         EICHelloService_Hello_MsgIn,
         EICHelloService_HelloInt_MsgIn,

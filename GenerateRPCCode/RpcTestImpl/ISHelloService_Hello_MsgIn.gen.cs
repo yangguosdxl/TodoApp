@@ -8,7 +8,7 @@ using RpcTestInterface;
 namespace CSRPC
 {
     [MessagePack.MessagePackObject]
-    public class ISHelloService_Hello_MsgIn : IMessage
+    internal class ISHelloService_Hello_MsgIn : IMessage
     {
     }
 }

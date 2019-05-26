@@ -75,15 +75,7 @@ namespace ClientTest
             ISerializer serializer = new Serializer();
             ICallAsync callAsync = new CallAsync("127.0.0.1", 1234, Cool.Interface.NetWork.NetType.TCP);
 
-            ClientTest.CHelloService cHelloService = new ClientTest.CHelloService();
-            cHelloService.Serializer = serializer;
-            cHelloService.CallAsync = callAsync;
-            cHelloService.ChunkType = (int)ChunkType.BASE;
-
-            IRPCHandlerMap cHelloServiceHandlerMap = new ICHelloService_HandlerMap(cHelloService);
-
-            //ISHelloService sHelloService = new CSRPC.SHelloService(serializer, callAsync);
-            //sHelloService.ChunkType = (int)ChunkType.BASE;
+            callAsync.AddRpcHandlers<ICHelloService>(new CHelloService());
 
             while (true)
             {

@@ -8,7 +8,7 @@ using RpcTestInterface;
 namespace CSRPC
 {
     [MessagePack.MessagePackObject]
-    public class ISHelloService_HelloInt_MsgOut : IMessage
+    internal class ISHelloService_HelloInt_MsgOut : IMessage
     {
         [MessagePack.Key(1)]
         public ValueTuple<System.Int32, System.Int32> Value;
