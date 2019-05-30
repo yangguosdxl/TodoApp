@@ -1,5 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
@@ -13,7 +17,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet $(SolutionDir)..\..\app\bin\tools\GenerateRpcCode\netcoreapp2.1\GenerateRPCCode.dll $(TargetPath) $(SolutionDir)RpcTestImpl" />
+    <Exec Command="dotnet $(SolutionDir)..\..\app\bin\tools\GenerateRpcCode\GenerateRPCCode.dll $(TargetPath) $(SolutionDir)RpcTestImpl" />
   </Target>
 
 </Project>
