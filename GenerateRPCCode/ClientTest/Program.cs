@@ -21,6 +21,7 @@ namespace ClientTest
 
         static void Main(string[] args)
         {
+            Logger.Trace("Hello");
             for(int i = 0; i < 1; ++i)
             {
                 Task.Run(StartClient);

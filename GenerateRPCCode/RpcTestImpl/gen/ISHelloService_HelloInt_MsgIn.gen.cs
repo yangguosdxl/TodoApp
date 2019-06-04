@@ -1,16 +1,15 @@
 using System;
 using Cool.Interface.Rpc;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Cool.Coroutine;
 using RpcTestInterface;
 
 namespace CSRPC
 {
     [MessagePack.MessagePackObject]
-    internal class ISHelloService_Hello2_MsgIn : IMessage
+    internal class ISHelloService_HelloInt_MsgIn : IMessage
     {
         [MessagePack.Key(1)]
-        public RpcTestInterface.Param p;
+        public System.Int32 a;
     }
 }

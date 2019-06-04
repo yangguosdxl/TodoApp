@@ -13,4 +13,8 @@
     <DefineConstants>TRACE;CSHARP_7_OR_LATER</DefineConstants>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\app\Program\Base\CoolAsync\Cool.Async.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Asset\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>Cool.Test</RootNamespace>
+    <AssemblyName>Cool.Test.GameClient</AssemblyName>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Asset\nlog.config" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="nlog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\app\Program\Base\BaseLib\Cool.Base.csproj" />
+    <ProjectReference Include="..\..\app\Program\Base\CoolAsync\Cool.Async.csproj" />
+    <ProjectReference Include="..\..\app\Program\Base\CoolRpcInterface\Cool.Interface.Rpc.csproj" />
+    <ProjectReference Include="..\..\app\Program\Base\CSCommon\CSCommon.csproj" />
+    <ProjectReference Include="..\..\app\Program\Base\NetWorkInterface\Cool.Interface.NetWork.csproj" />
+    <ProjectReference Include="..\..\app\Program\Base\NetWork\CoolNetWork\Cool.NetWork.csproj" />
+    <ProjectReference Include="..\..\app\Program\Client\GameClient\Cool.GameClient.csproj" />
+    <ProjectReference Include="..\..\app\Program\GameLogic.Gen\GameLogic.Gen.csproj" />
+    <ProjectReference Include="..\..\app\Program\GameRpc.Gen\GameRpc.Gen.csproj" />
+    <ProjectReference Include="..\..\app\Program\Interfaces\Cool.Interface.ComponentSystem\Cool.Interface.ComponentSystem.csproj" />
+    <ProjectReference Include="..\..\app\Program\Interfaces\GameEngine\Cool.Interface.GameEngine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Asset\" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>
