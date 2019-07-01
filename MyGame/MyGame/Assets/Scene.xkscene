@@ -1,0 +1,38 @@
+!SceneAsset
+Id: 8a3444d0-cbb0-48e1-a465-8ef7a0e64ce9
+SerializedVersion: {Xenko: 3.1.0.1}
+Tags: []
+ChildrenIds: []
+Offset: {X: 0.0, Y: 0.0, Z: 0.0}
+Hierarchy:
+    RootParts:
+        - ref!! 2883afae-fdae-4c4b-bee1-8b6e1cfabb73
+        - ref!! 3bf034dd-dede-4503-b423-858128b3b944
+    Parts:
+        -   Entity:
+                Id: 2883afae-fdae-4c4b-bee1-8b6e1cfabb73
+                Name: Camera
+                Components:
+                    38844600f6e3b0ba33028b5ab7aaa67e: !TransformComponent
+                        Id: 14caa0a9-2c12-4cc8-b7e8-d483c7b3f56c
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    960f8e208581fa87afc8bea827c68507: !CameraComponent
+                        Id: ffd7b83e-212c-486d-b2a2-6e35fde05ddc
+                        Name: null
+                        Projection: Perspective
+                        Slot: 5a58439e-3490-4891-9c8e-fea707db542a
+        -   Entity:
+                Id: 3bf034dd-dede-4503-b423-858128b3b944
+                Name: Player
+                Components:
+                    05cdf772bb24771aa003d598f6116ea5: !TransformComponent
+                        Id: 0053210b-807a-43a3-a8a6-617cae820ee4
+                        Position: {X: -7.354645, Y: 1.26587844, Z: 3.46431351}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    9b94300747760e9c68a45a0b2e2064c9: !MyGame.Player,MyGame
+                        Id: 2319d63d-64cd-4757-a64b-376195a62e7d
