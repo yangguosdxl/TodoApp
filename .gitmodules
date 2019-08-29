@@ -16,3 +16,6 @@
 [submodule "UIWidgetsTest/Packages/com.unity.uiwidgets"]
 	path = UIWidgetsTest/Packages/com.unity.uiwidgets
 	url = https://github.com/UnityTech/UIWidgets.git
+[submodule "opentk"]
+	path = opentk
+	url = https://github.com/opentk/opentk.git
