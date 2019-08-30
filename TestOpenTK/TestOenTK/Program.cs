@@ -7,31 +7,29 @@ using System.IO;
 
 namespace TestOenTK
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine("Curr work path: " + Directory.GetCurrentDirectory());
-            using (Game game = new Game(800, 600, "LearnOpenTK"))
-            {
-                //Run takes a double, which is how many frames per second it should strive to reach.
-                //You can leave that out and it'll just update as fast as the hardware will allow it.
-                game.Run(60.0);
-            }
+            using Game game = new Game(800, 600, "LearnOpenTK");
+            //Run takes a double, which is how many frames per second it should strive to reach.
+            //You can leave that out and it'll just update as fast as the hardware will allow it.
+            game.Run(60.0);
         }
     }
 
-    class Game : GameWindow
+    internal class Game : GameWindow
     {
-        int VertexBufferObject;
+        private int VertexBufferObject;
 
-        float[] vertices = {
+        private readonly float[] vertices = {
             -0.5f, -0.5f, 0.0f, //Bottom-left vertex
              0.5f, -0.5f, 0.0f, //Bottom-right vertex
              0.0f,  0.5f, 0.0f  //Top vertex
         };
 
-        Shader shader;
+        private Shader shader;
 
         public Game(int width, int height, string title) : 
             base(width, height, GraphicsMode.Default, title)
@@ -57,7 +55,6 @@ namespace TestOenTK
             //Code goes here
             shader = new Shader("shader.vert", "shader.frag");
             VertexBufferObject = GL.GenBuffer();
-
 
             base.OnLoad(e);
         }
@@ -90,8 +87,6 @@ namespace TestOenTK
             GL.EnableVertexAttribArray(0);
 
             shader.Use();
-            
-
 
             Context.SwapBuffers();
             base.OnRenderFrame(e);
