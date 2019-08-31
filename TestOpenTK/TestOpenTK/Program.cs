@@ -8,6 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Advanced;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+
 namespace TestOenTK
 {
     internal static class Program
@@ -60,17 +65,14 @@ namespace TestOenTK
         };
 
         private readonly float[] m_aVertices2 = {
-            -0.5f, -0.5f, 0.0f, //Bottom-left vertex
-            0f, 1f, 0f, 1,
+            // pos              // color       // uv
+            -0.5f, -0.5f, 0.0f, 0f, 1f, 0f, 1, 0, 0,
 
-             -0.5f, 0.5f, 0.0f, //Bottom-right vertex
-             1f, 0f, 0f, 1,
+             -0.5f, 0.5f, 0.0f, 1f, 0f, 0f, 1, 0, 1,
 
-             0.5f,  0.5f, 0.0f,  //Top vertex
-             0f, 0f, 1f, 1,
+             0.5f,  0.5f, 0.0f, 0f, 0f, 1f, 1, 1, 1,
 
-             0.5f, -0.5f, 0.0f,
-             1f, 0.2f, 0.5f, 1,
+             0.5f, -0.5f, 0.0f, 1f, 0.2f, 0.5f, 1, 0
         };
 
         private readonly uint[] m_aIndices2 = { // 注意索引从0开始! 
@@ -80,6 +82,9 @@ namespace TestOenTK
 
         private Shader m_Shader;
         private Shader m_Shader2;
+        private int[] m_Tex = new int[2];
+        
+
 
         public Game(int width, int height, string title) : 
             base(width, height, GraphicsMode.Default, title)
@@ -108,6 +113,44 @@ namespace TestOenTK
             //Code goes here
             m_Shader = new Shader("shader.vert", "shader.frag");
             m_Shader2 = new Shader("shader2.vert", "shader2.frag");
+
+            Image<Rgb24> image = Image.Load<Rgb24>("container.jpg");
+
+            //ImageSharp loads from the top-left pixel, whereas OpenGL loads from the bottom-left, causing the texture to be flipped vertically.
+            //This will correct that, making the texture display properly.
+            image.Mutate(x => x.Flip(FlipMode.Vertical));
+
+            //Get an array of the pixels, in ImageSharp's internal format.
+            Rgb24[] tempPixels = image.GetPixelSpan().ToArray();
+
+            GL.GenTextures(2, m_Tex);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, m_Tex[0]);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, image.Width, image.Height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, tempPixels);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+            image.Dispose();
+
+            Image<Rgba32> image2 = Image.Load<Rgba32>("awesomeface.png");
+
+            //ImageSharp loads from the top-left pixel, whereas OpenGL loads from the bottom-left, causing the texture to be flipped vertically.
+            //This will correct that, making the texture display properly.
+            image2.Mutate(x => x.Flip(FlipMode.Vertical));
+
+            //Get an array of the pixels, in ImageSharp's internal format.
+            Rgba32[] tempPixels2 = image2.GetPixelSpan().ToArray();
+
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, m_Tex[1]);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image2.Width, image2.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tempPixels2);
+
+            image2.Dispose();
 
             int[] VAO = new int[2];
             int[] IBO = new int[2];
@@ -158,16 +201,26 @@ namespace TestOenTK
 
 
             m_Shader2.Use();
+
+            int iOurTexture1 = m_Shader2.GetUniformLocation("ourTexture");
+            GL.Uniform1(iOurTexture1, m_Tex[0]);
+
+            int iOurTexture2 = m_Shader2.GetUniformLocation("ourTexture2");
+            GL.Uniform1(iOurTexture2, m_Tex[1]);
+
             GL.BindVertexArray(VAO[1]);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO[1]);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, IBO[1]);
 
             GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 7 * sizeof(float), 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 9 * sizeof(float), 0);
 
             GL.EnableVertexAttribArray(1);
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 7 * sizeof(float), 3 * sizeof(float));
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 9 * sizeof(float), 3 * sizeof(float));
+
+            GL.EnableVertexAttribArray(2);
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 9 * sizeof(float), 7 * sizeof(float));
 
             GL.BindVertexArray(0);
 
@@ -239,13 +292,20 @@ namespace TestOenTK
                     {
                         int iOurColorLocation = data.shader.GetUniformLocation("ourColor");
 
-                        float fGreenColor = ((float)Math.Sin(fElpaseSeconds) + 1) / 2;
+                        float fGreenColor = ((float)Math.Sin(fElpaseSeconds) + 1) / 8;
                         GL.Uniform4(iOurColorLocation, 0, fGreenColor, 0, 1);
 
                         int iOurTranslateLocation = data.shader.GetUniformLocation("ourTranslate");
 
                         float fTranslateY = (float)Math.Sin(fElpaseSeconds)/2;
                         GL.Uniform3(iOurTranslateLocation, 0, fTranslateY, 0);
+
+                        GL.ActiveTexture(TextureUnit.Texture0);
+                        GL.BindTexture(TextureTarget.Texture2D, m_Tex[0]);
+
+                        GL.ActiveTexture(TextureUnit.Texture1);
+                        GL.BindTexture(TextureTarget.Texture2D, m_Tex[1]);
+
                     }
 
                     GL.BindVertexArray(data.VAO);
