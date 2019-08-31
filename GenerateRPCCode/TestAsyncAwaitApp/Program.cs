@@ -21,6 +21,9 @@ namespace TestAsyncAwaitApp
         {
             Logger.Info("Hello World!");
 
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
             CustomTaskScheduler scheduler = new CustomTaskScheduler();
             MySynchronizationContext context = new MySynchronizationContext();
 
@@ -30,7 +33,7 @@ namespace TestAsyncAwaitApp
             //Task.Factory.StartNew(Hello, "B:", new CancellationToken(), TaskCreationOptions.None, scheduler);
             //Task.Factory.StartNew(Hello, "C:", new CancellationToken(), TaskCreationOptions.None, scheduler);
 
-            // Task.Factory.StartNew(Hello, "PoolA:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
+            Task.Factory.StartNew(Hello, "PoolA:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
             //Task.Factory.StartNew(Hello, "PoolB:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
             //Task.Factory.StartNew(Hello, "PoolC:", new CancellationToken(), TaskCreationOptions.None, TaskScheduler.Default);
 
@@ -43,6 +46,8 @@ namespace TestAsyncAwaitApp
 
             while(Console.KeyAvailable == false)
             {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
                 scheduler.Update();
                 //myTaskScheduler.Update();
                 s_WaitOneFrameTasks.Update();
@@ -50,6 +55,16 @@ namespace TestAsyncAwaitApp
             }
 
             ref StructA a = ref alist[0];
+        }
+
+        private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            Console.WriteLine("TaskScheduler_UnobservedTaskException:\n" + e.Exception);
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine("TaskScheduler_UnobservedTaskException:\n" + e.ExceptionObject);
         }
 
         static async MyTask<string> HelloMyTask2(object prefix)
@@ -89,6 +104,7 @@ namespace TestAsyncAwaitApp
 
         static async Task Hello(object prefix)
         {
+            throw new Exception("hello");
             for(int i = 0; i < 3; i++)
             {
                 Log(prefix + $"{i}");

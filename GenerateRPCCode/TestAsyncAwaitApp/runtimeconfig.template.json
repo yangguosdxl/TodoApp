@@ -1,0 +1,9 @@
+{
+  "runtimeOptions": {
+    "ThrowUnobservedTaskExceptions ": true
+  },
+
+    "configProperties": {
+      "ThrowUnobservedTaskExceptions ": true
+    }
+  }
