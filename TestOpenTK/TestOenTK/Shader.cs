@@ -6,9 +6,14 @@ using System.Text;
 public class Shader : IDisposable
 {
     int Handle;
+    string m_VertexPath;
+    string m_FragPath;
 
     public Shader(string vertexPath, string fragmentPath)
     {
+        m_VertexPath = vertexPath;
+        m_FragPath = fragmentPath;
+
         string VertexShaderSource;
 
         using (StreamReader reader = new StreamReader(vertexPath, Encoding.UTF8))
@@ -33,14 +38,14 @@ public class Shader : IDisposable
 
         string infoLogVert = GL.GetShaderInfoLog(VertexShader);
         if (infoLogVert != System.String.Empty)
-            System.Console.WriteLine(infoLogVert);
+            System.Console.WriteLine($"{vertexPath}:{infoLogVert}");
 
         GL.CompileShader(FragmentShader);
 
         string infoLogFrag = GL.GetShaderInfoLog(FragmentShader);
 
         if (infoLogFrag != System.String.Empty)
-            System.Console.WriteLine(infoLogFrag);
+            System.Console.WriteLine($"{fragmentPath}:{infoLogFrag}");
 
         Handle = GL.CreateProgram();
 
@@ -58,6 +63,26 @@ public class Shader : IDisposable
     public void Use()
     {
         GL.UseProgram(Handle);
+    }
+
+    public int GetAttribLocation(string name)
+    {
+        int iLocation = GL.GetAttribLocation(Handle, name);
+        if (iLocation == -1)
+        {
+            Console.WriteLine($"{m_VertexPath},{m_FragPath}: Can not find attrib name {name}");
+        }
+        return iLocation;
+    }
+
+    public int GetUniformLocation(string name)
+    {
+        int iLocation = GL.GetUniformLocation(Handle, name);
+        if (iLocation == -1)
+        {
+            Console.WriteLine($"{m_VertexPath},{m_FragPath}: Can not find uniform name {name}");
+        }
+        return iLocation;
     }
 
     #region IDisposable Support
