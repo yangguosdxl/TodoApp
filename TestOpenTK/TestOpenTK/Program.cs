@@ -12,6 +12,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using TestOpenTK;
 
 namespace TestOenTK
 {
@@ -82,7 +83,8 @@ namespace TestOenTK
 
         private Shader m_Shader;
         private Shader m_Shader2;
-        private int[] m_Tex = new int[2];
+        private Texture m_Texture1;
+        private Texture m_Texture2;
         
 
 
@@ -114,28 +116,8 @@ namespace TestOenTK
             m_Shader = new Shader("shader.vert", "shader.frag");
             m_Shader2 = new Shader("shader2.vert", "shader2.frag");
 
-            Image<Rgb24> image = Image.Load<Rgb24>("container.jpg");
-
-            //ImageSharp loads from the top-left pixel, whereas OpenGL loads from the bottom-left, causing the texture to be flipped vertically.
-            //This will correct that, making the texture display properly.
-            image.Mutate(x => x.Flip(FlipMode.Vertical));
-
-            //Get an array of the pixels, in ImageSharp's internal format.
-            Rgb24[] tempPixels = image.GetPixelSpan().ToArray();
-
-            GL.GenTextures(2, m_Tex);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, m_Tex[0]);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, image.Width, image.Height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, tempPixels);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-
-            image.Dispose();
+            m_Texture1 = new Texture("container.jpg");
+            m_Texture2 = new Texture("awesomeface.png");
 
             Image<Rgba32> image2 = Image.Load<Rgba32>("awesomeface.png");
 
@@ -146,9 +128,11 @@ namespace TestOenTK
             //Get an array of the pixels, in ImageSharp's internal format.
             Rgba32[] tempPixels2 = image2.GetPixelSpan().ToArray();
 
+            m_Tex[1] = GL.GenTexture();
             GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, m_Tex[1]);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image2.Width, image2.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tempPixels2);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
             image2.Dispose();
 
@@ -281,34 +265,33 @@ namespace TestOenTK
                 {
                     var data = m_DrawDatas[i];
 
-                    //Console.WriteLine("draw vao " + data.VAO);
-
-                    //for (int attrIndex = 0; attrIndex < data.enableAttrIndex; ++attrIndex)
-                    //    GL.EnableVertexAttribArray(attrIndex);
-
-                    data.shader.Use();
+                    GL.BindVertexArray(data.VAO);
 
                     if (i == 1)
                     {
-                        int iOurColorLocation = data.shader.GetUniformLocation("ourColor");
-
-                        float fGreenColor = ((float)Math.Sin(fElpaseSeconds) + 1) / 8;
-                        GL.Uniform4(iOurColorLocation, 0, fGreenColor, 0, 1);
-
-                        int iOurTranslateLocation = data.shader.GetUniformLocation("ourTranslate");
-
-                        float fTranslateY = (float)Math.Sin(fElpaseSeconds)/2;
-                        GL.Uniform3(iOurTranslateLocation, 0, fTranslateY, 0);
-
                         GL.ActiveTexture(TextureUnit.Texture0);
                         GL.BindTexture(TextureTarget.Texture2D, m_Tex[0]);
 
                         GL.ActiveTexture(TextureUnit.Texture1);
                         GL.BindTexture(TextureTarget.Texture2D, m_Tex[1]);
+                    }
+
+                    data.shader.Use();
+
+                    if (i == 1)
+                    {
+                        //int iOurColorLocation = data.shader.GetUniformLocation("ourColor");
+
+                        //float fGreenColor = ((float)Math.Sin(fElpaseSeconds) + 1) / 8;
+                        //GL.Uniform4(iOurColorLocation, 0, fGreenColor, 0, 1);
+
+                        //int iOurTranslateLocation = data.shader.GetUniformLocation("ourTranslate");
+
+                        //float fTranslateY = (float)Math.Sin(fElpaseSeconds)/2;
+                        //GL.Uniform3(iOurTranslateLocation, 0, fTranslateY, 0);
 
                     }
 
-                    GL.BindVertexArray(data.VAO);
 
                     //GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
