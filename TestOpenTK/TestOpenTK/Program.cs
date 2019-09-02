@@ -91,6 +91,9 @@ namespace TestOenTK
         private Matrix4 m_World2View;
         private Matrix4 m_View2Proj;
 
+        private float m_fSpeed = 600;
+
+        private Camera m_Camera = new Camera(new Vector3(0, 0, -2f), new Vector3(0, 0, 1f), new Vector3(0, 1, 0));
 
         public Game(int width, int height, string title) : 
             base(width, height, GraphicsMode.Default, title)
@@ -105,6 +108,34 @@ namespace TestOenTK
             {
                 Exit();
             }
+            else if (input.IsKeyDown(Key.Number1))
+            {
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            }
+            else if (input.IsKeyDown(Key.Number2))
+            {
+                GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            }
+            else if (input.IsKeyDown(Key.W))
+            {
+                Vector3 v = (float)(UpdateTime * m_fSpeed) * m_Camera.CameraFront;
+                m_Camera.CameraPos += v;
+            }
+            else if (input.IsKeyDown(Key.S))
+            {
+                Vector3 v = (float)(UpdateTime * -m_fSpeed) * m_Camera.CameraFront;
+                m_Camera.CameraPos += v;
+            }
+            else if (input.IsKeyDown(Key.A))
+            {
+                Vector3 v = (float)(UpdateTime * -m_fSpeed) * m_Camera.CameraRight;
+                m_Camera.CameraPos += v;
+            }
+            else if (input.IsKeyDown(Key.D))
+            {
+                Vector3 v = (float)(UpdateTime * m_fSpeed) * m_Camera.CameraRight;
+                m_Camera.CameraPos += v;
+            }
 
             base.OnUpdateFrame(e);
         }
@@ -114,7 +145,7 @@ namespace TestOenTK
             m_StartTime = DateTime.Now;
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            
 
             //Code goes here
             m_Shader = new Shader("shader.vert", "shader.frag");
@@ -280,9 +311,11 @@ namespace TestOenTK
 
                         
 
-                        float fTranslateY = (float)((Math.Sin(fElpaseSeconds) + 1) / 2 * Math.PI);
-                        m_ModelTransform = Matrix4.CreateRotationX(fTranslateY);
+                        float fTranslateY = (float)((Math.Sin(fElpaseSeconds) + 1) / 2 * 2*Math.PI);
+                        m_ModelTransform = Matrix4.CreateRotationX(-fElpaseSeconds);
                         //m_ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90));
+
+                        m_World2View = m_Camera.LookAt();
 
                         Matrix4 m = m_View2Proj * m_World2View * m_Local2World * m_ModelTransform;
                         // * m_ModelTransform;
