@@ -7,11 +7,11 @@ out vec4 vertexColor;
 out vec4 vertexPos;
 out vec2 texCoord;
 
-uniform vec3 ourTranslate;
+uniform mat4 pvm;
 
 void main()
 {
-    gl_Position = vec4(aPosition + ourTranslate, 1.0);
+    gl_Position = pvm * vec4(aPosition, 1.0) ; // * model * view * proj;
 	vertexPos = gl_Position;
 	vertexColor = aColor;
 	texCoord = aST;

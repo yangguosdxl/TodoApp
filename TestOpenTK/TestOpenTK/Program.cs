@@ -85,7 +85,11 @@ namespace TestOenTK
         private Shader m_Shader2;
         private Texture m_Texture1;
         private Texture m_Texture2;
-        
+
+        private Matrix4 m_ModelTransform;
+        private Matrix4 m_Local2World;
+        private Matrix4 m_World2View;
+        private Matrix4 m_View2Proj;
 
 
         public Game(int width, int height, string title) : 
@@ -110,31 +114,22 @@ namespace TestOenTK
             m_StartTime = DateTime.Now;
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
             //Code goes here
             m_Shader = new Shader("shader.vert", "shader.frag");
             m_Shader2 = new Shader("shader2.vert", "shader2.frag");
 
-            m_Texture1 = new Texture("container.jpg");
-            m_Texture2 = new Texture("awesomeface.png");
+            m_Texture1 = new Texture("container.jpg", TextureUnit.Texture0);
+            //m_Texture1.Use();
+            m_Texture2 = new Texture("awesomeface.png", TextureUnit.Texture1);
+            //m_Texture2.Use(TextureUnit.Texture1);
 
-            Image<Rgba32> image2 = Image.Load<Rgba32>("awesomeface.png");
+            m_ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90));
+            m_Local2World = Matrix4.Identity;
+            m_World2View = Matrix4.CreateTranslation(0, 0, -2);
+            m_View2Proj = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), 800.0f / 600, 0.1f, 100f);
 
-            //ImageSharp loads from the top-left pixel, whereas OpenGL loads from the bottom-left, causing the texture to be flipped vertically.
-            //This will correct that, making the texture display properly.
-            image2.Mutate(x => x.Flip(FlipMode.Vertical));
-
-            //Get an array of the pixels, in ImageSharp's internal format.
-            Rgba32[] tempPixels2 = image2.GetPixelSpan().ToArray();
-
-            m_Tex[1] = GL.GenTexture();
-            GL.ActiveTexture(TextureUnit.Texture1);
-            GL.BindTexture(TextureTarget.Texture2D, m_Tex[1]);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, image2.Width, image2.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, tempPixels2);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-
-            image2.Dispose();
 
             int[] VAO = new int[2];
             int[] IBO = new int[2];
@@ -187,10 +182,10 @@ namespace TestOenTK
             m_Shader2.Use();
 
             int iOurTexture1 = m_Shader2.GetUniformLocation("ourTexture");
-            GL.Uniform1(iOurTexture1, m_Tex[0]);
+            GL.Uniform1(iOurTexture1, 0);
 
             int iOurTexture2 = m_Shader2.GetUniformLocation("ourTexture2");
-            GL.Uniform1(iOurTexture2, m_Tex[1]);
+            GL.Uniform1(iOurTexture2, 1);
 
             GL.BindVertexArray(VAO[1]);
 
@@ -269,26 +264,48 @@ namespace TestOenTK
 
                     if (i == 1)
                     {
-                        GL.ActiveTexture(TextureUnit.Texture0);
-                        GL.BindTexture(TextureTarget.Texture2D, m_Tex[0]);
+                        m_Texture1.Use();
 
-                        GL.ActiveTexture(TextureUnit.Texture1);
-                        GL.BindTexture(TextureTarget.Texture2D, m_Tex[1]);
+                        m_Texture2.Use(TextureUnit.Texture1);
                     }
 
                     data.shader.Use();
 
                     if (i == 1)
                     {
-                        //int iOurColorLocation = data.shader.GetUniformLocation("ourColor");
+                        int iOurColorLocation = data.shader.GetUniformLocation("ourColor");
 
-                        //float fGreenColor = ((float)Math.Sin(fElpaseSeconds) + 1) / 8;
-                        //GL.Uniform4(iOurColorLocation, 0, fGreenColor, 0, 1);
+                        float fGreenColor = ((float)Math.Sin(fElpaseSeconds) + 1) / 8;
+                        GL.Uniform4(iOurColorLocation, 0, fGreenColor, 0, 1);
 
-                        //int iOurTranslateLocation = data.shader.GetUniformLocation("ourTranslate");
+                        
 
-                        //float fTranslateY = (float)Math.Sin(fElpaseSeconds)/2;
-                        //GL.Uniform3(iOurTranslateLocation, 0, fTranslateY, 0);
+                        float fTranslateY = (float)((Math.Sin(fElpaseSeconds) + 1) / 2 * Math.PI);
+                        m_ModelTransform = Matrix4.CreateRotationX(fTranslateY);
+                        //m_ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90));
+
+                        Matrix4 m = m_View2Proj * m_World2View * m_Local2World * m_ModelTransform;
+                        // * m_ModelTransform;
+                        m = m_ModelTransform * m_Local2World * m_World2View * m_View2Proj;
+                        //m = m_ModelTransform * m_View2Proj;
+                        //m = Matrix4.Identity;
+
+
+                        int pvm = data.shader.GetUniformLocation("pvm");
+                        GL.UniformMatrix4(pvm, false, ref m);
+
+                        //m_ModelTransform = Matrix4.Identity;
+                        //m_World2View = Matrix4.Identity;
+                        //m_View2Proj = Matrix4.Identity;
+
+                        //int model = data.shader.GetUniformLocation("model");
+                        //GL.UniformMatrix4(model, false, ref m_ModelTransform);
+
+                        //int view = data.shader.GetUniformLocation("view");
+                        //GL.UniformMatrix4(view, false, ref m_World2View);
+
+                        //int proj = data.shader.GetUniformLocation("proj");
+                        //GL.UniformMatrix4(proj, false, ref m_View2Proj);
 
                     }
 
@@ -296,6 +313,31 @@ namespace TestOenTK
                     //GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
                     GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, data.offset);
+
+                    //if (i == 1)
+                    //{
+                    //    int iOurColorLocation = data.shader.GetUniformLocation("ourColor");
+
+                    //    float fRedColor = ((float)Math.Sin(fElpaseSeconds) + 1) / 8;
+                    //    GL.Uniform4(iOurColorLocation, fRedColor, 0, 0, 1);
+
+                    //    int iOurTranslateLocation = data.shader.GetUniformLocation("ourTranslate");
+
+                    //    float fTranslateY = (float)(Math.Sin(fElpaseSeconds) + 1) / 2;
+
+                    //    Matrix4 m = Matrix4.CreateTranslation(-1f, 0f, 1) * Matrix4.CreateScale(fTranslateY);
+                    //    m = Matrix4.CreateTranslation(0f, 0.5f, 0);
+                    //    m = Matrix4.Identity * Matrix4.CreateTranslation(0.5f, 0.5f, 0) * Matrix4.CreateScale(fTranslateY);
+                    //    GL.UniformMatrix4(iOurTranslateLocation, true, ref m);
+                    //    GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, data.offset);
+                    //}
+
+
+                    //GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+
+                    
+
+
                     GL.BindVertexArray(0);
                 }
 
