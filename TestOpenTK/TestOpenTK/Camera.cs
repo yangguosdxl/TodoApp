@@ -14,6 +14,7 @@ namespace TestOpenTK
 
         private float m_fPitch;
         private float m_fYaw = (float)(0.5f*Math.PI);
+        private float m_Fov = 45;
 
         public Vector3 CameraPos
         {
@@ -44,6 +45,8 @@ namespace TestOpenTK
                 CameraRight = Vector3.Cross(m_CameraFront, m_CameraUp).Normalized();
             }
         }
+
+        public float Fov { get => m_Fov; set => m_Fov = value; }
 
         public Camera(Vector3 cameraPos, Vector3 cameraFront, Vector3 cameraUp)
         {
