@@ -94,6 +94,11 @@ namespace TestOenTK
         private float m_fSpeed = 600;
 
         private Camera m_Camera = new Camera(new Vector3(0, 0, -2f), new Vector3(0, 0, 1f), new Vector3(0, 1, 0));
+        private bool _firstMove = true;
+        private Vector2 _lastPos;
+        private float sensitivity = (float)(0.05 * Math.PI/180);
+        private bool m_bEnabledRotation = false;
+
 
         public Game(int width, int height, string title) : 
             base(width, height, GraphicsMode.Default, title)
@@ -137,6 +142,43 @@ namespace TestOenTK
                 m_Camera.CameraPos += v;
             }
 
+            // Get the mouse state
+            var mouse = Mouse.GetState();
+
+            if (mouse.LeftButton == ButtonState.Pressed)
+            {
+                m_bEnabledRotation = true;
+                CursorVisible = false;
+
+                if (_firstMove) // this bool variable is initially set to true
+                {
+                    _lastPos = new Vector2(mouse.X, mouse.Y);
+                    _firstMove = false;
+                }
+                else
+                {
+                    // Calculate the offset of the mouse position
+                    var deltaX = mouse.X - _lastPos.X;
+                    var deltaY = mouse.Y - _lastPos.Y;
+                    _lastPos = new Vector2(mouse.X, mouse.Y);
+
+                    //Console.WriteLine($"mouse pos {mouse.X}, {mouse.Y}");
+
+                    // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
+                    m_Camera.Yaw += deltaX * sensitivity;
+                    m_Camera.Pitch -= deltaY * sensitivity; // reversed since y-coordinates range from bottom to top
+                }
+            }
+            else
+            {
+                m_bEnabledRotation = false;
+                CursorVisible = true;
+                _firstMove = true;
+            }
+
+            
+
+
             base.OnUpdateFrame(e);
         }
 
@@ -160,7 +202,6 @@ namespace TestOenTK
             m_Local2World = Matrix4.Identity;
             m_World2View = Matrix4.CreateTranslation(0, 0, -2);
             m_View2Proj = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), 800.0f / 600, 0.1f, 100f);
-
 
             int[] VAO = new int[2];
             int[] IBO = new int[2];
