@@ -21,6 +21,26 @@ namespace TestOpenTK
 
         private float m_fElpaseSeconds = 0;
 
+        protected Matrix4 m_World2View;
+        protected Matrix4 m_View2Proj;
+
+        public BaseGameWindow(int width, int height, string title) :
+            base(width, height, GraphicsMode.Default, title)
+                { }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            m_StartTime = DateTime.Now;
+
+            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+            m_View2Proj = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), Width / Height, 0.1f, 100f);
+
+            m_World2View = m_Camera.LookAt();
+
+            base.OnLoad(e);
+        }
+
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             //Get the state of the keyboard this frame
@@ -119,6 +139,8 @@ namespace TestOpenTK
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             //Code goes here.
+
+            m_World2View = m_Camera.LookAt();
 
             DoDraw((float)e.Time);
 
