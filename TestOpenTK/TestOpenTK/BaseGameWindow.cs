@@ -102,8 +102,8 @@ namespace TestOpenTK
                     //Console.WriteLine($"mouse pos {mouse.X}, {mouse.Y}");
 
                     // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
-                    m_Camera.Yaw += -deltaX * sensitivity;
-                    m_Camera.Pitch -= -deltaY * sensitivity; // reversed since y-coordinates range from bottom to top
+                    m_Camera.Yaw += deltaX * sensitivity;
+                    m_Camera.Pitch -= deltaY * sensitivity; // reversed since y-coordinates range from bottom to top
                 }
             }
             else

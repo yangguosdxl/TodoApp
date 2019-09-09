@@ -16,6 +16,8 @@ namespace TestOpenTK
         public int offset;
         public Shader shader;
         public int enableAttrIndex;
+        public Matrix4 ModelTransform = Matrix4.Identity;
+        public Matrix4 World = Matrix4.Identity;
     }
 
     internal class BeginGameWindow : GameWindow

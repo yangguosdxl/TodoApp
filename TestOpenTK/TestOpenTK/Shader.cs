@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 using System;
 using System.IO;
 using System.Text;
@@ -83,6 +84,14 @@ public class Shader : IDisposable
             Console.WriteLine($"{m_VertexPath},{m_FragPath}: Can not find uniform name {name}");
         }
         return iLocation;
+    }
+
+    public void SetUniformMat(string name, ref Matrix4 mat)
+    {
+        int location = GetUniformLocation(name);
+        if (location == -1) return;
+
+        GL.UniformMatrix4(location, false, ref mat);
     }
 
     #region IDisposable Support
