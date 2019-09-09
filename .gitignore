@@ -330,8 +330,6 @@ ASALocalRun/
 .mfractor/
 UIWidgetsTest/Library/
 UIWidgetsTest/Temp/
-*.csproj
-*.sln
 
 
 *.user
@@ -347,3 +345,14 @@ _ReSharper*
 [Bb]in/
 obj/
 Cache/
+UIWidgetsTest/Unity.UIWidgets.csproj
+UIWidgetsTest/Unity.UIWidgets.Tests.csproj
+UIWidgetsTest/Unity.UIWidgets.Editor.csproj
+UIWidgetsTest/Unity.UIWidgets.Editor.Tests.csproj
+UIWidgetsTest/Unity.InternalAPIEngineBridge.024.csproj
+UIWidgetsTest/UIWidgetsTheatre.csproj
+UIWidgetsTest/UIWidgetsTest.sln
+UIWidgetsTest/UIWidgetsSample.csproj
+UIWidgetsTest/UIWidgetsGallery.csproj
+UIWidgetsTest/UIWidgetsGallery.Editor.csproj
+UIWidgetsTest/Assembly-CSharp.csproj
