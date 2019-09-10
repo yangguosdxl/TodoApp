@@ -1,5 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Schema.Generation;
+using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Utilities;
 
 namespace Manatee.Json.Test
 {
@@ -7,6 +14,7 @@ namespace Manatee.Json.Test
     {
         class Table
         {
+            [Range(10, 100)]
             public int a;
         }
 
@@ -17,7 +25,7 @@ namespace Manatee.Json.Test
         static void Main(string[] args)
         {
             
-            var serializer = new JsonSerializer();
+            string json = JsonConverter
 
             Console.WriteLine("Hello World!");
         }

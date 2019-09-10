@@ -19,3 +19,9 @@
 [submodule "opentk"]
 	path = opentk
 	url = https://github.com/opentk/opentk.git
+[submodule "Newtonsoft.Json"]
+	path = Newtonsoft.Json
+	url = https://github.com/JamesNK/Newtonsoft.Json.git
+[submodule "Newtonsoft.Json.Schema"]
+	path = Newtonsoft.Json.Schema
+	url = https://github.com/JamesNK/Newtonsoft.Json.Schema.git
