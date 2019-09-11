@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Utilities;
+using System.Xml;
 
 namespace Manatee.Json.Test
 {
@@ -24,8 +25,15 @@ namespace Manatee.Json.Test
         }
         static void Main(string[] args)
         {
-            
-            string json = JsonConverter
+            TableCollection tc = new TableCollection();
+
+            string json = JsonConvert.SerializeObject(tc);
+
+            Console.WriteLine(json);
+
+            XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(json);
+
+            Console.WriteLine(doc.ToString());
 
             Console.WriteLine("Hello World!");
         }
