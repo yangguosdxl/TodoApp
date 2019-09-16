@@ -25,3 +25,6 @@
 [submodule "Newtonsoft.Json.Schema"]
 	path = Newtonsoft.Json.Schema
 	url = https://github.com/JamesNK/Newtonsoft.Json.Schema.git
+[submodule "lowdb"]
+	path = lowdb
+	url = https://github.com/typicode/lowdb.git
