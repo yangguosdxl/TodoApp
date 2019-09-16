@@ -39,7 +39,7 @@ namespace TestOpenTK
             m_CubeShader.Use();
             GL.EnableVertexAttribArray(0);
 
-            m_Cube.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
+            //m_Cube.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
 
             m_Light.VAO = GL.GenVertexArray();
             GL.BindVertexArray(m_Light.VAO);
@@ -51,8 +51,8 @@ namespace TestOpenTK
             m_LightShader.Use();
             GL.EnableVertexAttribArray(0);
 
-            m_Light.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
-            m_Light.World = Matrix4.CreateTranslation(0.7f, 0.7f, 0) * Matrix4.CreateScale(0.2f);
+            //m_Light.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
+            m_Light.World = Matrix4.CreateTranslation(4f, 4f, 0) * Matrix4.CreateScale(0.2f);
 
             base.OnLoad(e);
         }
