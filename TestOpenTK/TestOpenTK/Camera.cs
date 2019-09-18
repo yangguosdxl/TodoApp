@@ -63,7 +63,22 @@ namespace TestOpenTK
             m_CameraFront.X = (float)(Math.Cos(m_fPitch) * Math.Cos(m_fYaw));
             m_CameraFront.Z = (float)(Math.Cos(m_fPitch) * Math.Sin(m_fYaw));
 
-            return Matrix4.LookAt(m_CameraPos, m_CameraPos + m_CameraFront, m_CameraUp);
+
+            Vector3 cameraZ = m_CameraFront;
+            Vector3 cameraX = Vector3.Cross(m_CameraUp, cameraZ);
+            Vector3 cameraY = Vector3.Cross(cameraZ, cameraX);
+
+            Matrix4 cameraToWorld = Matrix4.Identity;
+            cameraToWorld.Column0 = new Vector4(cameraX, 0);
+            cameraToWorld.Column1 = new Vector4(cameraY, 0);
+            cameraToWorld.Column2 = new Vector4(cameraZ, 0);
+            cameraToWorld.Column3 = new Vector4(m_CameraPos, 1);
+
+            Matrix4 worldToCamera = Matrix4.Transpose(cameraToWorld);
+
+            return worldToCamera;
+
+            //return Matrix4.LookAt(m_CameraPos, m_CameraPos + m_CameraFront, m_CameraUp);
         }
     }
 }
