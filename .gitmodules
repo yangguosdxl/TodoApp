@@ -28,3 +28,6 @@
 [submodule "lowdb"]
 	path = lowdb
 	url = https://github.com/typicode/lowdb.git
+[submodule "DotNetCorePlugins"]
+	path = DotNetCorePlugins
+	url = https://github.com/natemcmaster/DotNetCorePlugins.git
