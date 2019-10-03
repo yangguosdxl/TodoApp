@@ -28,3 +28,6 @@
 [submodule "lowdb"]
 	path = lowdb
 	url = https://github.com/typicode/lowdb.git
+[submodule "AppMetrics_Samples.V2"]
+	path = AppMetrics_Samples.V2
+	url = https://github.com/AppMetrics/Samples.V2.git

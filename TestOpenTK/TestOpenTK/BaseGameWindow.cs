@@ -32,7 +32,9 @@ namespace TestOpenTK
         {
             m_StartTime = DateTime.Now;
 
-            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            //GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+            GL.ClearColor(1f, 1f, 1f, 1.0f);
 
             m_View2Proj = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), Width / Height, 0.1f, 100f);
 
