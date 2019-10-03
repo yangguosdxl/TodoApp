@@ -31,3 +31,12 @@
 [submodule "AppMetrics_Samples.V2"]
 	path = AppMetrics_Samples.V2
 	url = https://github.com/AppMetrics/Samples.V2.git
+[submodule "DotNetCorePlugins"]
+	path = DotNetCorePlugins
+	url = https://github.com/natemcmaster/DotNetCorePlugins.git
+[submodule "UpsilonGC"]
+	path = UpsilonGC
+	url = https://github.com/kkokosa/UpsilonGC.git
+[submodule "prometheus-net.DotNetRuntime"]
+	path = prometheus-net.DotNetRuntime
+	url = https://github.com/djluck/prometheus-net.DotNetRuntime.git
