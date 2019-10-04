@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace TestOpenTK
 {
-    class LightGameWindow : BaseGameWindow
+    class TriangleGameWindow : BaseGameWindow
     {
         DrawData m_Cube = new DrawData();
         DrawData m_Light = new DrawData();
@@ -16,7 +16,7 @@ namespace TestOpenTK
         Shader m_CubeShader;
         Shader m_LightShader;
 
-        public LightGameWindow(int v1, int v2, string v3) : base(v1, v2, v3)
+        public TriangleGameWindow(int v1, int v2, string v3) : base(v1, v2, v3)
         {
         }
 
@@ -27,7 +27,7 @@ namespace TestOpenTK
 
             m_VBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, m_VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, SimpleModel.Cube.Length * sizeof(float), SimpleModel.Cube, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, SimpleModel.Triangle.Length * sizeof(float), SimpleModel.Triangle, BufferUsageHint.StaticDraw);
 
             m_Cube.VAO = GL.GenVertexArray();
             GL.BindVertexArray(m_Cube.VAO);
@@ -40,7 +40,7 @@ namespace TestOpenTK
             GL.EnableVertexAttribArray(0);
 
             //m_Cube.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
-            m_Cube.World = Matrix4.CreateTranslation(0f, 0f, -10f);
+            m_Cube.World = Matrix4.CreateTranslation(0f, 0f, 0f);
 
             m_Light.VAO = GL.GenVertexArray();
             GL.BindVertexArray(m_Light.VAO);
@@ -76,7 +76,7 @@ namespace TestOpenTK
             Matrix4 cubeMat = m_Cube.ModelTransform * m_Cube.World * m_World2View * m_View2Proj;
             m_Cube.shader.SetUniformMat("pvm", ref cubeMat);
             GL.BindVertexArray(m_Cube.VAO);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));
+            GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Triangle.Length * sizeof(float));
 
             //m_Light.shader.Use();
             //Matrix4 lightMat = m_Light.ModelTransform * m_Light.World * m_World2View * m_View2Proj;

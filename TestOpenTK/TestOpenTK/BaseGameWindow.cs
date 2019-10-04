@@ -11,7 +11,7 @@ namespace TestOpenTK
     {
         DateTime m_StartTime;
 
-        private Camera m_Camera = new Camera(new Vector3(0, 0, 2f), new Vector3(0, 0, 1f), new Vector3(0, 1, 0));
+        private Camera m_Camera = new Camera(new Vector3(0, 0, -2f), new Vector3(0, 0, 1f), new Vector3(0, 1, 0));
         private bool _firstMove = true;
         private Vector2 _lastPos;
         private float sensitivity = (float)(0.05 * Math.PI / 180);

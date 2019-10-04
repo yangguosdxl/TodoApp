@@ -13,7 +13,7 @@ namespace TestOpenTK
         Vector3 m_CameraUp;
 
         private float m_fPitch;
-        private float m_fYaw = (float)(0.5f*Math.PI);
+        private float m_fYaw = 0.5f*(float)Math.PI;
         private float m_Fov = 45;
 
         public Vector3 CameraPos
@@ -31,7 +31,7 @@ namespace TestOpenTK
             {
                 m_fPitch = (float)MathHelper.Clamp(value, -89*180/Math.PI, 89 * 180 / Math.PI);
 
-                CameraRight = Vector3.Cross(m_CameraFront, m_CameraUp).Normalized();
+                //CameraRight = Vector3.Cross(m_CameraFront, m_CameraUp).Normalized();
             }
         }
 
@@ -42,7 +42,7 @@ namespace TestOpenTK
             {
                 m_fYaw = value;
 
-                CameraRight = Vector3.Cross(m_CameraFront, m_CameraUp).Normalized();
+                //CameraRight = Vector3.Cross(m_CameraFront, m_CameraUp).Normalized();
             }
         }
 
@@ -75,7 +75,6 @@ namespace TestOpenTK
             cameraToWorld.Column3 = new Vector4(m_CameraPos, 1);
 
             Matrix4 worldToCamera = Matrix4.Transpose(cameraToWorld);
-
             return worldToCamera;
 
             //return Matrix4.LookAt(m_CameraPos, m_CameraPos + m_CameraFront, m_CameraUp);
