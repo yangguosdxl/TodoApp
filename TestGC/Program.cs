@@ -20,6 +20,7 @@ namespace gc_latency_experiment
         private static int windowSize = 200000; // 200,000
         private const int msgCount = 10000000; // 10,000,000 
         private const int msgSize = 1024;      // 1,024
+        private const int GCWaterLine = 1000;
 
         private static void pushMessage(Dictionary<int, byte[]> map, int id)
         {
@@ -63,10 +64,14 @@ namespace gc_latency_experiment
 
         static void Main(string[] args)
         {
+            GCSettings.LatencyMode = GCLatencyMode.Interactive;
+
             Console.WriteLine("Starting GC Latency Experiment - {0} - {1} - {2}",
                 Environment.Is64BitProcess ? "64-bit" : "32-bit",
                 GCSettings.IsServerGC ? "SERVER" : "WORKSTATION",
                 GCSettings.LatencyMode);
+
+            
 
             //A single tick represents one hundred nanoseconds or one ten-millionth of a second. 
             //There are 10,000 ticks in a millisecond, or 10 million ticks in a second.
@@ -140,6 +145,8 @@ namespace gc_latency_experiment
             }
 
             var totalTime = Stopwatch.StartNew();
+
+            int countForGC = 0;
             for (var i = 0; i < msgCount; i++)
             {
                 var sw = Stopwatch.StartNew();
@@ -155,6 +162,14 @@ namespace gc_latency_experiment
                     best = sw.Elapsed;
 
                 histogram.RecordValue(sw.ElapsedTicks);
+
+                ++countForGC;
+                if (countForGC >= GCWaterLine)
+                {
+                    countForGC = 0;
+                    GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false);
+                }
+
             }
             totalTime.Stop();
 
