@@ -40,6 +40,7 @@ namespace TestOpenTK
             GL.EnableVertexAttribArray(0);
 
             //m_Cube.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
+            m_Cube.World = Matrix4.CreateTranslation(0f, 0f, -10f);
 
             m_Light.VAO = GL.GenVertexArray();
             GL.BindVertexArray(m_Light.VAO);
@@ -52,7 +53,9 @@ namespace TestOpenTK
             GL.EnableVertexAttribArray(0);
 
             //m_Light.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
-            m_Light.World = Matrix4.CreateTranslation(4f, 4f, 0) * Matrix4.CreateScale(0.2f);
+            //m_Light.World = Matrix4.CreateTranslation(0f, 4f, 0) * Matrix4.CreateScale(0.2f);
+            //m_Light.World = Matrix4.CreateScale(0.2f);
+            m_Light.World = Matrix4.CreateTranslation(0f, 0f, -10f);
 
             base.OnLoad(e);
         }
@@ -75,11 +78,11 @@ namespace TestOpenTK
             GL.BindVertexArray(m_Cube.VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));
 
-            m_Light.shader.Use();
-            Matrix4 lightMat = m_Light.ModelTransform * m_Light.World * m_World2View * m_View2Proj;
-            m_Light.shader.SetUniformMat("pvm", ref lightMat);
-            GL.BindVertexArray(m_Light.VAO);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));
+            //m_Light.shader.Use();
+            //Matrix4 lightMat = m_Light.ModelTransform * m_Light.World * m_World2View * m_View2Proj;
+            //m_Light.shader.SetUniformMat("pvm", ref lightMat);
+            //GL.BindVertexArray(m_Light.VAO);
+            //GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));
         }
     }
 }
