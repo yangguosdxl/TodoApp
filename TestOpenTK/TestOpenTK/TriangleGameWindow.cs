@@ -38,7 +38,7 @@ namespace TestOpenTK
             GL.EnableVertexAttribArray(0);
 
             //m_Cube.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
-            m_Triangle.World = Matrix4.CreateTranslation(0f, 0f, -5f);
+            m_Triangle.World = Matrix4.CreateTranslation(0f, 0f, 0f);
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
 

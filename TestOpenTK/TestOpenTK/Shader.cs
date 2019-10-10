@@ -94,6 +94,14 @@ public class Shader : IDisposable
         GL.UniformMatrix4(location, false, ref mat);
     }
 
+    public void SetUniform3(string name, ref Vector3 v3)
+    {
+        int location = GetUniformLocation(name);
+        if (location == -1) return;
+
+        GL.Uniform3(location, ref v3);
+    }
+
     #region IDisposable Support
     private bool disposedValue = false; // 要检测冗余调用
 
