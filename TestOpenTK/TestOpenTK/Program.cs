@@ -22,7 +22,7 @@ namespace TestOenTK
         {
             Console.WriteLine("Curr work path: " + Directory.GetCurrentDirectory());
             //using (Game game = new Game(800, 600, "LearnOpenTK"))
-            using(GameWindow gw = new LightGameWindow(800,600, "LightGameWindow"))
+            using(GameWindow gw = new TriangleGameWindow(800,600, "TriangleGameWindow"))
             {
                 //Run takes a double, which is how many frames per second it should strive to reach.
                 //You can leave that out and it'll just update as fast as the hardware will allow it.

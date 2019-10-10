@@ -75,6 +75,7 @@
     <Compile Include="Shader.cs" />
     <Compile Include="SimpleModel.cs" />
     <Compile Include="Texture.cs" />
+    <Compile Include="TriangleGameWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

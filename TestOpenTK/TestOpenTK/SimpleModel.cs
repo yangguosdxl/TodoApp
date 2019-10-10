@@ -52,5 +52,12 @@ namespace TestOpenTK
         -0.5f,  0.5f,  0.5f,
         -0.5f,  0.5f, -0.5f,
     };
+
+        public static float[] Triangle = new float[]
+        {
+            -0.5f, -0.5f, 0,
+               0f,  0.5f, 0,
+             0.5f, -0.5f, 0,
+        };
     }
 }

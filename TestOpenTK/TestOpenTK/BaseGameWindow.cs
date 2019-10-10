@@ -11,7 +11,7 @@ namespace TestOpenTK
     {
         DateTime m_StartTime;
 
-        private Camera m_Camera = new Camera(new Vector3(0, 0, 2f), new Vector3(0, 0, 1f), new Vector3(0, 1, 0));
+        private Camera m_Camera = new Camera(new Vector3(0, 0, -2f), new Vector3(0, 0, 1f), new Vector3(0, 1, 0));
         private bool _firstMove = true;
         private Vector2 _lastPos;
         private float sensitivity = (float)(0.05 * Math.PI / 180);
@@ -32,9 +32,9 @@ namespace TestOpenTK
         {
             m_StartTime = DateTime.Now;
 
-            //GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-            GL.ClearColor(1f, 1f, 1f, 1.0f);
+            //GL.ClearColor(1f, 1f, 1f, 1.0f);
 
             m_View2Proj = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45), Width / Height, 0.1f, 100f);
 
@@ -62,12 +62,12 @@ namespace TestOpenTK
             }
             else if (input.IsKeyDown(Key.W))
             {
-                Vector3 v = (float)(UpdateTime * m_fSpeed) * m_Camera.CameraFront;
+                Vector3 v = (float)(UpdateTime * -m_fSpeed) * m_Camera.CameraFront;
                 m_Camera.CameraPos += v;
             }
             else if (input.IsKeyDown(Key.S))
             {
-                Vector3 v = (float)(UpdateTime * -m_fSpeed) * m_Camera.CameraFront;
+                Vector3 v = (float)(UpdateTime * m_fSpeed) * m_Camera.CameraFront;
                 m_Camera.CameraPos += v;
             }
             else if (input.IsKeyDown(Key.A))
