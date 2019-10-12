@@ -11,7 +11,7 @@ namespace TestOpenTK
     {
         DateTime m_StartTime;
 
-        private Camera m_Camera = new Camera(new Vector3(0, 0, 2f), new Vector3(0, 0, 1f), new Vector3(0, 1, 0));
+        protected Camera m_Camera = new Camera(new Vector3(0, 0, 2f), new Vector3(0, 0, 1f), new Vector3(0, 1, 0));
         private bool _firstMove = true;
         private Vector2 _lastPos;
         private float sensitivity = (float)(0.05 * Math.PI / 180);
@@ -19,7 +19,7 @@ namespace TestOpenTK
 
         private float m_fSpeed = 600;
 
-        private float m_fElpaseSeconds = 0;
+        protected float m_fElpaseSeconds = 0;
 
         protected Matrix4 m_World2View;
         protected Matrix4 m_View2Proj;
@@ -31,6 +31,8 @@ namespace TestOpenTK
         protected override void OnLoad(EventArgs e)
         {
             m_StartTime = DateTime.Now;
+
+            GL.Enable(EnableCap.DepthTest);
 
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
@@ -59,6 +61,14 @@ namespace TestOpenTK
             else if (input.IsKeyDown(Key.Number2))
             {
                 GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            }
+            else if (input.IsKeyDown(Key.Number3))
+            {
+                GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
+            }
+            else if (input.IsKeyDown(Key.Number4))
+            {
+                GL.PolygonMode(MaterialFace.Front, PolygonMode.Line);
             }
             else if (input.IsKeyDown(Key.W))
             {
@@ -101,13 +111,21 @@ namespace TestOpenTK
                     var deltaY = mouse.Y - _lastPos.Y;
                     _lastPos = new Vector2(mouse.X, mouse.Y);
 
+                    if (deltaX != 0 || deltaY != 0)
+                    {
+                        Console.WriteLine($"dx: {deltaX}, dy: {deltaY}, x: {mouse.X}, y: {mouse.Y}, lastpos: {_lastPos}");
+                    }
+
+                    
+
                     //Console.WriteLine($"mouse pos {mouse.X}, {mouse.Y}");
 
                     // Apply the camera pitch and yaw (we clamp the pitch in the camera class)
-                    if(deltaX > 0 || deltaY > 0)
+                    if (deltaX != 0 || deltaY != 0)
                     {
+                        
                         m_Camera.Yaw += deltaX * sensitivity;
-                        m_Camera.Pitch -= deltaY * sensitivity; // reversed since y-coordinates range from bottom to top
+                        m_Camera.Pitch += deltaY * sensitivity; // reversed since y-coordinates range from bottom to top
                     }
 
                 }
@@ -142,7 +160,7 @@ namespace TestOpenTK
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             m_fElpaseSeconds = (float)((DateTime.Now - m_StartTime).TotalMilliseconds / 1000);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             //Code goes here.
 
