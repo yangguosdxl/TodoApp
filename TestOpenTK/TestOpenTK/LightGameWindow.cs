@@ -25,7 +25,8 @@ namespace TestOpenTK
 
         protected override void OnLoad(EventArgs e)
         {
-            m_CubeShader = new Shader("Cube.vert.glsl", "Cube.frag.glsl");
+            //m_CubeShader = new Shader("Cube.vert.glsl", "Cube.frag.glsl");
+            m_CubeShader = new Shader("CubeGouraud.vert.glsl", "CubeGouraud.frag.glsl");
             m_LightShader = new Shader("Light.vert.glsl", "Light.frag.glsl");
 
             m_VBO = GL.GenBuffer();
@@ -120,9 +121,10 @@ namespace TestOpenTK
 
             //m_Cube.shader.SetUniform3("objectColor", ref objectColor);
             m_Cube.shader.SetUniform3("lightColor", ref lightColor);
-            m_Cube.shader.SetUniform3("lightPos", ref m_LightPos);
+            Vector3 viewLightPos = (new Vector4( m_LightPos, 1) * m_Camera.WorldToCameraMatrix).Xyz;
+            m_Cube.shader.SetUniform3("lightPos", ref viewLightPos);
             Vector3 cameraPos = m_Camera.CameraPos;
-            m_Cube.shader.SetUniform3("viewPos", ref cameraPos);
+            //m_Cube.shader.SetUniform3("viewPos", ref cameraPos);
 
             GL.BindVertexArray(m_Cube.VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));

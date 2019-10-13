@@ -104,7 +104,9 @@
     <None Include="App.config" />
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+    <None Include="Shaders\CubeGouraud.frag.glsl" />
     <None Include="Shaders\Cube.frag.glsl" />
+    <None Include="Shaders\CubeGouraud.vert.glsl" />
     <None Include="Shaders\Cube.vert.glsl" />
     <None Include="Shaders\Light.frag.glsl" />
     <None Include="Shaders\Light.vert.glsl" />

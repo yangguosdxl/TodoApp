@@ -48,6 +48,8 @@ namespace TestOpenTK
 
         public float Fov { get => m_Fov; set => m_Fov = value; }
 
+        public Matrix4 WorldToCameraMatrix { get; set; }
+
         public Camera(Vector3 cameraPos, Vector3 cameraFront, Vector3 cameraUp)
         {
             m_CameraPos = cameraPos;
@@ -76,6 +78,7 @@ namespace TestOpenTK
 
             Matrix4 worldToCamera;
             Matrix4.Invert(ref cameraToWorld, out worldToCamera);
+            WorldToCameraMatrix = worldToCamera;
             //worldToCamera = cameraToWorld;
             return worldToCamera;
 
