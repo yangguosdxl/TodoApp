@@ -28,7 +28,7 @@ namespace TestOenTK
                 //You can leave that out and it'll just update as fast as the hardware will allow it.
                 gw.Run(60.0);
             }
-
+            Console.ReadKey();
         }
     }
 

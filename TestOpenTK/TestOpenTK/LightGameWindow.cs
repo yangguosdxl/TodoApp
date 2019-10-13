@@ -67,7 +67,7 @@ namespace TestOpenTK
             GL.EnableVertexAttribArray(0);
 
             //m_Light.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
-            m_LightPos = new Vector3(0f, 0f, -2f);
+            m_LightPos = new Vector3(0f, 0.5f, -2f);
 
             m_Light.World = Matrix4.CreateScale(0.2f) * Matrix4.CreateTranslation(m_LightPos);
             //m_Light.World = Matrix4.CreateScale(0.2f);
@@ -89,24 +89,24 @@ namespace TestOpenTK
         protected override void DoDraw(float deltaMS)
         {
             #region 灯光轨迹
-            //float fLightRotateSpeed = 0.7f;
-            //float fLightLength = 0.5f;
-            //float fLightY = (float)Math.Sin(m_fElpaseSeconds * fLightRotateSpeed) * fLightLength;
-            //float fLightX = (float)Math.Cos(m_fElpaseSeconds * fLightRotateSpeed) * fLightLength;
-            //m_LightPos.X = fLightX;
-            //m_LightPos.Y = fLightY;
+            float fLightRotateSpeed = 0.7f;
+            float fLightLength = 0.5f;
+            float fLightY = (float)Math.Sin(m_fElpaseSeconds * fLightRotateSpeed) * fLightLength;
+            float fLightX = (float)Math.Cos(m_fElpaseSeconds * fLightRotateSpeed) * fLightLength;
+            m_LightPos.X = fLightX;
+            m_LightPos.Y = fLightY;
 
-            //m_Light.World = Matrix4.CreateScale(0.2f) * Matrix4.CreateTranslation(m_LightPos);
+            m_Light.World = Matrix4.CreateScale(0.2f) * Matrix4.CreateTranslation(m_LightPos);
 
             //Console.WriteLine($"light {m_LightPos}");
             #endregion
 
             #region Cube轨迹
-            //float fCubeRotateSpeed = 0.5f;
-            //m_Cube.World =
-            //    Matrix4.CreateRotationY(m_fElpaseSeconds * fCubeRotateSpeed) *
-            //    //Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) *
-            //    Matrix4.CreateTranslation(0f, 0f, -3f);
+            float fCubeRotateSpeed = 0.5f;
+            m_Cube.World =
+                Matrix4.CreateRotationY(m_fElpaseSeconds * fCubeRotateSpeed) *
+                //Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) *
+                Matrix4.CreateTranslation(0f, 0f, -3f);
             #endregion
 
             //Vector3 objectColor = new Vector3(1.0f, 0.5f, 0.3f);
