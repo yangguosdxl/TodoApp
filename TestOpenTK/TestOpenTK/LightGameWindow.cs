@@ -19,6 +19,9 @@ namespace TestOpenTK
 
         Vector3 m_LightPos;
 
+        Texture m_Container2;
+        Texture m_Container2Specular;
+
         public LightGameWindow(int v1, int v2, string v3) : base(v1, v2, v3)
         {
         }
@@ -26,7 +29,7 @@ namespace TestOpenTK
         protected override void OnLoad(EventArgs e)
         {
             //m_CubeShader = new Shader("Cube.vert.glsl", "Cube.frag.glsl");
-            m_CubeShader = new Shader("CubeGouraud.vert.glsl", "CubeGouraud.frag.glsl");
+            m_CubeShader = new Shader("CubeMaterial.vert.glsl", "CubeMaterial.frag.glsl");
             m_LightShader = new Shader("Light.vert.glsl", "Light.frag.glsl");
 
             m_VBO = GL.GenBuffer();
@@ -37,15 +40,17 @@ namespace TestOpenTK
             GL.BindVertexArray(m_Cube.VAO);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, m_VBO);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 9 * sizeof(float), 0);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 9 * sizeof(float), 3*sizeof(float));
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 9 * sizeof(float), 6 * sizeof(float));
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 11 * sizeof(float), 0);
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 11 * sizeof(float), 3*sizeof(float));
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 11 * sizeof(float), 6 * sizeof(float));
+            GL.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, 11 * sizeof(float), 9 * sizeof(float));
 
             m_Cube.shader = m_CubeShader;
             m_CubeShader.Use();
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(3);
 
             //m_Cube.ModelTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) * Matrix4.CreateRotationY(MathHelper.DegreesToRadians(45));
             m_Cube.World =
@@ -73,6 +78,11 @@ namespace TestOpenTK
             m_Light.World = Matrix4.CreateScale(0.2f) * Matrix4.CreateTranslation(m_LightPos);
             //m_Light.World = Matrix4.CreateScale(0.2f);
             //m_Light.World = Matrix4.CreateTranslation(m_LightPos);
+
+            m_Container2 = new Texture("container2.png", TextureUnit.Texture0);
+            m_Container2Specular = new Texture("container2_specular.png", TextureUnit.Texture1);
+
+
 
             base.OnLoad(e);
         }
@@ -120,11 +130,23 @@ namespace TestOpenTK
             m_Cube.shader.SetUniformMat("ViewToProject", ref m_View2Proj);
 
             //m_Cube.shader.SetUniform3("objectColor", ref objectColor);
-            m_Cube.shader.SetUniform3("lightColor", ref lightColor);
+            //m_Cube.shader.SetUniform3("lightColor", lightColor);
             Vector3 viewLightPos = (new Vector4( m_LightPos, 1) * m_Camera.WorldToCameraMatrix).Xyz;
-            m_Cube.shader.SetUniform3("lightPos", ref viewLightPos);
+            m_Cube.shader.SetUniform3("light.position", viewLightPos);
             Vector3 cameraPos = m_Camera.CameraPos;
-            //m_Cube.shader.SetUniform3("viewPos", ref cameraPos);
+            //m_Cube.shader.SetUniform3("viewPos", cameraPos);
+
+            //m_Cube.shader.SetUniform3("material.ambient", new Vector3(1.0f, 0.5f, 0.31f));
+            m_Container2.Use();
+            m_Container2Specular.Use(TextureUnit.Texture1);
+
+            m_Cube.shader.SetUniform1("material.diffuse", 0);
+            m_Cube.shader.SetUniform1("material.specular", 1);
+            m_Cube.shader.SetUniform1("material.shininess", 32.0f);
+
+            m_Cube.shader.SetUniform3("light.ambient", 0.2f, 0.2f, 0.2f);
+            m_Cube.shader.SetUniform3("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
+            m_Cube.shader.SetUniform3("light.specular", 1.0f, 1.0f, 1.0f);
 
             GL.BindVertexArray(m_Cube.VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));
@@ -135,7 +157,7 @@ namespace TestOpenTK
             m_Light.shader.SetUniformMat("WorldToView", ref m_World2View);
             m_Light.shader.SetUniformMat("ViewToProject", ref m_View2Proj);
 
-            m_Light.shader.SetUniform3("lightColor", ref lightColor);
+            m_Light.shader.SetUniform3("lightColor", lightColor);
 
             GL.BindVertexArray(m_Light.VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.SimpleCube.Length * sizeof(float));

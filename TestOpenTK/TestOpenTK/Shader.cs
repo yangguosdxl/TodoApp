@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -76,12 +77,19 @@ public class Shader : IDisposable
         return iLocation;
     }
 
+    HashSet<string> m_ErrorUniformLocation = new HashSet<string>();
     public int GetUniformLocation(string name)
     {
         int iLocation = GL.GetUniformLocation(Handle, name);
         if (iLocation == -1)
         {
-            Console.WriteLine($"{m_VertexPath},{m_FragPath}: Can not find uniform name {name}");
+            if (m_ErrorUniformLocation.Contains(name) == false)
+            {
+                m_ErrorUniformLocation.Add(name);
+
+                Console.WriteLine($"{m_VertexPath},{m_FragPath}: Can not find uniform name {name}");
+            }
+            
         }
         return iLocation;
     }
@@ -94,12 +102,36 @@ public class Shader : IDisposable
         GL.UniformMatrix4(location, false, ref mat);
     }
 
-    public void SetUniform3(string name, ref Vector3 v3)
+    public void SetUniform3(string name, Vector3 v3)
     {
         int location = GetUniformLocation(name);
         if (location == -1) return;
 
         GL.Uniform3(location, ref v3);
+    }
+
+    public void SetUniform3(string name, float x, float y, float z)
+    {
+        int location = GetUniformLocation(name);
+        if (location == -1) return;
+
+        GL.Uniform3(location, x, y, z);
+    }
+
+    public void SetUniform1(string name, float v)
+    {
+        int location = GetUniformLocation(name);
+        if (location == -1) return;
+
+        GL.Uniform1(location, v);
+    }
+
+    public void SetUniform1(string name, int v)
+    {
+        int location = GetUniformLocation(name);
+        if (location == -1) return;
+
+        GL.Uniform1(location, v);
     }
 
     #region IDisposable Support

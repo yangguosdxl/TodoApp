@@ -108,6 +108,8 @@
     <None Include="Shaders\Cube.frag.glsl" />
     <None Include="Shaders\CubeGouraud.vert.glsl" />
     <None Include="Shaders\Cube.vert.glsl" />
+    <None Include="Shaders\CubeMaterial.frag.glsl" />
+    <None Include="Shaders\CubeMaterial.vert.glsl" />
     <None Include="Shaders\Light.frag.glsl" />
     <None Include="Shaders\Light.vert.glsl" />
     <None Include="Shaders\shader.frag" />
@@ -118,6 +120,8 @@
   <ItemGroup>
     <Content Include="Shaders\awesomeface.png" />
     <Content Include="Shaders\container.jpg" />
+    <Content Include="Shaders\container2.png" />
+    <Content Include="Shaders\container2_specular.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
