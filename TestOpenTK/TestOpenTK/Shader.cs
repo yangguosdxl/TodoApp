@@ -110,6 +110,14 @@ public class Shader : IDisposable
         GL.Uniform3(location, ref v3);
     }
 
+    public void SetUniform4(string name, Vector4 v4)
+    {
+        int location = GetUniformLocation(name);
+        if (location == -1) return;
+
+        GL.Uniform4(location, ref v4);
+    }
+
     public void SetUniform3(string name, float x, float y, float z)
     {
         int location = GetUniformLocation(name);

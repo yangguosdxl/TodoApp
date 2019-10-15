@@ -122,6 +122,8 @@
     <Content Include="Shaders\container.jpg" />
     <Content Include="Shaders\container2.png" />
     <Content Include="Shaders\container2_specular.png" />
+    <Content Include="Shaders\lighting_maps_specular_color.png" />
+    <Content Include="Shaders\matrix.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

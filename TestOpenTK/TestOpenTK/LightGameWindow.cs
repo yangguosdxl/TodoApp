@@ -21,6 +21,7 @@ namespace TestOpenTK
 
         Texture m_Container2;
         Texture m_Container2Specular;
+        Texture m_EmissionMatrix;
 
         public LightGameWindow(int v1, int v2, string v3) : base(v1, v2, v3)
         {
@@ -80,8 +81,9 @@ namespace TestOpenTK
             //m_Light.World = Matrix4.CreateTranslation(m_LightPos);
 
             m_Container2 = new Texture("container2.png", TextureUnit.Texture0);
-            m_Container2Specular = new Texture("container2_specular.png", TextureUnit.Texture1);
-
+            m_Container2Specular = new Texture("lighting_maps_specular_color.png", TextureUnit.Texture1);
+            m_EmissionMatrix = new Texture("matrix.jpg", TextureUnit.Texture1);
+            
 
 
             base.OnLoad(e);
@@ -131,17 +133,19 @@ namespace TestOpenTK
 
             //m_Cube.shader.SetUniform3("objectColor", ref objectColor);
             //m_Cube.shader.SetUniform3("lightColor", lightColor);
-            Vector3 viewLightPos = (new Vector4( m_LightPos, 1) * m_Camera.WorldToCameraMatrix).Xyz;
-            m_Cube.shader.SetUniform3("light.position", viewLightPos);
+            Vector4 viewLightPos = (new Vector4( m_LightPos, 0) * m_Camera.WorldToCameraMatrix);
+            m_Cube.shader.SetUniform4("light.position", viewLightPos);
             Vector3 cameraPos = m_Camera.CameraPos;
             //m_Cube.shader.SetUniform3("viewPos", cameraPos);
 
             //m_Cube.shader.SetUniform3("material.ambient", new Vector3(1.0f, 0.5f, 0.31f));
             m_Container2.Use();
             m_Container2Specular.Use(TextureUnit.Texture1);
+            m_EmissionMatrix.Use(TextureUnit.Texture2);
 
             m_Cube.shader.SetUniform1("material.diffuse", 0);
             m_Cube.shader.SetUniform1("material.specular", 1);
+            m_Cube.shader.SetUniform1("material.emission", 2);
             m_Cube.shader.SetUniform1("material.shininess", 32.0f);
 
             m_Cube.shader.SetUniform3("light.ambient", 0.2f, 0.2f, 0.2f);
@@ -150,6 +154,23 @@ namespace TestOpenTK
 
             GL.BindVertexArray(m_Cube.VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));
+
+            // We want to draw all the cubes at their respective positions
+            for (int i = 0; i < SimpleModel.cubePositions.Length; i++)
+            {
+                // First we create a model from an identity matrix
+                Matrix4 model = Matrix4.Identity;
+                // Then we translate said matrix by the cube position
+                model *= Matrix4.CreateTranslation(SimpleModel.cubePositions[i]);
+                // We then calculate the angle and rotate the model around an axis
+                float angle = 20.0f * i;
+                model *= Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.3f, 0.5f), angle);
+                // Remember to set the model at last so it can be used by opentk
+                m_Cube.shader.SetUniformMat("ModelToWorld", ref model);
+
+                // At last we draw all our cubes
+                GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            }
 
             m_Light.shader.Use();
 
