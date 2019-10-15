@@ -108,6 +108,7 @@
     <None Include="Shaders\Cube.frag.glsl" />
     <None Include="Shaders\CubeGouraud.vert.glsl" />
     <None Include="Shaders\Cube.vert.glsl" />
+    <None Include="Shaders\CubeMaterialMultiLight.frag.glsl" />
     <None Include="Shaders\CubeMaterial.frag.glsl" />
     <None Include="Shaders\CubeMaterial.vert.glsl" />
     <None Include="Shaders\Light.frag.glsl" />
