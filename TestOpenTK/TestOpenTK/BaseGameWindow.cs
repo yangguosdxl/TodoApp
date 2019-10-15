@@ -17,7 +17,7 @@ namespace TestOpenTK
         private float sensitivity = (float)(0.05 * Math.PI / 180);
         private bool m_bEnabledRotation = false;
 
-        private float m_fSpeed = 600;
+        private float m_fSpeed = 3000;
 
         protected float m_fElpaseSeconds = 0;
 

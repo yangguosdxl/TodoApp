@@ -117,7 +117,7 @@ namespace TestOpenTK
             m_Cube.World =
                 Matrix4.CreateRotationY(m_fElpaseSeconds * fCubeRotateSpeed) *
                 //Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) *
-                Matrix4.CreateTranslation(0f, 0f, -3f);
+                Matrix4.CreateTranslation(0f, 0f, -8f);
             #endregion
 
             //Vector3 objectColor = new Vector3(1.0f, 0.5f, 0.3f);
@@ -147,6 +147,10 @@ namespace TestOpenTK
             m_Cube.shader.SetUniform3("light.ambient", 0.2f, 0.2f, 0.2f);
             m_Cube.shader.SetUniform3("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
             m_Cube.shader.SetUniform3("light.specular", 1.0f, 1.0f, 1.0f);
+
+            m_Cube.shader.SetUniform1("light.constant", 1.0f);
+            m_Cube.shader.SetUniform1("light.linear", 0.09f);
+            m_Cube.shader.SetUniform1("light.quadratic", 0.032f);
 
             GL.BindVertexArray(m_Cube.VAO);
             GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));
