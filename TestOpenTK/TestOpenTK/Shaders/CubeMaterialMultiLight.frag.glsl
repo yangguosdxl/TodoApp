@@ -87,7 +87,7 @@ vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir)
 	return result;
 }
 
-vec3 CalcPointLight(PointLight light, vec3 norm, vec3 viewDir)
+vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 {
 	vec4 lightPos = light.position;
 
@@ -97,8 +97,8 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 viewDir)
     // diffuse
     vec3 norm = normalize(Normal);
 
-	vec3 lightDir = normalize(lightPos.xyz - FragPos);
-    float distance = length(lightPos.xyz - FragPos);
+	vec3 lightDir = normalize(lightPos.xyz - fragPos);
+    float distance = length(lightPos.xyz - fragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + 
 			light.quadratic * (distance * distance));
 		
@@ -121,7 +121,7 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 viewDir)
     return result;
 }
 
-vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 viewDir)
+vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 {
 	vec4 lightPos = light.position;
 
@@ -131,9 +131,9 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 viewDir)
     // diffuse
     vec3 norm = normalize(Normal);
 
-	vec3 lightDir = normalize(lightPos.xyz - FragPos);
+	vec3 lightDir = normalize(lightPos.xyz - fragPos);
 
-	float distance = length(lightPos.xyz - FragPos);
+	float distance = length(lightPos.xyz - fragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + 
 		light.quadratic * (distance * distance));
 
@@ -174,8 +174,8 @@ void main()
 
 	for(int i = 0; i < NR_POINT_LIGHTS; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
-    // 第三阶段：聚光
-    //result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
+    
+    result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
 
 	vec3 emission = texture(material.emission, FragUV).rgb;
 

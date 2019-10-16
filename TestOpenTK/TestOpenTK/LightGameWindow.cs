@@ -131,6 +131,12 @@ namespace TestOpenTK
             m_Cube.shader.SetUniformMat("WorldToView", ref m_World2View);
             m_Cube.shader.SetUniformMat("ViewToProject", ref m_View2Proj);
 
+            // dir light
+
+            // point light
+
+            //
+
             //m_Cube.shader.SetUniform3("objectColor", ref objectColor);
             //m_Cube.shader.SetUniform3("lightColor", lightColor);
             Vector4 viewLightPos = (new Vector4( m_LightPos, 1) * m_Camera.WorldToCameraMatrix);
