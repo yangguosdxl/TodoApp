@@ -95,7 +95,6 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, FragUV));
 
     // diffuse
-    vec3 norm = normalize(Normal);
 
 	vec3 lightDir = normalize(lightPos.xyz - fragPos);
     float distance = length(lightPos.xyz - fragPos);
@@ -129,8 +128,6 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, FragUV));
 
     // diffuse
-    vec3 norm = normalize(Normal);
-
 	vec3 lightDir = normalize(lightPos.xyz - fragPos);
 
 	float distance = length(lightPos.xyz - fragPos);
@@ -177,9 +174,7 @@ void main()
     
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
 
-	vec3 emission = texture(material.emission, FragUV).rgb;
-
-	result += emission;
+	//result += = texture(material.emission, FragUV).rgb;
 
     FragColor = vec4(result, 1.0);
 
