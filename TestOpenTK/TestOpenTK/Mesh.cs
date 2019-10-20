@@ -15,9 +15,9 @@ namespace TestOpenTK
         /*  网格数据  */
         public Vertex[] vertices;
         public uint[] indices;
-        public Texture[] textures;
+        public MeshTexture[] textures;
         /*  函数  */
-        public Mesh(Vertex[] vertices, uint[] indices, Texture[] textures)
+        public Mesh(Vertex[] vertices, uint[] indices, MeshTexture[] textures)
         {
             this.vertices = vertices;
             this.indices = indices;
@@ -26,10 +26,17 @@ namespace TestOpenTK
         }
         public void Draw(Shader shader)
         {
+            shader.Use();
             for(int i = 0; i < this.textures.Length; ++i)
             {
-
+                MeshTexture meshTex = this.textures[i];
+                meshTex.tex.Use(TextureUnit.Texture0 + i);
+                shader.SetUniform1(meshTex.shaderTexFieldName, i);
             }
+
+            GL.BindVertexArray(VAO);
+            GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
+            GL.BindVertexArray(0);
         }
 
 

@@ -94,10 +94,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssimpHelper.cs" />
     <Compile Include="BaseGameWindow.cs" />
     <Compile Include="BeginGameWindow.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Mesh.cs" />
+    <Compile Include="MeshTexture.cs" />
+    <Compile Include="Model.cs" />
     <Compile Include="TriangleGameWindow.cs" />
     <Compile Include="LightGameWindow.cs" />
     <Compile Include="Program.cs" />
