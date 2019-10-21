@@ -101,54 +101,44 @@ namespace TestOpenTK
             //Vector3 objectColor = new Vector3(1.0f, 0.5f, 0.3f);
             Vector3 lightColor = Vector3.One;
 
-            m_Cube.shader.Use();
+            m_Cube.Shader.Use();
 
-            m_Cube.shader.SetUniformMat("ModelToWorld", ref m_Cube.World);
-            m_Cube.shader.SetUniformMat("WorldToView", ref m_World2View);
-            m_Cube.shader.SetUniformMat("ViewToProject", ref m_View2Proj);
+            m_Cube.Shader.SetUniformMat("ModelToWorld", ref m_Cube.World);
+            m_Cube.Shader.SetUniformMat("WorldToView", ref m_World2View);
+            m_Cube.Shader.SetUniformMat("ViewToProject", ref m_View2Proj);
 
             // dir light
-            m_Cube.shader.SetUniform3("dirLight.direction", (new Vector4(-0.2f, -1.0f, -0.3f, 0)*m_Camera.WorldToCameraMatrix).Xyz);
-            m_Cube.shader.SetUniform3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-            m_Cube.shader.SetUniform3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-            m_Cube.shader.SetUniform3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+            m_Cube.Shader.SetUniform3("dirLight.direction", (new Vector4(-0.2f, -1.0f, -0.3f, 0)*m_Camera.WorldToCameraMatrix).Xyz);
+            m_Cube.Shader.SetUniform3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+            m_Cube.Shader.SetUniform3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+            m_Cube.Shader.SetUniform3("dirLight.specular", 0.5f, 0.5f, 0.5f);
             // point light
             for (int i = 0; i < 4; ++i)
             {
-                m_Cube.shader.SetUniform3($"pointLights[{i}].position", (new Vector4(SimpleModel.pointLightPositions[i],1)* m_Camera.WorldToCameraMatrix).Xyz);
-                m_Cube.shader.SetUniform3($"pointLights[{i}].ambient", 0.05f, 0.05f, 0.05f);
+                m_Cube.Shader.SetUniform3($"pointLights[{i}].position", (new Vector4(SimpleModel.pointLightPositions[i],1)* m_Camera.WorldToCameraMatrix).Xyz);
+                m_Cube.Shader.SetUniform3($"pointLights[{i}].ambient", 0.05f, 0.05f, 0.05f);
                 if (i == 2)
-                    m_Cube.shader.SetUniform3($"pointLights[{i}].diffuse", 0f, 1f, 0f);
+                    m_Cube.Shader.SetUniform3($"pointLights[{i}].diffuse", 0f, 1f, 0f);
                 else
-                    m_Cube.shader.SetUniform3($"pointLights[{i}].diffuse", 0.8f, 0.8f, 0.8f);
-                m_Cube.shader.SetUniform3($"pointLights[{i}].specular", 1.0f, 1.0f, 1.0f);
-                m_Cube.shader.SetUniform1($"pointLights[{i}].constant", 1.0f);
-                m_Cube.shader.SetUniform1($"pointLights[{i}].linear", 0.09f);
-                m_Cube.shader.SetUniform1($"pointLights[{i}].quadratic", 0.032f);
+                    m_Cube.Shader.SetUniform3($"pointLights[{i}].diffuse", 0.8f, 0.8f, 0.8f);
+                m_Cube.Shader.SetUniform3($"pointLights[{i}].specular", 1.0f, 1.0f, 1.0f);
+                m_Cube.Shader.SetUniform1($"pointLights[{i}].constant", 1.0f);
+                m_Cube.Shader.SetUniform1($"pointLights[{i}].linear", 0.09f);
+                m_Cube.Shader.SetUniform1($"pointLights[{i}].quadratic", 0.032f);
             }
             // spot light
-            m_Cube.shader.SetUniform3("spotLight.position", (new Vector4(m_Camera.CameraPos,1)* m_Camera.WorldToCameraMatrix).Xyz);
-            m_Cube.shader.SetUniform3("spotLight.direction", (new Vector4(-m_Camera.CameraFront, 1) * m_Camera.WorldToCameraMatrix).Xyz);
-            m_Cube.shader.SetUniform3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-            m_Cube.shader.SetUniform3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-            m_Cube.shader.SetUniform3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-            m_Cube.shader.SetUniform1("spotLight.constant", 1.0f);
-            m_Cube.shader.SetUniform1("spotLight.linear", 0.09f);
-            m_Cube.shader.SetUniform1("spotLight.quadratic", 0.032f);
-            m_Cube.shader.SetUniform1("spotLight.cutOff", (float)Math.Cos(MathHelper.DegreesToRadians(1.5f)));
-            m_Cube.shader.SetUniform1("spotLight.outerCutOff", (float)Math.Cos(MathHelper.DegreesToRadians(2.5f)));
+            m_Cube.Shader.SetUniform3("spotLight.position", (new Vector4(m_Camera.CameraPos,1)* m_Camera.WorldToCameraMatrix).Xyz);
+            m_Cube.Shader.SetUniform3("spotLight.direction", (new Vector4(-m_Camera.CameraFront, 1) * m_Camera.WorldToCameraMatrix).Xyz);
+            m_Cube.Shader.SetUniform3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+            m_Cube.Shader.SetUniform3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+            m_Cube.Shader.SetUniform3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+            m_Cube.Shader.SetUniform1("spotLight.constant", 1.0f);
+            m_Cube.Shader.SetUniform1("spotLight.linear", 0.09f);
+            m_Cube.Shader.SetUniform1("spotLight.quadratic", 0.032f);
+            m_Cube.Shader.SetUniform1("spotLight.cutOff", (float)Math.Cos(MathHelper.DegreesToRadians(1.5f)));
+            m_Cube.Shader.SetUniform1("spotLight.outerCutOff", (float)Math.Cos(MathHelper.DegreesToRadians(2.5f)));
 
-            m_Container2.Use();
-            m_Container2Specular.Use(TextureUnit.Texture1);
-            m_EmissionMatrix.Use(TextureUnit.Texture2);
-
-            m_Cube.shader.SetUniform1("material.diffuse", 0);
-            m_Cube.shader.SetUniform1("material.specular", 1);
-            m_Cube.shader.SetUniform1("material.emission", 2);
-            m_Cube.shader.SetUniform1("material.shininess", 32.0f);
-
-            GL.BindVertexArray(m_Cube.VAO);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, SimpleModel.Cube.Length * sizeof(float));
+            m_Cube.Draw();
 
             // We want to draw all the cubes at their respective positions
             for (int i = 0; i < SimpleModel.cubePositions.Length; i++)
@@ -164,7 +154,7 @@ namespace TestOpenTK
                 
                 //model *= Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.3f, 0.5f), angle);
                 // Remember to set the model at last so it can be used by opentk
-                m_Cube.shader.SetUniformMat("ModelToWorld", ref model);
+                m_Cube.Shader.SetUniformMat("ModelToWorld", ref model);
 
                 // At last we draw all our cubes
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
