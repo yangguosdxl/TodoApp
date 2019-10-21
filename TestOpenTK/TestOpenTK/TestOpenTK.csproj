@@ -98,6 +98,7 @@
     <Compile Include="BaseGameWindow.cs" />
     <Compile Include="BeginGameWindow.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="ModelGameWindow.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="MeshTexture.cs" />
     <Compile Include="Model.cs" />
@@ -123,6 +124,9 @@
     <None Include="Shaders\CubeMaterial.vert.glsl" />
     <None Include="Shaders\Light.frag.glsl" />
     <None Include="Shaders\Light.vert.glsl" />
+    <None Include="Shaders\nanosuit\nanosuit.blend" />
+    <None Include="Shaders\nanosuit\nanosuit.mtl" />
+    <None Include="Shaders\nanosuit\nanosuit.obj" />
     <None Include="Shaders\shader.frag" />
     <None Include="Shaders\shader.vert" />
     <None Include="Shaders\shader2.frag" />
@@ -135,6 +139,24 @@
     <Content Include="Shaders\container2_specular.png" />
     <Content Include="Shaders\lighting_maps_specular_color.png" />
     <Content Include="Shaders\matrix.jpg" />
+    <Content Include="Shaders\nanosuit\arm_dif.png" />
+    <Content Include="Shaders\nanosuit\arm_showroom_ddn.png" />
+    <Content Include="Shaders\nanosuit\arm_showroom_spec.png" />
+    <Content Include="Shaders\nanosuit\body_dif.png" />
+    <Content Include="Shaders\nanosuit\body_showroom_ddn.png" />
+    <Content Include="Shaders\nanosuit\body_showroom_spec.png" />
+    <Content Include="Shaders\nanosuit\glass_ddn.png" />
+    <Content Include="Shaders\nanosuit\glass_dif.png" />
+    <Content Include="Shaders\nanosuit\hand_dif.png" />
+    <Content Include="Shaders\nanosuit\hand_showroom_ddn.png" />
+    <Content Include="Shaders\nanosuit\hand_showroom_spec.png" />
+    <Content Include="Shaders\nanosuit\helmet_diff.png" />
+    <Content Include="Shaders\nanosuit\helmet_showroom_ddn.png" />
+    <Content Include="Shaders\nanosuit\helmet_showroom_spec.png" />
+    <Content Include="Shaders\nanosuit\leg_dif.png" />
+    <Content Include="Shaders\nanosuit\leg_showroom_ddn.png" />
+    <Content Include="Shaders\nanosuit\leg_showroom_spec.png" />
+    <Content Include="Shaders\nanosuit\LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

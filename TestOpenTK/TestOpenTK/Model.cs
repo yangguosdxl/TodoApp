@@ -12,14 +12,18 @@ namespace TestOpenTK
 {
     class Model
     {
+        public Shader Shader { get; set; }
+        public Matrix4 World;
         /*  函数   */
-        public Model(string path)
+        public Model(string path, Shader shader)
         {
             loadModel(path);
+            this.Shader = shader;
         }
-        public void Draw(Shader shader)
+        public void Draw()
         {
-
+            foreach (var mesh in meshes)
+                mesh.Draw(this.Shader);
         }
 
         /*  模型数据  */
@@ -98,7 +102,26 @@ namespace TestOpenTK
         MeshTexture[] loadMaterialTextures(Material mat, TextureType type,
                                              string typeName)
         {
+            MeshTexture[] textures = new MeshTexture[mat.GetMaterialTextureCount(type)];
+            for (int i = 0; i < mat.GetMaterialTextureCount(type); i++)
+            {
+                TextureSlot textureSlot;
+                mat.GetMaterialTexture(type, i, out textureSlot);
 
+                string path = Path.Combine(directory, textureSlot.FilePath);
+
+                Texture texture = Texture.GetTextureFromCache(path);
+                if (texture == null)
+                {
+                    texture = new Texture(path, OpenTK.Graphics.OpenGL4.TextureUnit.Texture0);
+                    Texture.AddTextureToCache(path, texture);
+                }
+                MeshTexture meshTexture = new MeshTexture();
+                meshTexture.tex = texture;
+                meshTexture.shaderTexFieldName = typeName;
+                textures[i] = meshTexture;
+            }
+            return textures;
         }
     };
 }
