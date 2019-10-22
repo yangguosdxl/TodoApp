@@ -58,7 +58,6 @@ out vec4 FragColor;
 
 in vec3 Normal;
 in vec3 FragPos;
-in vec3 Color;
 in vec2 FragUV;
 
 
@@ -84,6 +83,7 @@ vec3 CalcDirLight(DirLight light, vec3 norm, vec3 viewDir)
 
     vec3 result = ambient + diffuse + specular;
 
+	//return specular;
 	return result;
 }
 
@@ -170,7 +170,6 @@ void main()
 	result += CalcDirLight(dirLight, norm, viewDir);
 
 	FragColor = vec4(result, 1.0);
-	return;
 
 	for(int i = 0; i < NR_POINT_LIGHTS; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
@@ -179,6 +178,5 @@ void main()
 
 	//result += = texture(material.emission, FragUV).rgb;
 
-    FragColor = vec4(result, 1.0);
-	//FragColor = vec4(viewDir, 1.0);
+    //FragColor = vec4(result, 1.0);
 }

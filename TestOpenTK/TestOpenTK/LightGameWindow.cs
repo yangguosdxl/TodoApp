@@ -132,9 +132,9 @@ namespace TestOpenTK
             m_Cube.shader.SetUniformMat("ViewToProject", ref m_View2Proj);
 
             // dir light
-            m_Cube.shader.SetUniform3("dirLight.direction", (new Vector4(-0.2f, -1.0f, -0.3f, 0)*m_Camera.WorldToCameraMatrix).Xyz);
+            m_Cube.shader.SetUniform3("dirLight.direction", (new Vector4(0f, 0f, -1f, 0)*m_Camera.WorldToCameraMatrix).Xyz);
             m_Cube.shader.SetUniform3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-            m_Cube.shader.SetUniform3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+            m_Cube.shader.SetUniform3("dirLight.diffuse", 1f, 1f, 1f);
             m_Cube.shader.SetUniform3("dirLight.specular", 0.5f, 0.5f, 0.5f);
             // point light
             for (int i = 0; i < 4; ++i)

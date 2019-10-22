@@ -25,7 +25,7 @@ namespace TestOpenTK
         protected override void OnLoad(EventArgs e)
         {
             //m_CubeShader = new Shader("Cube.vert.glsl", "Cube.frag.glsl");
-            m_CubeShader = new Shader("CubeMaterial.vert.glsl", "CubeMaterialMultiLight.frag.glsl");
+            m_CubeShader = new Shader("ModelMaterial.vert.glsl", "ModelMaterialMultiLight.frag.glsl");
             m_LightShader = new Shader("Light.vert.glsl", "Light.frag.glsl");
 
             m_CubeShader.Use();
@@ -107,11 +107,13 @@ namespace TestOpenTK
             m_Cube.Shader.SetUniformMat("WorldToView", ref m_World2View);
             m_Cube.Shader.SetUniformMat("ViewToProject", ref m_View2Proj);
 
+            m_Cube.Shader.SetUniform1("material.shininess", 9999);
+
             // dir light
-            m_Cube.Shader.SetUniform3("dirLight.direction", (new Vector4(-0.2f, -1.0f, -0.3f, 0)*m_Camera.WorldToCameraMatrix).Xyz);
-            m_Cube.Shader.SetUniform3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+            m_Cube.Shader.SetUniform3("dirLight.direction", (new Vector4(0f, -1.0f, -1f, 0)*m_Camera.WorldToCameraMatrix).Xyz);
+            m_Cube.Shader.SetUniform3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
             m_Cube.Shader.SetUniform3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-            m_Cube.Shader.SetUniform3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+            m_Cube.Shader.SetUniform3("dirLight.specular", 0.1f, 0.1f, 0.1f);
             // point light
             for (int i = 0; i < 4; ++i)
             {
