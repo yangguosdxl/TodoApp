@@ -37,7 +37,7 @@ namespace TestOpenTK
             }
 
             GL.BindVertexArray(VAO);
-            GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, indices.Length * sizeof(uint), DrawElementsType.UnsignedInt, 0);
             GL.BindVertexArray(0);
         }
 
@@ -53,8 +53,13 @@ namespace TestOpenTK
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, this.vertices.Length * Marshal.SizeOf(typeof(Vertex)), this.vertices, BufferUsageHint.StaticDraw);
+            GL.EnableVertexAttribArray(0);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 0);
+
+            GL.EnableVertexAttribArray(1);
             GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 3 * sizeof(float));
+
+            GL.EnableVertexAttribArray(2);
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 8 * sizeof(float), 6 * sizeof(float));
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);

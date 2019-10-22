@@ -27,7 +27,7 @@ namespace TestOpenTK
         }
 
         /*  模型数据  */
-        List<Mesh> meshes;
+        List<Mesh> meshes = new List<Mesh>();
         string directory;
         /*  函数   */
         void loadModel(string path)
@@ -90,10 +90,10 @@ namespace TestOpenTK
             {
                 Material material = scene.Materials[mesh.MaterialIndex];
                 MeshTexture[] diffuseMaps = loadMaterialTextures(material,
-                                                    TextureType.Diffuse, "texture_diffuse");
+                                                    TextureType.Diffuse, "material.diffuse");
                 textures.AddRange(diffuseMaps);
                 MeshTexture[] specularMaps = loadMaterialTextures(material,
-                                                    TextureType.Specular, "texture_specular");
+                                                    TextureType.Specular, "material.specular");
                 textures.AddRange(specularMaps);
             }
 

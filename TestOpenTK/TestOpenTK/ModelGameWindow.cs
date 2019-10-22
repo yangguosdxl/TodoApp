@@ -95,7 +95,7 @@ namespace TestOpenTK
             m_Cube.World =
                 Matrix4.CreateRotationY(m_fElpaseSeconds * fCubeRotateSpeed) *
                 //Matrix4.CreateRotationX(MathHelper.DegreesToRadians(45)) *
-                Matrix4.CreateTranslation(0f, 0f, -8f);
+                Matrix4.CreateTranslation(0f, -8f, -20f);
             #endregion
 
             //Vector3 objectColor = new Vector3(1.0f, 0.5f, 0.3f);
@@ -141,24 +141,23 @@ namespace TestOpenTK
             m_Cube.Draw();
 
             // We want to draw all the cubes at their respective positions
-            for (int i = 0; i < SimpleModel.cubePositions.Length; i++)
-            {
-                // First we create a model from an identity matrix
-                Matrix4 model = Matrix4.Identity;
+            //for (int i = 0; i < SimpleModel.cubePositions.Length; i++)
+            //{
+            //    // First we create a model from an identity matrix
+            //    Matrix4 model = Matrix4.Identity;
 
-                float angle = 20.0f * i;
-                model *= Matrix4.CreateFromAxisAngle(new Vector3(1, 1, 1), angle);
-                // Then we translate said matrix by the cube position
-                model *= Matrix4.CreateTranslation(SimpleModel.cubePositions[i] + new Vector3(0,0,-10));
-                // We then calculate the angle and rotate the model around an axis
+            //    float angle = 20.0f * i;
+            //    model *= Matrix4.CreateFromAxisAngle(new Vector3(1, 1, 1), angle);
+            //    // Then we translate said matrix by the cube position
+            //    model *= Matrix4.CreateTranslation(SimpleModel.cubePositions[i] + new Vector3(0,0,-10));
+            //    // We then calculate the angle and rotate the model around an axis
                 
-                //model *= Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.3f, 0.5f), angle);
-                // Remember to set the model at last so it can be used by opentk
-                m_Cube.Shader.SetUniformMat("ModelToWorld", ref model);
+            //    //model *= Matrix4.CreateFromAxisAngle(new Vector3(1.0f, 0.3f, 0.5f), angle);
+            //    // Remember to set the model at last so it can be used by opentk
+            //    m_Cube.Shader.SetUniformMat("ModelToWorld", ref model);
 
-                // At last we draw all our cubes
-                GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
-            }
+            //    m_Cube.Draw();
+            //}
 
             m_Light.shader.Use();
 
